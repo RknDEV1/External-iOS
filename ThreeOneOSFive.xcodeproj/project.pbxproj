@@ -32,6 +32,10 @@
 		3105J204 /* DisplayIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 3105J203; };
 		3105J206 /* DisplayIdentityAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105J205; };
 		3105K200 /* SoundEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105K100; };
+			3105K201 /* PatchLoadingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105K101; };
+			3105T200 /* ScrollAndLoadingTests.swift in Tests */ = {isa = PBXBuildFile; fileRef = 3105T100; };
+			3105T201 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3105T102; };
+			3105T202 /* PatchLoadingCoordinator.swift in Tests */ = {isa = PBXBuildFile; fileRef = 3105K101; };
 		3105A236 /* ContainerIdentityResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105A108; };
 		3105A237 /* ContainerBrowserLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105A109; };
 		3105A238 /* FileReplacementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105A110; };
@@ -135,6 +139,10 @@
 		3105J203 /* DisplayIdentity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DisplayIdentity.m; sourceTree = "<group>"; };
 		3105J205 /* DisplayIdentityAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayIdentityAttribution.swift; sourceTree = "<group>"; };
 		3105K100 /* SoundEffectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEffectManager.swift; sourceTree = "<group>"; };
+			3105K101 /* PatchLoadingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchLoadingCoordinator.swift; sourceTree = "<group>"; };
+			3105T100 /* ScrollAndLoadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollAndLoadingTests.swift; sourceTree = "<group>"; };
+			3105T101 /* ThreeOneOSFiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ThreeOneOSFiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+			3105T102 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		3105A108 /* ContainerIdentityResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerIdentityResolver.swift; sourceTree = "<group>"; };
 		3105A109 /* ContainerBrowserLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerBrowserLogic.swift; sourceTree = "<group>"; };
 		3105A110 /* FileReplacementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileReplacementService.swift; sourceTree = "<group>"; };
@@ -192,6 +200,7 @@
 			children = (
 				3105A401 /* ThreeOneOSFive */,
 				3105A402 /* Products */,
+				3105T400 /* ThreeOneOSFiveTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -293,11 +302,20 @@
 				3105J203 /* DisplayIdentity.m */,
 				3105J205 /* DisplayIdentityAttribution.swift */,
 				3105K100 /* SoundEffectManager.swift */,
+				3105K101 /* PatchLoadingCoordinator.swift */,
 				3105A025 /* Utils.swift */,
 				3105A026 /* SBX.swift */,
 				3105A027 /* MG.swift */,
 			);
 			path = helpers;
+			sourceTree = "<group>";
+		};
+		3105T400 /* ThreeOneOSFiveTests */ = {
+			isa = PBXGroup;
+			children = (
+				3105T100 /* ScrollAndLoadingTests.swift */,
+			);
+			path = ThreeOneOSFiveTests;
 			sourceTree = "<group>";
 		};
 		3105A406 /* kexploit */ = {
@@ -341,6 +359,22 @@
 			productReference = 3105A010;
 			productType = "com.apple.product-type.application";
 		};
+		3105T500 /* ThreeOneOSFiveTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3105T600;
+			buildPhases = (
+				3105T300 /* Tests Sources */,
+				3105T301 /* Tests Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ThreeOneOSFiveTests;
+			productName = ThreeOneOSFiveTests;
+			productReference = 3105T101;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -367,6 +401,7 @@
 			projectRoot = "";
 			targets = (
 				3105A500,
+				3105T500,
 			);
 		};
 /* End PBXProject section */
@@ -448,12 +483,30 @@
 				3105G203,
 				3105H200,
 				3105I200,
-				3105I201,
+					3105I201,
+					3105K201,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3105T300 /* Tests Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3105T200,
+				3105T202,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+		3105T301 /* Tests Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3105T201,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* Begin PBXVariantGroup section */
 		3105A120 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
@@ -655,6 +708,32 @@
 		};
 /* End XCBuildConfiguration section */
 
+		3105T601 /* Debug Tests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.chzpriv.ThreeOneOSFiveTests";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/3105.app/3105";
+			};
+			name = Debug;
+		};
+		3105T602 /* Release Tests */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.chzpriv.ThreeOneOSFiveTests";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/3105.app/3105";
+			};
+			name = Release;
+		};
 /* Begin XCConfigurationList section */
 		3105A600 /* Build configuration list for PBXNativeTarget "3105" */ = {
 			isa = XCConfigurationList;
@@ -670,6 +749,15 @@
 			buildConfigurations = (
 				3105AA01 /* Debug */,
 				3105AA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3105T600 /* Build configuration list for PBXNativeTarget "ThreeOneOSFiveTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3105T601,
+				3105T602,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

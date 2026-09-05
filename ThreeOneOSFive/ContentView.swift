@@ -332,6 +332,7 @@ private struct CHZPrivHomeView: View {
     @State private var enabledPatchIDs = Set<UUID>()
     @State private var isWorking = false
     @State private var didLoadPatches = false
+    @State private var patchLoadingCoordinator = PatchLoadingCoordinator()
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -606,7 +607,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func loadPatchesIfNeeded() {
-        guard !isFreeFireMax, !didLoadPatches else { return }
+        guard !isFreeFireMax, !didLoadPatches, patchLoadingCoordinator.beginIfNeeded() else { return }
         didLoadPatches = true
         DispatchQueue.global(qos: .userInitiated).async {
             PatchProjectLibrary.installBundledOriginalFreeFirePatches()
