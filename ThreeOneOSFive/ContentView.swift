@@ -345,10 +345,20 @@ private struct CHZPrivHomeView: View {
                     if selectedPage == .license {
                         LicenseInfoView()
                     } else {
-                        ScrollView {
-                            VStack(spacing: 13) {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            LazyVStack(alignment: .leading, spacing: 13) {
                                 logo
+                                    .scrollTransition(.interactive, axis: .vertical) { content, phase in
+                                        content.opacity(phase.isIdentity ? 1 : 0.88)
+                                    }
                                 activityLogView
+                                    .scrollTransition(.interactive, axis: .vertical) { content, phase in
+                                        content.scaleEffect(phase.isIdentity ? 1 : 0.985)
+                                    }
+                                categoryOverview
+                                    .scrollTransition(.interactive, axis: .vertical) { content, phase in
+                                        content.opacity(phase.isIdentity ? 1 : 0.92)
+                                    }
                                 functions
                                 backupStatus
                             }
@@ -356,7 +366,7 @@ private struct CHZPrivHomeView: View {
                             .padding(.top, 10)
                             .padding(.bottom, 112)
                         }
-                        .scrollIndicators(.hidden)
+                        .scrollBounceBehavior(.basedOnSize)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -436,6 +446,47 @@ private struct CHZPrivHomeView: View {
             .padding(.top, 6)
     }
 
+    private var categoryOverview: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: 10) {
+                categoryOverviewCard(.avatar)
+                categoryOverviewCard(.cache)
+            }
+            .scrollTargetLayout()
+            .padding(.horizontal, 1)
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollClipDisabled()
+    }
+
+    private func categoryOverviewCard(_ category: PatchCategory) -> some View {
+        let count = freeFirePatches.filter { $0.category == category }.count
+        return HStack(spacing: 9) {
+            Image(systemName: category.symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(AppTheme.accentBright)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(category.rawValue.uppercased())
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(AppTheme.primaryText)
+                Text("\(count) funções")
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+        .padding(.horizontal, 13)
+        .frame(minWidth: 142, minHeight: 48, alignment: .leading)
+        .background(AppTheme.cardBackground.opacity(0.72), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
+        }
+        .scrollTransition(.interactive, axis: .horizontal) { content, phase in
+            content.scaleEffect(phase.isIdentity ? 1 : 0.94)
+                .opacity(phase.isIdentity ? 1 : 0.72)
+        }
+    }
+
     private var functions: some View {
         VStack(alignment: .leading, spacing: 15) {
             if isFreeFireMax {
@@ -476,8 +527,10 @@ private struct CHZPrivHomeView: View {
                     .foregroundStyle(AppTheme.secondaryText)
                     .padding(.vertical, 8)
             } else {
-                ForEach(items) { item in
-                    functionRow(item: item)
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(items) { item in
+                        functionRow(item: item)
+                    }
                 }
             }
         }
@@ -526,7 +579,11 @@ private struct CHZPrivHomeView: View {
             RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.15)
         }
-        .shadow(color: AppTheme.accent.opacity(0.16), radius: 10, y: 5)
+        .shadow(color: AppTheme.accent.opacity(0.12), radius: 5, y: 3)
+        .scrollTransition(.interactive, axis: .vertical) { content, phase in
+            content.scaleEffect(phase.isIdentity ? 1 : 0.985)
+                .opacity(phase.isIdentity ? 1 : 0.9)
+        }
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(LinearGradient(
