@@ -348,17 +348,8 @@ private struct CHZPrivHomeView: View {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
                                 logo
-                                    .scrollTransition(.interactive, axis: .vertical) { content, phase in
-                                        content.opacity(phase.isIdentity ? 1 : 0.88)
-                                    }
                                 activityLogView
-                                    .scrollTransition(.interactive, axis: .vertical) { content, phase in
-                                        content.scaleEffect(phase.isIdentity ? 1 : 0.985)
-                                    }
                                 categoryOverview
-                                    .scrollTransition(.interactive, axis: .vertical) { content, phase in
-                                        content.opacity(phase.isIdentity ? 1 : 0.92)
-                                    }
                                 functions
                                 backupStatus
                             }
@@ -452,11 +443,8 @@ private struct CHZPrivHomeView: View {
                 categoryOverviewCard(.avatar)
                 categoryOverviewCard(.cache)
             }
-            .scrollTargetLayout()
             .padding(.horizontal, 1)
         }
-        .scrollTargetBehavior(.viewAligned)
-        .scrollClipDisabled()
     }
 
     private func categoryOverviewCard(_ category: PatchCategory) -> some View {
@@ -480,10 +468,6 @@ private struct CHZPrivHomeView: View {
         .overlay {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
-        }
-        .scrollTransition(.interactive, axis: .horizontal) { content, phase in
-            content.scaleEffect(phase.isIdentity ? 1 : 0.94)
-                .opacity(phase.isIdentity ? 1 : 0.72)
         }
     }
 
@@ -580,10 +564,6 @@ private struct CHZPrivHomeView: View {
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.15)
         }
         .shadow(color: AppTheme.accent.opacity(0.12), radius: 5, y: 3)
-        .scrollTransition(.interactive, axis: .vertical) { content, phase in
-            content.scaleEffect(phase.isIdentity ? 1 : 0.985)
-                .opacity(phase.isIdentity ? 1 : 0.9)
-        }
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(LinearGradient(
