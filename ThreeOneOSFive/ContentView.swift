@@ -288,6 +288,17 @@ private struct DashboardView: View {
 }
 
 
+private extension View {
+    @ViewBuilder
+    func chzPrivScrollBounceBehavior() -> some View {
+        if #available(iOS 16.4, *) {
+            self.scrollBounceBehavior(.basedOnSize)
+        } else {
+            self
+        }
+    }
+}
+
 private struct CHZPrivHomeView: View {
     let isFreeFireMax: Bool
     let onExitToGamePicker: () -> Void
@@ -358,7 +369,7 @@ private struct CHZPrivHomeView: View {
                             .padding(.top, 10)
                             .padding(.bottom, 112)
                         }
-                        .scrollBounceBehavior(.basedOnSize)
+                        .chzPrivScrollBounceBehavior()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

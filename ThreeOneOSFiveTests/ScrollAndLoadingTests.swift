@@ -52,6 +52,8 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(source.contains("ScrollView(.horizontal, showsIndicators: false)"))
         XCTAssertTrue(source.contains("LazyVStack"))
         XCTAssertTrue(source.contains("LazyHStack"))
+        XCTAssertTrue(source.contains("#available(iOS 16.4, *)"))
+        XCTAssertTrue(source.contains("chzPrivScrollBounceBehavior"))
         XCTAssertFalse(source.contains("scrollTargetBehavior"))
         XCTAssertFalse(source.contains("scrollTargetLayout"))
         XCTAssertFalse(source.contains("scrollClipDisabled"))
