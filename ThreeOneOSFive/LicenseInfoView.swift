@@ -3,6 +3,7 @@ import UIKit
 
 struct LicenseInfoView: View {
     @EnvironmentObject private var appState: AppState
+    @ObservedObject var licenseViewModel: LicenseViewModel
 
     private var deviceIdentifier: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
@@ -33,6 +34,9 @@ struct LicenseInfoView: View {
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .navigationTitle("Licença")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            licenseViewModel.refresh()
+        }
     }
 
     private var pageHeader: some View {
@@ -51,15 +55,15 @@ struct LicenseInfoView: View {
 
     private var licenseSection: some View {
         infoSection(title: "INFORMAÇÕES DA LICENÇA") {
-            infoRow(label: "Produto", value: "EXTERNAL")
+            infoRow(label: "Produto", value: licenseViewModel.snapshot.product)
             divider
-            infoRow(label: "Status da Key", value: "NÃO VERIFICADO", valueColor: AppTheme.secondaryText)
+            infoRow(label: "Status da Key", value: licenseViewModel.statusText, valueColor: licenseViewModel.statusColor)
             divider
-            infoRow(label: "Tempo da Key", value: "INDISPONÍVEL", valueColor: AppTheme.secondaryText, monospaced: true)
+            infoRow(label: "Tempo da Key", value: licenseViewModel.expirationText, valueColor: AppTheme.secondaryText, monospaced: true)
             divider
-            infoRow(label: "Expiração", value: "AGUARDANDO ATIVAÇÃO", valueColor: AppTheme.secondaryText, monospaced: true)
+            infoRow(label: "Expiração", value: licenseViewModel.expirationText, valueColor: AppTheme.secondaryText, monospaced: true)
             divider
-            infoRow(label: "ID do Dispositivo", value: shortIdentifier(deviceIdentifier), valueColor: AppTheme.secondaryText, monospaced: true)
+            infoRow(label: "ID do Dispositivo", value: shortIdentifier(licenseViewModel.snapshot.deviceID), valueColor: AppTheme.secondaryText, monospaced: true)
         }
     }
 

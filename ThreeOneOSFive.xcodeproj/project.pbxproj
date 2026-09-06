@@ -33,6 +33,8 @@
 		3105J206 /* DisplayIdentityAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105J205; };
 		3105K200 /* SoundEffectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105K100; };
 			3105K201 /* PatchLoadingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105K101; };
+			3105K202 /* LicenseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105K102; };
+			3105K203 /* AuthenticationDependency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105K103; };
 			3105T200 /* ScrollAndLoadingTests.swift in Tests */ = {isa = PBXBuildFile; fileRef = 3105T100; };
 			3105T201 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3105T102; };
 			3105T202 /* PatchLoadingCoordinator.swift in Tests */ = {isa = PBXBuildFile; fileRef = 3105K101; };
@@ -140,6 +142,8 @@
 		3105J205 /* DisplayIdentityAttribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayIdentityAttribution.swift; sourceTree = "<group>"; };
 		3105K100 /* SoundEffectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEffectManager.swift; sourceTree = "<group>"; };
 			3105K101 /* PatchLoadingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatchLoadingCoordinator.swift; sourceTree = "<group>"; };
+			3105K102 /* LicenseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseViewModel.swift; sourceTree = "<group>"; };
+			3105K103 /* AuthenticationDependency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationDependency.swift; sourceTree = "<group>"; };
 			3105T100 /* ScrollAndLoadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollAndLoadingTests.swift; sourceTree = "<group>"; };
 			3105T101 /* ThreeOneOSFiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ThreeOneOSFiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 			3105T102 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
@@ -303,6 +307,8 @@
 				3105J205 /* DisplayIdentityAttribution.swift */,
 				3105K100 /* SoundEffectManager.swift */,
 				3105K101 /* PatchLoadingCoordinator.swift */,
+				3105K102 /* LicenseViewModel.swift */,
+				3105K103 /* AuthenticationDependency.swift */,
 				3105A025 /* Utils.swift */,
 				3105A026 /* SBX.swift */,
 				3105A027 /* MG.swift */,
@@ -485,6 +491,8 @@
 				3105I200,
 					3105I201,
 					3105K201,
+					3105K202,
+					3105K203,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

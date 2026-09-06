@@ -303,6 +303,7 @@ private struct CHZPrivHomeView: View {
     let isFreeFireMax: Bool
     let onExitToGamePicker: () -> Void
     @EnvironmentObject private var appState: AppState
+    @StateObject private var licenseViewModel = LicenseViewModel()
 
     private enum HomePage {
         case license
@@ -355,7 +356,7 @@ private struct CHZPrivHomeView: View {
             ZStack(alignment: .bottom) {
                 Group {
                     if selectedPage == .license {
-                        LicenseInfoView()
+                        LicenseInfoView(licenseViewModel: licenseViewModel)
                     } else {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
@@ -621,19 +622,26 @@ private struct CHZPrivHomeView: View {
         guard !isFreeFireMax, !didLoadPatches, patchLoadingCoordinator.beginIfNeeded() else { return }
         didLoadPatches = true
         DispatchQueue.global(qos: .userInitiated).async {
-            PatchProjectLibrary.installBundledOriginalFreeFirePatches()
-            let items = PatchProjectLibrary.load()
-            let enabled = Set(items.compactMap { item in
-                DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
-            })
-            DispatchQueue.main.async {
-                freeFirePatches = items
-                enabledPatchIDs = enabled
+            autoreleasepool {
+                PatchProjectLibrary.installBundledOriginalFreeFirePatches()
+                let items = PatchProjectLibrary.load()
+                let enabled = Set(items.compactMap { item in
+                    DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
+                })
+                DispatchQueue.main.async {
+                    freeFirePatches = items
+                    enabledPatchIDs = enabled
+                }
             }
         }
     }
 
     private func updatePatchState(item: PatchLibraryItem, isEnabled: Bool) {
+        if isEnabled && !licenseViewModel.isActive {
+            appendLog("Ativação bloqueada: licença ausente, inválida ou expirada", level: .warning)
+            return
+        }
+
         guard let baseProject = item.project else {
             appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
             return
