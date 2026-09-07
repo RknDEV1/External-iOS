@@ -398,8 +398,10 @@ private struct CHZPrivHomeView: View {
         .fullScreenCover(isPresented: $licenseViewModel.requiresLogin, onDismiss: {
             licenseViewModel.refresh()
         }) {
-            CHZLoginViewControllerRepresentable()
-                .ignoresSafeArea()
+            CHZPrivLoginShell {
+                CHZLoginViewControllerRepresentable()
+            }
+            .preferredColorScheme(.dark)
         }
     }
 
@@ -878,6 +880,42 @@ private struct CHZSwitchStyle: ToggleStyle {
     }
 }
 
+
+private struct CHZPrivLoginShell<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        ZStack {
+            AppTheme.pageBackground.ignoresSafeArea()
+            LinearGradient(
+                colors: [AppTheme.accent.opacity(0.20), .clear, AppTheme.consoleBackground],
+                startPoint: .topTrailing,
+                endPoint: .bottomLeading
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 12) {
+                CHZPrivWordmark(size: 30)
+                Text("ACESSO SEGURO")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .tracking(2.0)
+                    .foregroundStyle(AppTheme.secondaryText)
+
+                content()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(AppTheme.outlineStrong, lineWidth: 1.1)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .padding(.horizontal, 12)
+            }
+            .padding(.top, 20)
+            .padding(.bottom, 12)
+        }
+    }
+}
 
 private struct CHZLoginViewControllerRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> CHZLoginViewController {
