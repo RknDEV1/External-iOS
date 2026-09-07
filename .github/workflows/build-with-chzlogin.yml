@@ -172,6 +172,7 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
+            PROVISIONING_PROFILE_REQUIRED=NO \
             archive
             
 
