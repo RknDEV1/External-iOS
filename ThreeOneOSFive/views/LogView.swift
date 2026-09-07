@@ -39,7 +39,8 @@ struct LogView: View {
                     ScrollViewReader { proxy in
                         ScrollView {
                             LazyVStack(alignment: .leading, spacing: 0) {
-                                ForEach(Array(appLog.entries.enumerated()), id: \.offset) { index, entry in
+                                ForEach(appLog.entries.indices, id: \.self) { index in
+                                    let entry = appLog.entries[index]
                                     VStack(spacing: 0) {
                                         Text(entry)
                                             .font(.system(.caption, design: .monospaced))
