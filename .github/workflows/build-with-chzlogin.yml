@@ -141,32 +141,32 @@ jobs:
 
       - name: Build unsigned archive
         run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
-          s = p.read_text()
-          p.write_text(s.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;"))
-          PY
-          rm -rf "$RUNNER_TEMP/UnsignedBuild" "$RUNNER_TEMP/3105.xcarchive"
-          xcodebuild build \
-            -project ThreeOneOSFive.xcodeproj \
-            -scheme 3105 \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-            CONFIGURATION_BUILD_DIR="$RUNNER_TEMP/UnsignedBuild" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGN_STYLE=Manual \
-            DEVELOPMENT_TEAM="" \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            PROVISIONING_PROFILE_REQUIRED=NO
-          APP_BUILT="$RUNNER_TEMP/UnsignedBuild/3105.app"
-          test -d "$APP_BUILT"
-          mkdir -p "$RUNNER_TEMP/3105.xcarchive/Products/Applications"
-          cp -R "$APP_BUILT" "$RUNNER_TEMP/3105.xcarchive/Products/Applications/3105.app"
+                set -euo pipefail
+                python3 - <<'PY'
+                from pathlib import Path
+                p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
+                s = p.read_text()
+                p.write_text(s.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;"))
+                PY
+                rm -rf "$RUNNER_TEMP/UnsignedBuild" "$RUNNER_TEMP/3105.xcarchive"
+                xcodebuild build \
+                  -project ThreeOneOSFive.xcodeproj \
+                  -scheme 3105 \
+                  -configuration Release \
+                  -sdk iphoneos \
+                  -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+                  CONFIGURATION_BUILD_DIR="$RUNNER_TEMP/UnsignedBuild" \
+                  CODE_SIGNING_ALLOWED=NO \
+                  CODE_SIGNING_REQUIRED=NO \
+                  CODE_SIGN_IDENTITY="" \
+                  CODE_SIGN_STYLE=Manual \
+                  DEVELOPMENT_TEAM="" \
+                  PROVISIONING_PROFILE_SPECIFIER="" \
+                  PROVISIONING_PROFILE_REQUIRED=NO
+                APP_BUILT="$RUNNER_TEMP/UnsignedBuild/3105.app"
+                test -d "$APP_BUILT"
+                mkdir -p "$RUNNER_TEMP/3105.xcarchive/Products/Applications"
+                cp -R "$APP_BUILT" "$RUNNER_TEMP/3105.xcarchive/Products/Applications/3105.app"
 
       - name: Locate app bundle
         run: |
