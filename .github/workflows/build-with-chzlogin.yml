@@ -132,6 +132,13 @@ jobs:
         
           set -euo pipefail
           
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
+          text = p.read_text()
+          text = text.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;")
+          p.write_text(text)
+          PY
           rm -rf "$RUNNER_TEMP/UnsignedBuild"
           
           xcodebuild build \
