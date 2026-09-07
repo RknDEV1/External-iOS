@@ -28,26 +28,17 @@ struct CHZLoginKeychainProvider: LicenseSessionProviding {
     }
 
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
-        CHZAuthManager.shared().validateSavedKey { [currentDeviceID] in
-            DispatchQueue.main.async {
-                completion(LicenseSnapshot(
-                    status: .active,
-                    product: "CHZ PRIV",
-                    expiration: nil,
-                    deviceID: currentDeviceID
-                ))
-            }
-        } failure: { [currentDeviceID] message in
-            let normalized = message.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            let status: LicenseSnapshot.Status = normalized.contains("expir") ? .expired : .invalid
-            DispatchQueue.main.async {
-                completion(LicenseSnapshot(
-                    status: status,
-                    product: "CHZ PRIV",
-                    expiration: nil,
-                    deviceID: currentDeviceID
-                ))
-            }
+        let manager = CHZAuthManager.sharedManager()
+        let hasSession = manager.hasValidSavedSession()
+        let status: LicenseSnapshot.Status = hasSession ? .active : .invalid
+        let snapshot = LicenseSnapshot(
+            status: status,
+            product: "CHZ PRIV",
+            expiration: nil,
+            deviceID: currentDeviceID
+        )
+        DispatchQueue.main.async {
+            completion(snapshot)
         }
     }
 }
