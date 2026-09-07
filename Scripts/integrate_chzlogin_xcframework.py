@@ -112,6 +112,30 @@ def find_framework(root: Path) -> Path:
 
 
 
+def ensure_xcframework_metadata(framework: Path) -> None:
+    """Create minimal valid XCFramework metadata when a package omits its root Info.plist."""
+    metadata = framework / "Info.plist"
+    if metadata.is_file():
+        return
+    slice_plist = framework / "ios-arm64" / "Info.plist"
+    if not slice_plist.is_file():
+        raise RuntimeError(f"XCFramework metadata missing: {metadata}")
+    metadata.write_text("""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\"><dict>
+<key>CFBundlePackageType</key><string>XFWK</string>
+<key>XCFrameworkFormatVersion</key><string>1.0</string>
+<key>AvailableLibraries</key><array><dict>
+<key>BinaryPath</key><string>ChzLogin.framework/ChzLogin</string>
+<key>LibraryIdentifier</key><string>ios-arm64</string>
+<key>LibraryPath</key><string>ChzLogin.framework</string>
+<key>SupportedArchitectures</key><array><string>arm64</string></array>
+<key>SupportedPlatform</key><string>ios</string>
+</dict></array>
+</dict></plist>
+""")
+
+
 def patch_project(project_file: Path) -> None:
 
     text = project_file.read_text()
@@ -212,8 +236,7 @@ def main() -> None:
 
         shutil.copytree(framework, destination)
 
-
-
+    ensure_xcframework_metadata(destination)
     patch_project(project_file)
 
     print(f"Integrated: {destination}")
