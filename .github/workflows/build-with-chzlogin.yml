@@ -107,7 +107,9 @@ jobs:
           LOCAL_XCFRAMEWORK="$GITHUB_WORKSPACE/Frameworks/ChzLogin.xcframework"
           if test -f "$LOCAL_XCFRAMEWORK/ios-arm64/ChzLogin.framework/ChzLogin"; then
             echo "Using versioned ChzLogin XCFramework from the repository"
-            echo "XCFRAMEWORK_ARCHIVE=$LOCAL_XCFRAMEWORK" >> "$GITHUB_ENV"
+            rm -rf "$RUNNER_TEMP/ChzLogin.xcframework"
+            cp -R "$LOCAL_XCFRAMEWORK" "$RUNNER_TEMP/ChzLogin.xcframework"
+            echo "XCFRAMEWORK_ARCHIVE=$RUNNER_TEMP/ChzLogin.xcframework" >> "$GITHUB_ENV"
           else
             test -n "${XCFRAMEWORK_URL:-}"
             curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
