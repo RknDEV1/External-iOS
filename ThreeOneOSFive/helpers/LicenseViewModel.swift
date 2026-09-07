@@ -56,6 +56,7 @@ struct CHZLoginKeychainProvider: LicenseSessionProviding {
 final class LicenseViewModel: ObservableObject {
     @Published private(set) var snapshot = LicenseSnapshot()
     @Published private(set) var isValidating = false
+    @Published var requiresLogin = false
 
     private let provider: LicenseSessionProviding
 
@@ -93,11 +94,13 @@ final class LicenseViewModel: ObservableObject {
     func refresh() {
         guard !isValidating else { return }
         isValidating = true
+        requiresLogin = false
         snapshot.status = .loading
         provider.validateSavedLicense { [weak self] next in
             guard let self else { return }
             self.snapshot = next
             self.isValidating = false
+            self.requiresLogin = next.status != .active
         }
     }
 }

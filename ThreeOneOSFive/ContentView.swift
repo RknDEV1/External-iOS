@@ -395,6 +395,12 @@ private struct CHZPrivHomeView: View {
             licenseViewModel.refresh()
             loadPatchesIfNeeded()
         }
+        .fullScreenCover(isPresented: $licenseViewModel.requiresLogin, onDismiss: {
+            licenseViewModel.refresh()
+        }) {
+            CHZLoginViewControllerRepresentable()
+                .ignoresSafeArea()
+        }
     }
 
     private var bottomNavigation: some View {
@@ -859,4 +865,13 @@ private struct CHZSwitchStyle: ToggleStyle {
         .accessibilityLabel(configuration.isOn ? "Ativado" : "Desativado")
         .accessibilityAddTraits(configuration.isOn ? .isSelected : [])
     }
+}
+
+
+private struct CHZLoginViewControllerRepresentable: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> CHZLoginViewController {
+        CHZLoginViewController()
+    }
+
+    func updateUIViewController(_ viewController: CHZLoginViewController, context: Context) {}
 }
