@@ -60,6 +60,12 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertFalse(source.contains("scrollTransition"))
     }
 
+    func testPatchDisplayNameUsesSafeRenamedLabel() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        XCTAssertTrue(source.contains("return \"Hs Pescoço Baixo\""))
+        XCTAssertTrue(source.contains("private func displayTitle(for item: PatchLibraryItem)"))
+    }
+
     func testPatchLoadingSourceStaysOffMainThreadAndHasDuplicateGuard() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
         XCTAssertTrue(source.contains("DispatchQueue.global(qos: .userInitiated).async"))

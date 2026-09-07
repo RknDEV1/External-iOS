@@ -541,7 +541,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func functionRow(item: PatchLibraryItem) -> some View {
-        let title = item.project?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
+        let title = displayTitle(for: item)
         return HStack(spacing: 12) {
                 Image(systemName: item.category.symbol)
                 .font(.system(size: 20, weight: .semibold))
@@ -595,6 +595,17 @@ private struct CHZPrivHomeView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .allowsHitTesting(false)
         }
+    }
+
+    private func displayTitle(for item: PatchLibraryItem) -> String {
+        let rawTitle = item.project?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
+        let normalized = rawTitle
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .uppercased()
+        if normalized.contains("100") && normalized.contains("BAYPSS") {
+            return "Hs Pescoço Baixo"
+        }
+        return rawTitle
     }
 
     private func patchDescription(for item: PatchLibraryItem) -> String {
