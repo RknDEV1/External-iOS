@@ -145,6 +145,13 @@ jobs:
         
           set -euo pipefail
           
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
+          s = p.read_text()
+          p.write_text(s.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;"))
+          PY
+
           xcodebuild \
           
             -project ThreeOneOSFive.xcodeproj \
