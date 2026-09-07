@@ -137,6 +137,8 @@ jobs:
           p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
           text = p.read_text()
           text = text.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;")
+          text = text.replace("ProvisioningStyle = Automatic;", "ProvisioningStyle = Manual;")
+          text = text.replace("buildSettings = {", "buildSettings = {\n\t\t\t\tCODE_SIGNING_ALLOWED = NO;\n\t\t\t\tCODE_SIGNING_REQUIRED = NO;\n\t\t\t\tCODE_SIGN_IDENTITY = \"-\";\n\t\t\t\tDEVELOPMENT_TEAM = \"\";\n\t\t\t\tPROVISIONING_PROFILE_REQUIRED = NO;\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = \"\";")
           p.write_text(text)
           PY
           rm -rf "$RUNNER_TEMP/UnsignedBuild"
