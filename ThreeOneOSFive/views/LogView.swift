@@ -97,7 +97,7 @@ struct LogView: View {
     private var logToolbar: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
             Button(language.text("logs.clear"), role: .destructive) {
-                appLog.entries.removeAll()
+                appLog.clear()
             }
             .disabled(appLog.entries.isEmpty)
         }

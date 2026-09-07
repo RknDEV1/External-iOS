@@ -14,6 +14,12 @@ final class AppLog: ObservableObject {
     private var pendingEntries: [String] = []
     private var drainScheduled = false
 
+    func clear() {
+        DispatchQueue.main.async {
+            self.entries.removeAll(keepingCapacity: true)
+        }
+    }
+
     func append(_ msg: String) {
         let normalized = msg.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalized.isEmpty else { return }
