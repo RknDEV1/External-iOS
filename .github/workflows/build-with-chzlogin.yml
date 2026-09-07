@@ -143,34 +143,12 @@ jobs:
           PY
           rm -rf "$RUNNER_TEMP/UnsignedBuild"
           
-          xcodebuild build \
-          
-            -project ThreeOneOSFive.xcodeproj \
-            
-            -scheme 3105 \
-            
-            -configuration Release \
-            
-            -sdk iphoneos \
-            
-            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-            
-            CONFIGURATION_BUILD_DIR="$RUNNER_TEMP/UnsignedBuild" \
-            
-            CODE_SIGNING_ALLOWED=NO \
-            
-            CODE_SIGNING_REQUIRED=NO \
-            
-            CODE_SIGN_IDENTITY='' \
-            
-            CODE_SIGN_STYLE=Manual \
-            
-            DEVELOPMENT_TEAM='' \
-            
-            PROVISIONING_PROFILE_SPECIFIER='' \
-            
-            PROVISIONING_PROFILE_REQUIRED=NO
-            
+          xcodebuild build -project ThreeOneOSFive.xcodeproj -scheme 3105 -configuration Release -sdk iphoneos -derivedDataPath "$RUNNER_TEMP/DerivedData" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM='' PROVISIONING_PROFILE_SPECIFIER='' PROVISIONING_PROFILE_REQUIRED=NO
+          APP_BUILT="$(find "$RUNNER_TEMP/DerivedData" "$GITHUB_WORKSPACE/build" -type d -name '3105.app' -print -quit)"
+          test -n "$APP_BUILT"
+          rm -rf "$RUNNER_TEMP/UnsignedBuild"
+          mkdir -p "$RUNNER_TEMP/UnsignedBuild"
+          cp -R "$APP_BUILT" "$RUNNER_TEMP/UnsignedBuild/3105.app"
           test -d "$RUNNER_TEMP/UnsignedBuild/3105.app"
           
 
