@@ -4,11 +4,60 @@ import Darwin
 import Combine
 
 // MARK: - Global logger
-class AppLog: ObservableObject {
+final class AppLog: ObservableObject {
     static let shared = AppLog()
-    @Published var entries: [String] = []
+    private static let maximumEntries = 400
+    private static let maximumPendingEntries = 200
+    @Published private(set) var entries: [String] = []
+
+    private let lock = NSLock()
+    private var pendingEntries: [String] = []
+    private var drainScheduled = false
+
     func append(_ msg: String) {
-        DispatchQueue.main.async { self.entries.append(msg) }
+        let normalized = msg.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else { return }
+
+        var scheduleDrain = false
+        lock.lock()
+        pendingEntries.append(normalized)
+        if pendingEntries.count > Self.maximumPendingEntries {
+            pendingEntries.removeFirst(pendingEntries.count - Self.maximumPendingEntries)
+        }
+        if !drainScheduled {
+            drainScheduled = true
+            scheduleDrain = true
+        }
+        lock.unlock()
+
+        if scheduleDrain {
+            DispatchQueue.main.async { [weak self] in
+                self?.drainPendingEntries()
+            }
+        }
+    }
+
+    private func drainPendingEntries() {
+        lock.lock()
+        let batch = pendingEntries
+        pendingEntries.removeAll(keepingCapacity: true)
+        drainScheduled = false
+        lock.unlock()
+
+        entries.append(contentsOf: batch)
+        if entries.count > Self.maximumEntries {
+            entries.removeFirst(entries.count - Self.maximumEntries)
+        }
+
+        lock.lock()
+        let needsAnotherDrain = !pendingEntries.isEmpty && !drainScheduled
+        if needsAnotherDrain { drainScheduled = true }
+        lock.unlock()
+        if needsAnotherDrain {
+            DispatchQueue.main.async { [weak self] in
+                self?.drainPendingEntries()
+            }
+        }
     }
 }
 func log(_ msg: String) { AppLog.shared.append("[3105] \(msg)") }
@@ -38,9 +87,7 @@ func setupLogCapture() {
         if let text = String(data: data, encoding: .utf8) {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             if !trimmed.isEmpty {
-                DispatchQueue.main.async {
-                    AppLog.shared.append(trimmed)
-                }
+                AppLog.shared.append(trimmed)
             }
         }
     }
