@@ -28,7 +28,7 @@ struct CHZLoginKeychainProvider: LicenseSessionProviding {
     }
 
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
-        CHZAuthManager.sharedManager().validateSavedKey { [currentDeviceID] in
+        CHZAuthManager.shared().validateSavedKey { [currentDeviceID] in
             DispatchQueue.main.async {
                 completion(LicenseSnapshot(
                     status: .active,
