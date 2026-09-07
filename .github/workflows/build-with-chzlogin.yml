@@ -1,0 +1,262 @@
+name: Build CHZ PRIV with ChzLogin XCFramework
+
+
+
+on:
+
+  workflow_dispatch:
+
+    inputs:
+
+      xcframework_url:
+
+        description: "URL direta do ChzLogin.xcframework.zip (Dropbox deve usar dl=1)"
+
+        required: true
+
+        type: string
+
+      commit_integration:
+
+        description: "Salvar o XCFramework e alterações do projeto no branch"
+
+        required: true
+
+        default: false
+
+        type: boolean
+
+
+
+permissions:
+
+  contents: write
+
+
+
+env:
+
+  XCFRAMEWORK_ARCHIVE: ${{ github.workspace }}/chzlogin-xcframework.zip
+
+
+
+jobs:
+
+  build:
+
+    runs-on: macos-15
+
+    steps:
+
+      - name: Checkout
+
+        uses: actions/checkout@v4
+
+        with:
+
+          fetch-depth: 0
+
+
+
+      - name: Select Xcode
+
+        env:
+
+          XCODE_PATH: ${{ vars.XCODE_PATH }}
+
+        run: |
+
+          set -euo pipefail
+
+          if [ -n "${XCODE_PATH:-}" ]; then
+
+            sudo xcode-select -s "$XCODE_PATH"
+
+          fi
+
+          xcodebuild -version
+
+          xcrun --sdk iphoneos --show-sdk-version
+
+
+
+      - name: Run XCTest regression suite
+
+        run: |
+
+          set -euo pipefail
+
+          xcodebuild test \
+
+            -project ThreeOneOSFive.xcodeproj \
+
+            -target ThreeOneOSFiveTests \
+
+            -configuration Debug \
+
+            -sdk iphonesimulator \
+
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+
+            -derivedDataPath "$RUNNER_TEMP/TestDerivedData" \
+
+            CODE_SIGNING_ALLOWED=NO \
+
+            CODE_SIGNING_REQUIRED=NO
+
+
+
+      - name: Download ChzLogin XCFramework
+
+        env:
+
+          XCFRAMEWORK_URL: ${{ inputs.xcframework_url }}
+
+        run: |
+
+          set -euo pipefail
+
+          curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
+
+          unzip -t "$XCFRAMEWORK_ARCHIVE"
+
+
+
+      - name: Integrate ChzLogin dependency
+
+        run: |
+
+          set -euo pipefail
+
+          python3 Scripts/integrate_chzlogin_xcframework.py \
+
+            "$XCFRAMEWORK_ARCHIVE" \
+
+            "$GITHUB_WORKSPACE"
+
+          test -f Frameworks/ChzLogin.xcframework/ios-arm64/ChzLogin.framework/ChzLogin
+
+          grep -q 'ChzLogin.xcframework' ThreeOneOSFive.xcodeproj/project.pbxproj
+
+
+
+      - name: Build unsigned archive
+
+        run: |
+
+          set -euo pipefail
+
+          xcodebuild \
+
+            -project ThreeOneOSFive.xcodeproj \
+
+            -scheme 3105 \
+
+            -configuration Release \
+
+            -sdk iphoneos \
+
+            -archivePath "$RUNNER_TEMP/3105.xcarchive" \
+
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+
+            CODE_SIGNING_ALLOWED=NO \
+
+            CODE_SIGNING_REQUIRED=NO \
+
+            archive
+
+
+
+      - name: Locate app bundle
+
+        run: |
+
+          set -euo pipefail
+
+          APP_PATH=$(find "$RUNNER_TEMP/3105.xcarchive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)
+
+          test -n "$APP_PATH"
+
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+
+
+
+      - name: Verify embedded dependency
+
+        run: |
+
+          set -euo pipefail
+
+          test -f "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
+
+          file "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
+
+
+
+      - name: Package unsigned IPA
+
+        run: |
+
+          set -euo pipefail
+
+          rm -rf "$RUNNER_TEMP/Payload"
+
+          mkdir -p "$RUNNER_TEMP/Payload"
+
+          cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
+
+          cd "$RUNNER_TEMP"
+
+          zip -qry "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa" Payload
+
+          test -s "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
+
+          unzip -t "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
+
+          mv "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa" "$GITHUB_WORKSPACE/"
+
+
+
+      - name: Commit integration changes
+
+        if: ${{ inputs.commit_integration }}
+
+        run: |
+
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add Frameworks/ChzLogin.xcframework ThreeOneOSFive.xcodeproj/project.pbxproj
+
+          if git diff --cached --quiet; then
+
+            echo "No integration changes to commit."
+
+          else
+
+            git commit -m "Integrate ChzLogin XCFramework"
+
+            git push
+
+          fi
+
+
+
+      - name: Upload IPA artifact
+
+        uses: actions/upload-artifact@v4
+
+        with:
+
+          name: chz-priv-with-chzlogin-ipa
+
+          path: CHZ-PRIV-with-ChzLogin-*.ipa
+
+          if-no-files-found: error
+
+          compression-level: 0
+
