@@ -2,6 +2,7 @@ import Foundation
 import Security
 import SwiftUI
 import UIKit
+import ChzLogin
 
 struct LicenseSnapshot: Equatable {
     enum Status: Equatable {
@@ -13,88 +14,49 @@ struct LicenseSnapshot: Equatable {
     }
 
     var status: Status = .loading
-    var product = "EXTERNAL"
+    var product = "CHZ PRIV"
     var expiration: Date?
     var deviceID = "Indisponível"
 }
 
 protocol LicenseSessionProviding {
-    func loadSnapshot() -> LicenseSnapshot
+    func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void)
 }
 
 struct CHZLoginKeychainProvider: LicenseSessionProviding {
-    private let service = "com.chzpriv.login"
-    private let account = "validated_session_v1"
-
-    func loadSnapshot() -> LicenseSnapshot {
-        var query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-
-        var result: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess,
-              let data = result as? Data,
-              let object = try? JSONSerialization.jsonObject(with: data),
-              let session = object as? [String: Any] else {
-            return LicenseSnapshot(
-                status: .unavailable,
-                deviceID: currentDeviceID
-            )
-        }
-
-        let expiryText = session["expiry"] as? String ?? ""
-        guard let expiry = parseDate(expiryText) else {
-            return LicenseSnapshot(
-                status: .invalid,
-                expiration: nil,
-                deviceID: currentDeviceID
-            )
-        }
-
-        return LicenseSnapshot(
-            status: expiry > Date() ? .active : .expired,
-            product: "EXTERNAL",
-            expiration: expiry,
-            deviceID: currentDeviceID
-        )
-    }
-
     private var currentDeviceID: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
     }
 
-    private func parseDate(_ value: String) -> Date? {
-        guard !value.isEmpty else { return nil }
-
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = iso.date(from: value) { return date }
-        iso.formatOptions = [.withInternetDateTime]
-        if let date = iso.date(from: value) { return date }
-
-        if let timestamp = Double(value) {
-            return Date(timeIntervalSince1970: timestamp)
+    func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
+        CHZAuthManager.sharedManager().validateSavedKey { [currentDeviceID] in
+            DispatchQueue.main.async {
+                completion(LicenseSnapshot(
+                    status: .active,
+                    product: "CHZ PRIV",
+                    expiration: nil,
+                    deviceID: currentDeviceID
+                ))
+            }
+        } failure: { [currentDeviceID] message in
+            let normalized = message.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let status: LicenseSnapshot.Status = normalized.contains("expir") ? .expired : .invalid
+            DispatchQueue.main.async {
+                completion(LicenseSnapshot(
+                    status: status,
+                    product: "CHZ PRIV",
+                    expiration: nil,
+                    deviceID: currentDeviceID
+                ))
+            }
         }
-
-        for format in ["yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ssXXXXX"] {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
-            formatter.dateFormat = format
-            if let date = formatter.date(from: value) { return date }
-        }
-        return nil
     }
 }
 
 @MainActor
 final class LicenseViewModel: ObservableObject {
     @Published private(set) var snapshot = LicenseSnapshot()
+    @Published private(set) var isValidating = false
 
     private let provider: LicenseSessionProviding
 
@@ -123,13 +85,20 @@ final class LicenseViewModel: ObservableObject {
     }
 
     var expirationText: String {
-        guard let expiration = snapshot.expiration else { return "INDISPONÍVEL" }
+        guard let expiration = snapshot.expiration else {
+            return snapshot.status == .active ? "VALIDADA PELO CHZLOGIN" : "INDISPONÍVEL"
+        }
         return expiration.formatted(date: .abbreviated, time: .shortened)
     }
 
     func refresh() {
+        guard !isValidating else { return }
+        isValidating = true
         snapshot.status = .loading
-        let next = provider.loadSnapshot()
-        snapshot = next
+        provider.validateSavedLicense { [weak self] next in
+            guard let self else { return }
+            self.snapshot = next
+            self.isValidating = false
+        }
     }
 }

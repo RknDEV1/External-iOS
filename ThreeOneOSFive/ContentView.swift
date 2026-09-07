@@ -392,6 +392,7 @@ private struct CHZPrivHomeView: View {
         }
         .tint(AppTheme.accent)
         .onAppear {
+            licenseViewModel.refresh()
             loadPatchesIfNeeded()
         }
     }
@@ -638,7 +639,11 @@ private struct CHZPrivHomeView: View {
 
     private func updatePatchState(item: PatchLibraryItem, isEnabled: Bool) {
         if isEnabled && !licenseViewModel.isActive {
-            appendLog("Ativação bloqueada: licença ausente, inválida ou expirada", level: .warning)
+            if licenseViewModel.isValidating {
+                appendLog("Aguardando validação da licença pelo ChzLogin", level: .progress)
+            } else {
+                appendLog("Ativação bloqueada: licença ausente, inválida ou expirada", level: .warning)
+            }
             return
         }
 

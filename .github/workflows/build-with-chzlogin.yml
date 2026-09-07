@@ -169,18 +169,19 @@ jobs:
           
 
 
-      - name: Verify embedded dependency
-      
+      - name: Ensure ChzLogin framework metadata
         run: |
-        
           set -euo pipefail
-          
           APP_PATH="$RUNNER_TEMP/UnsignedBuild/3105.app"
-          
+          python3 Scripts/ensure_chzlogin_framework_plist.py "$APP_PATH"
+
+      - name: Verify embedded dependency
+        run: |
+          set -euo pipefail
+          APP_PATH="$RUNNER_TEMP/UnsignedBuild/3105.app"
           test -f "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
-          
+          test -f "$APP_PATH/Frameworks/ChzLogin.framework/Info.plist"
           file "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
-          
           echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
           
 
