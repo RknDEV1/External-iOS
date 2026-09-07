@@ -10,7 +10,7 @@ on:
     
       xcframework_url:
       
-        description: "URL direta do ChzLogin.xcframework.zip (Dropbox deve usar dl=1)"
+        description: URL direta do ChzLogin.xcframework.zip
         
         required: true
         
@@ -18,7 +18,7 @@ on:
         
       commit_integration:
       
-        description: "Salvar o XCFramework e alterações do projeto no branch"
+        description: Salvar a integração no branch main
         
         required: true
         
@@ -60,19 +60,9 @@ jobs:
 
       - name: Select Xcode
       
-        env:
-        
-          XCODE_PATH: ${{ vars.XCODE_PATH }}
-          
         run: |
         
           set -euo pipefail
-          
-          if [ -n "${XCODE_PATH:-}" ]; then
-          
-            sudo xcode-select -s "$XCODE_PATH"
-            
-          fi
           
           xcodebuild -version
           
@@ -81,8 +71,9 @@ jobs:
 
 
       - name: Run XCTest regression suite
-        continue-on-error: true
       
+        continue-on-error: true
+        
         run: |
         
           set -euo pipefail
@@ -101,11 +92,7 @@ jobs:
             
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             
-            -derivedDataPath "$RUNNER_TEMP/TestDerivedData" \
-            
-            CODE_SIGNING_ALLOWED=NO \
-            
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
             
 
 
@@ -132,86 +119,234 @@ jobs:
           set -euo pipefail
           
           python3 Scripts/integrate_chzlogin_xcframework.py "$XCFRAMEWORK_ARCHIVE" "$GITHUB_WORKSPACE"
-            
+          
           test -f Frameworks/ChzLogin.xcframework/ios-arm64/ChzLogin.framework/ChzLogin
           
-          grep -q 'ChzLogin.xcframework' ThreeOneOSFive.xcodeproj/project.pbxproj
+          grep -q ChzLogin.xcframework ThreeOneOSFive.xcodeproj/project.pbxproj
           
 
 
-      - name: Build unsigned archive
+      - name: Build unsigned app
+      
         run: |
-                set -euo pipefail
-                python3 - <<'PY'
-                from pathlib import Path
-                p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
-                s = p.read_text()
-                p.write_text(s.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;"))
-                PY
-                rm -rf "$RUNNER_TEMP/UnsignedBuild" "$RUNNER_TEMP/3105.xcarchive"
-                xcodebuild build \
-                  -project ThreeOneOSFive.xcodeproj \
-                  -scheme 3105 \
-                  -configuration Release \
-                  -sdk iphoneos \
-                  -derivedDataPath "$RUNNER_TEMP/DerivedData" \
-                  CONFIGURATION_BUILD_DIR="$RUNNER_TEMP/UnsignedBuild" \
-                  CODE_SIGNING_ALLOWED=NO \
-                  CODE_SIGNING_REQUIRED=NO \
-                  CODE_SIGN_IDENTITY="" \
-                  CODE_SIGN_STYLE=Manual \
-                  DEVELOPMENT_TEAM="" \
-                  PROVISIONING_PROFILE_SPECIFIER="" \
-                  PROVISIONING_PROFILE_REQUIRED=NO
-                APP_BUILT="$RUNNER_TEMP/UnsignedBuild/3105.app"
-                test -d "$APP_BUILT"
-                mkdir -p "$RUNNER_TEMP/3105.xcarchive/Products/Applications"
-                cp -R "$APP_BUILT" "$RUNNER_TEMP/3105.xcarchive/Products/Applications/3105.app"
-
-      - name: Locate app bundle
-        run: |
+        
           set -euo pipefail
-          APP_PATH=$(find "$RUNNER_TEMP/3105.xcarchive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)
-          test -n "$APP_PATH"
-          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+          
+          rm -rf "$RUNNER_TEMP/UnsignedBuild"
+          
+          xcodebuild build \
+          
+            -project ThreeOneOSFive.xcodeproj \
+            
+            -scheme 3105 \
+            
+            -configuration Release \
+            
+            -sdk iphoneos \
+            
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            
+            CONFIGURATION_BUILD_DIR="$RUNNER_TEMP/UnsignedBuild" \
+            
+            CODE_SIGNING_ALLOWED=NO \
+            
+            CODE_SIGNING_REQUIRED=NO \
+            
+            CODE_SIGN_IDENTITY='' \
+            
+            CODE_SIGN_STYLE=Manual \
+            
+            DEVELOPMENT_TEAM='' \
+            
+            PROVISIONING_PROFILE_SPECIFIER='' \
+            
+            PROVISIONING_PROFILE_REQUIRED=NO
+            
+          test -d "$RUNNER_TEMP/UnsignedBuild/3105.app"
+          
+
 
       - name: Verify embedded dependency
+      
         run: |
+        
           set -euo pipefail
+          
+          APP_PATH="$RUNNER_TEMP/UnsignedBuild/3105.app"
+          
           test -f "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
+          
           file "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
+          
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+          
+
 
       - name: Package unsigned IPA
+      
         run: |
+        
           set -euo pipefail
+          
           rm -rf "$RUNNER_TEMP/Payload"
+          
           mkdir -p "$RUNNER_TEMP/Payload"
+          
           cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
+          
           cd "$RUNNER_TEMP"
-          zip -qry "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa" Payload
-          test -s "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
-          unzip -t "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
-          mv "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa" "$GITHUB_WORKSPACE/"
+          
+          IPA="CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
+          
+          zip -qry "$IPA" Payload
+          
+          test -s "$IPA"
+          
+          unzip -t "$IPA"
+          
+          mv "$IPA" "$GITHUB_WORKSPACE/"
+          
+
 
       - name: Commit integration changes
+      
         if: ${{ inputs.commit_integration }}
+        
         run: |
+        
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git config user.name github-actions[bot]
+          
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          
           git add Frameworks/ChzLogin.xcframework ThreeOneOSFive.xcodeproj/project.pbxproj
-          if git diff --cached --quiet; then
-            echo "No integration changes to commit."
-          else
-            git commit -m "Integrate ChzLogin XCFramework"
-            git push
-          fi
+          
+          git commit -m 'Integrate ChzLogin XCFramework' || true
+          
+          git push
+          
+
 
       - name: Upload IPA artifact
+      
         uses: actions/upload-artifact@v4
+        
         with:
+        
           name: chz-priv-with-chzlogin-ipa
+          
           path: CHZ-PRIV-with-ChzLogin-*.ipa
+          
           if-no-files-found: error
+          
           compression-level: 0
+          
+
+
 # CHZ PRIV unsigned build workflow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
