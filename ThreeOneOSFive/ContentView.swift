@@ -618,7 +618,7 @@ private struct CHZPrivHomeView: View {
             .replacingOccurrences(of: "+", with: " ")
 
         if filename.contains("100") && filename.contains("BAYPSS") {
-            return "Hs no peito do inimigo"
+            return "Hs no pescoço do inimigo"
         }
         if filename.contains("PEITO") && filename.contains("PESCO") {
             return "Hs no pescoço e peito do inimigo"
