@@ -6,6 +6,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)saveKey:(NSString *)key error:(NSError **)error;
 + (nullable NSString *)loadKey:(NSError **)error;
++ (BOOL)saveSessionForKey:(NSString *)key expiry:(NSString *)expiry error:(NSError **)error;
++ (nullable NSDictionary *)loadSession:(NSError **)error;
 + (BOOL)deleteKey:(NSError **)error;
 
 @end

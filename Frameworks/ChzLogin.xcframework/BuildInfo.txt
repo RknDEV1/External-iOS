@@ -1,4 +1,4 @@
-SDK_NAME=iphoneos
-SDK_VERSION=18.5
 IPHONEOS_DEPLOYMENT_TARGET=16.0
+SDK_NAME=iphoneos
 ARCH=arm64
+INSTALL_NAME=@rpath/ChzLogin.framework/ChzLogin
