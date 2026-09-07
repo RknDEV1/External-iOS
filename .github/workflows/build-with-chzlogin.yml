@@ -12,10 +12,8 @@ on:
       
         description: URL direta do ChzLogin.xcframework.zip
         
-        required: true
-        
+        required: false
         type: string
-        
       commit_integration:
       
         description: Salvar a integração no branch main
@@ -106,13 +104,19 @@ jobs:
         
           set -euo pipefail
           
-          curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
-          
-          unzip -t "$XCFRAMEWORK_ARCHIVE"
-          if unzip -Z1 "$XCFRAMEWORK_ARCHIVE" | grep -qx 'ChzLogin.xcframework.zip'; then
-            unzip -p "$XCFRAMEWORK_ARCHIVE" 'ChzLogin.xcframework.zip' > "$RUNNER_TEMP/ChzLogin.xcframework.zip"
-            mv "$RUNNER_TEMP/ChzLogin.xcframework.zip" "$XCFRAMEWORK_ARCHIVE"
+          LOCAL_XCFRAMEWORK="$GITHUB_WORKSPACE/Frameworks/ChzLogin.xcframework"
+          if test -f "$LOCAL_XCFRAMEWORK/ios-arm64/ChzLogin.framework/ChzLogin"; then
+            echo "Using versioned ChzLogin XCFramework from the repository"
+            echo "XCFRAMEWORK_ARCHIVE=$LOCAL_XCFRAMEWORK" >> "$GITHUB_ENV"
+          else
+            test -n "${XCFRAMEWORK_URL:-}"
+            curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
             unzip -t "$XCFRAMEWORK_ARCHIVE"
+            if unzip -Z1 "$XCFRAMEWORK_ARCHIVE" | grep -qx 'ChzLogin.xcframework.zip'; then
+              unzip -p "$XCFRAMEWORK_ARCHIVE" 'ChzLogin.xcframework.zip' > "$RUNNER_TEMP/ChzLogin.xcframework.zip"
+              mv "$RUNNER_TEMP/ChzLogin.xcframework.zip" "$XCFRAMEWORK_ARCHIVE"
+              unzip -t "$XCFRAMEWORK_ARCHIVE"
+            fi
           fi
           
 
