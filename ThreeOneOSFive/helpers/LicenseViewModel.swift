@@ -28,7 +28,7 @@ struct CHZLoginKeychainProvider: LicenseSessionProviding {
     }
 
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
-        let manager = CHZAuthManager.sharedManager()
+        let manager = CHZAuthManager.shared()
         let hasSession = manager.hasValidSavedSession()
         let status: LicenseSnapshot.Status = hasSession ? .active : .invalid
         let snapshot = LicenseSnapshot(
