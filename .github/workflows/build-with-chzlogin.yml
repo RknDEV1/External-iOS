@@ -109,6 +109,11 @@ jobs:
           curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
           
           unzip -t "$XCFRAMEWORK_ARCHIVE"
+          if unzip -Z1 "$XCFRAMEWORK_ARCHIVE" | grep -qx 'ChzLogin.xcframework.zip'; then
+            unzip -p "$XCFRAMEWORK_ARCHIVE" 'ChzLogin.xcframework.zip' > "$RUNNER_TEMP/ChzLogin.xcframework.zip"
+            mv "$RUNNER_TEMP/ChzLogin.xcframework.zip" "$XCFRAMEWORK_ARCHIVE"
+            unzip -t "$XCFRAMEWORK_ARCHIVE"
+          fi
           
 
 
