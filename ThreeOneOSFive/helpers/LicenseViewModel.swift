@@ -2,7 +2,6 @@ import Foundation
 import Security
 import SwiftUI
 import UIKit
-import ChzLogin
 
 struct LicenseSnapshot: Equatable {
     enum Status: Equatable {
