@@ -50,6 +50,7 @@ final class LicenseViewModel: ObservableObject {
     @Published var requiresLogin = false
 
     private let provider: LicenseSessionProviding
+    private var sessionConfirmedInCurrentProcess = false
 
     init(provider: LicenseSessionProviding = CHZLoginKeychainProvider()) {
         self.provider = provider
@@ -83,6 +84,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func markAuthenticatedInCurrentProcess() {
+        sessionConfirmedInCurrentProcess = true
         snapshot.status = .active
         snapshot.product = "CHZ PRIV"
         isValidating = false
@@ -90,6 +92,7 @@ final class LicenseViewModel: ObservableObject {
     }
 
     func refresh() {
+        guard !sessionConfirmedInCurrentProcess else { return }
         guard !isValidating else { return }
         isValidating = true
         requiresLogin = false
@@ -98,6 +101,9 @@ final class LicenseViewModel: ObservableObject {
             guard let self else { return }
             self.snapshot = next
             self.isValidating = false
+            if next.status == .active {
+                self.sessionConfirmedInCurrentProcess = true
+            }
             self.requiresLogin = next.status != .active
         }
     }
