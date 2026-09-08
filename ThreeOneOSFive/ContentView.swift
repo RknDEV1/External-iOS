@@ -395,11 +395,13 @@ private struct CHZPrivHomeView: View {
             licenseViewModel.refresh()
             loadPatchesIfNeeded()
         }
-        .fullScreenCover(isPresented: $licenseViewModel.requiresLogin, onDismiss: {
-            licenseViewModel.refresh()
-        }) {
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CHZLoginDidAuthenticateNotification"))) { _ in
+            licenseViewModel.markAuthenticatedInCurrentProcess()
+        }
+        .fullScreenCover(isPresented: $licenseViewModel.requiresLogin) {
             CHZLoginViewControllerRepresentable()
                 .ignoresSafeArea()
+                .interactiveDismissDisabled(true)
         }
     }
 

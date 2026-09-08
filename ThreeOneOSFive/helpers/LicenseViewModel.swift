@@ -82,6 +82,13 @@ final class LicenseViewModel: ObservableObject {
         return expiration.formatted(date: .abbreviated, time: .shortened)
     }
 
+    func markAuthenticatedInCurrentProcess() {
+        snapshot.status = .active
+        snapshot.product = "CHZ PRIV"
+        isValidating = false
+        requiresLogin = false
+    }
+
     func refresh() {
         guard !isValidating else { return }
         isValidating = true
