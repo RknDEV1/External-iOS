@@ -45,7 +45,6 @@ jobs:
           xcodebuild test \
             -project ThreeOneOSFive.xcodeproj \
             -scheme 3105 \
-            -target ThreeOneOSFiveTests \
             -configuration Debug \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
