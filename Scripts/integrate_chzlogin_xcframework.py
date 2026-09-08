@@ -117,9 +117,9 @@ def ensure_xcframework_metadata(framework: Path) -> None:
     metadata = framework / "Info.plist"
     if metadata.is_file():
         return
-    slice_plist = framework / "ios-arm64" / "Info.plist"
-    if not slice_plist.is_file():
-        raise RuntimeError(f"XCFramework metadata missing: {metadata}")
+    slice_binary = framework / "ios-arm64" / "ChzLogin.framework" / "ChzLogin"
+    if not slice_binary.is_file():
+        raise RuntimeError(f"XCFramework iOS arm64 slice missing: {slice_binary}")
     metadata.write_text("""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\"><dict>
