@@ -1,367 +1,132 @@
 name: Build CHZ PRIV with ChzLogin XCFramework
 
-
-
 on:
-
   workflow_dispatch:
-  
     inputs:
-    
       xcframework_url:
-      
-        description: URL direta do ChzLogin.xcframework.zip
-        
-        required: false
+        description: "URL direta do ChzLogin.xcframework.zip (Dropbox deve usar dl=1)"
+        required: true
         type: string
       commit_integration:
-      
-        description: Salvar a integração no branch main
-        
+        description: "Salvar o XCFramework e alterações do projeto no branch"
         required: true
-        
         default: false
-        
         type: boolean
-        
-
 
 permissions:
-
   contents: write
-  
-
 
 env:
-
   XCFRAMEWORK_ARCHIVE: ${{ github.workspace }}/chzlogin-xcframework.zip
-  
-
 
 jobs:
-
   build:
-  
     runs-on: macos-15
-    
     steps:
-    
       - name: Checkout
-      
         uses: actions/checkout@v4
-        
         with:
-        
           fetch-depth: 0
-          
-
 
       - name: Select Xcode
-      
+        env:
+          XCODE_PATH: ${{ vars.XCODE_PATH }}
         run: |
-        
           set -euo pipefail
-          
+          if [ -n "${XCODE_PATH:-}" ]; then
+            sudo xcode-select -s "$XCODE_PATH"
+          fi
           xcodebuild -version
-          
           xcrun --sdk iphoneos --show-sdk-version
-          
-
 
       - name: Run XCTest regression suite
-      
-        continue-on-error: true
-        
         run: |
-        
           set -euo pipefail
-          
           xcodebuild test \
-          
             -project ThreeOneOSFive.xcodeproj \
-            
             -scheme 3105 \
-            
-            -only-testing:ThreeOneOSFiveTests \
-            
+            -target ThreeOneOSFiveTests \
             -configuration Debug \
-            
             -sdk iphonesimulator \
-            
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
-            
-
+            -derivedDataPath "$RUNNER_TEMP/TestDerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
 
       - name: Download ChzLogin XCFramework
-      
         env:
-        
           XCFRAMEWORK_URL: ${{ inputs.xcframework_url }}
-          
         run: |
-        
           set -euo pipefail
-          
-          LOCAL_XCFRAMEWORK="$GITHUB_WORKSPACE/Frameworks/ChzLogin.xcframework"
-          if test -f "$LOCAL_XCFRAMEWORK/ios-arm64/ChzLogin.framework/ChzLogin"; then
-            echo "Using versioned ChzLogin XCFramework from the repository"
-            rm -rf "$RUNNER_TEMP/ChzLogin.xcframework"
-            cp -R "$LOCAL_XCFRAMEWORK" "$RUNNER_TEMP/ChzLogin.xcframework"
-            echo "XCFRAMEWORK_ARCHIVE=$RUNNER_TEMP/ChzLogin.xcframework" >> "$GITHUB_ENV"
-          else
-            test -n "${XCFRAMEWORK_URL:-}"
-            curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
-            unzip -t "$XCFRAMEWORK_ARCHIVE"
-            if unzip -Z1 "$XCFRAMEWORK_ARCHIVE" | grep -qx 'ChzLogin.xcframework.zip'; then
-              unzip -p "$XCFRAMEWORK_ARCHIVE" 'ChzLogin.xcframework.zip' > "$RUNNER_TEMP/ChzLogin.xcframework.zip"
-              mv "$RUNNER_TEMP/ChzLogin.xcframework.zip" "$XCFRAMEWORK_ARCHIVE"
-              unzip -t "$XCFRAMEWORK_ARCHIVE"
-            fi
-          fi
-          
-
+          curl --fail --location --retry 3 --retry-delay 2 --output "$XCFRAMEWORK_ARCHIVE" "$XCFRAMEWORK_URL"
+          unzip -t "$XCFRAMEWORK_ARCHIVE"
 
       - name: Integrate ChzLogin dependency
-      
         run: |
-        
           set -euo pipefail
-          
-          python3 Scripts/integrate_chzlogin_xcframework.py "$XCFRAMEWORK_ARCHIVE" "$GITHUB_WORKSPACE"
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
-          text = p.read_text()
-          phase = "3105A300 /* Frameworks */ = {"
-          pos = text.find(phase)
-          if pos < 0:
-              raise SystemExit("PBXFrameworksBuildPhase não encontrado")
-          files = text.find("files = (", pos)
-          close = text.find("\n\t\t\t);", files)
-          if files < 0 or close < 0:
-              raise SystemExit("lista de frameworks não encontrada")
-          entry = "\n\t\t\t\t3105Z001 /* ChzLogin.xcframework in Frameworks */,"
-          if "3105Z001 /* ChzLogin.xcframework in Frameworks */" not in text[files:close]:
-              text = text[:close] + entry + text[close:]
-          p.write_text(text)
-          PY
+          python3 Scripts/integrate_chzlogin_xcframework.py \
+            "$XCFRAMEWORK_ARCHIVE" \
+            "$GITHUB_WORKSPACE"
           test -f Frameworks/ChzLogin.xcframework/ios-arm64/ChzLogin.framework/ChzLogin
-          
-          grep -q ChzLogin.xcframework ThreeOneOSFive.xcodeproj/project.pbxproj
-          
+          grep -q 'ChzLogin.xcframework' ThreeOneOSFive.xcodeproj/project.pbxproj
 
-
-      - name: Build unsigned app
-      
-        run: |
-        
-          set -euo pipefail
-          
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("ThreeOneOSFive.xcodeproj/project.pbxproj")
-          text = p.read_text()
-          text = text.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;")
-          text = text.replace("ProvisioningStyle = Automatic;", "ProvisioningStyle = Manual;")
-          text = text.replace("buildSettings = {", "buildSettings = {\n\t\t\t\tCODE_SIGNING_ALLOWED = NO;\n\t\t\t\tCODE_SIGNING_REQUIRED = NO;\n\t\t\t\tCODE_SIGN_IDENTITY = \"-\";\n\t\t\t\tDEVELOPMENT_TEAM = \"\";\n\t\t\t\tPROVISIONING_PROFILE_REQUIRED = NO;\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = \"\";")
-          p.write_text(text)
-          PY
-          rm -rf "$RUNNER_TEMP/UnsignedBuild"
-          
-          xcodebuild build -project ThreeOneOSFive.xcodeproj -scheme 3105 -configuration Release -sdk iphoneos -derivedDataPath "$RUNNER_TEMP/DerivedData" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM='' PROVISIONING_PROFILE_SPECIFIER='' PROVISIONING_PROFILE_REQUIRED=NO
-          APP_BUILT="$(find "$RUNNER_TEMP/DerivedData" "$GITHUB_WORKSPACE/build" -type d -name '3105.app' -print -quit)"
-          test -n "$APP_BUILT"
-          rm -rf "$RUNNER_TEMP/UnsignedBuild"
-          mkdir -p "$RUNNER_TEMP/UnsignedBuild"
-          cp -R "$APP_BUILT" "$RUNNER_TEMP/UnsignedBuild/3105.app"
-          test -d "$RUNNER_TEMP/UnsignedBuild/3105.app"
-          
-
-
-      - name: Ensure ChzLogin framework metadata
+      - name: Build unsigned archive
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/UnsignedBuild/3105.app"
-          python3 Scripts/ensure_chzlogin_framework_plist.py "$APP_PATH"
+          xcodebuild \
+            -project ThreeOneOSFive.xcodeproj \
+            -scheme 3105 \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$RUNNER_TEMP/3105.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            archive
+
+      - name: Locate app bundle
+        run: |
+          set -euo pipefail
+          APP_PATH=$(find "$RUNNER_TEMP/3105.xcarchive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)
+          test -n "$APP_PATH"
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
 
       - name: Verify embedded dependency
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/UnsignedBuild/3105.app"
           test -f "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
-          test -f "$APP_PATH/Frameworks/ChzLogin.framework/Info.plist"
           file "$APP_PATH/Frameworks/ChzLogin.framework/ChzLogin"
-          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
-          
-
 
       - name: Package unsigned IPA
-      
         run: |
-        
           set -euo pipefail
-          
           rm -rf "$RUNNER_TEMP/Payload"
-          
           mkdir -p "$RUNNER_TEMP/Payload"
-          
           cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
-          
           cd "$RUNNER_TEMP"
-          
-          IPA="CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
-          
-          zip -qry "$IPA" Payload
-          
-          test -s "$IPA"
-          
-          unzip -t "$IPA"
-          
-          mv "$IPA" "$GITHUB_WORKSPACE/"
-          
-
+          zip -qry "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa" Payload
+          test -s "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
+          unzip -t "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa"
+          mv "CHZ-PRIV-with-ChzLogin-${GITHUB_SHA::7}.ipa" "$GITHUB_WORKSPACE/"
 
       - name: Commit integration changes
-      
         if: ${{ inputs.commit_integration }}
-        
         run: |
-        
           set -euo pipefail
-          
-          git config user.name github-actions[bot]
-          
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Frameworks/ChzLogin.xcframework ThreeOneOSFive.xcodeproj/project.pbxproj
-          
-          git commit -m 'Integrate ChzLogin XCFramework' || true
-          
-          git push
-          
-
+          if git diff --cached --quiet; then
+            echo "No integration changes to commit."
+          else
+            git commit -m "Integrate ChzLogin XCFramework"
+            git push
+          fi
 
       - name: Upload IPA artifact
-      
         uses: actions/upload-artifact@v4
-        
         with:
-        
           name: chz-priv-with-chzlogin-ipa
-          
           path: CHZ-PRIV-with-ChzLogin-*.ipa
-          
           if-no-files-found: error
-          
           compression-level: 0
-          
-
-
-# CHZ PRIV unsigned build workflow
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
