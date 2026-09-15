@@ -308,6 +308,7 @@ private struct CHZPrivHomeView: View {
     private enum HomePage {
         case license
         case injector
+        case external
     }
 
     private enum LogLevel: Equatable {
@@ -357,6 +358,11 @@ private struct CHZPrivHomeView: View {
                 Group {
                     if selectedPage == .license {
                         LicenseInfoView(licenseViewModel: licenseViewModel)
+                    } else if selectedPage == .external {
+                        ExternalPanelView(
+                            isFreeFireMax: isFreeFireMax,
+                            licenseViewModel: licenseViewModel
+                        )
                     } else {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
@@ -409,6 +415,7 @@ private struct CHZPrivHomeView: View {
         HStack(spacing: 4) {
             bottomNavigationItem(.license, title: "Início", symbol: "house.fill")
             bottomNavigationItem(.injector, title: "Injetor", symbol: "gamecontroller.fill")
+            bottomNavigationItem(.external, title: "External", symbol: "rectangle.3.group.fill")
         }
         .padding(5)
         .background(.ultraThinMaterial, in: Capsule(style: .continuous))
@@ -888,3 +895,200 @@ private struct CHZLoginViewControllerRepresentable: UIViewControllerRepresentabl
 
     func updateUIViewController(_ viewController: CHZLoginViewController, context: Context) {}
 }
+
+
+private struct ExternalPanelView: View {
+    let isFreeFireMax: Bool
+    @ObservedObject var licenseViewModel: LicenseViewModel
+    @EnvironmentObject private var appState: AppState
+    @State private var diagnosticsEnabled = false
+    @State private var showLocalLogs = true
+
+    private var editionName: String {
+        isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE"
+    }
+
+    private var editionStatus: String {
+        isFreeFireMax ? "AMBIENTE SELECIONADO" : "AMBIENTE SELECIONADO"
+    }
+
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack(alignment: .leading, spacing: 14) {
+                header
+                environmentSection
+                statusSection
+                diagnosticsSection
+                settingsSection
+                safetyNote
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 112)
+        }
+        .scrollIndicators(.hidden)
+        .background(AppTheme.pageBackground.ignoresSafeArea())
+        .navigationTitle("Painel External")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("CHZ PRIV / EXTERNAL")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .tracking(1.1)
+                        .foregroundStyle(AppTheme.accentBright)
+                    Text("Painel External")
+                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .foregroundStyle(AppTheme.primaryText)
+                }
+                Spacer()
+                Image(systemName: "rectangle.3.group.fill")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(AppTheme.accentBright)
+            }
+            Text("Central de status, diagnóstico e configurações do próprio CHZ PRIV.")
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(AppTheme.secondaryText)
+        }
+    }
+
+    private var environmentSection: some View {
+        panelSection(title: "AMBIENTE") {
+            HStack(spacing: 12) {
+                Image(systemName: isFreeFireMax ? "sparkles.rectangle.stack.fill" : "gamecontroller.fill")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(AppTheme.accentBright)
+                    .frame(width: 34)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(editionName)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundStyle(AppTheme.primaryText)
+                    Text(editionStatus)
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .foregroundStyle(AppTheme.success)
+                }
+                Spacer()
+                Image(systemName: "checkmark.seal.fill")
+                    .foregroundStyle(AppTheme.success)
+            }
+        }
+    }
+
+    private var statusSection: some View {
+        panelSection(title: "STATUS DO APP") {
+            diagnosticRow("Licença", value: licenseViewModel.statusText, color: licenseViewModel.statusColor, symbol: "key.fill")
+            divider
+            diagnosticRow("Compatibilidade", value: appState.isSupported ? "COMPATÍVEL" : "INCOMPATÍVEL", color: appState.isSupported ? AppTheme.success : .red, symbol: "checkmark.shield.fill")
+            divider
+            diagnosticRow("Conexão", value: "PRONTA", color: AppTheme.success, symbol: "antenna.radiowaves.left.and.right")
+        }
+    }
+
+    private var diagnosticsSection: some View {
+        panelSection(title: "DIAGNÓSTICO") {
+            Toggle(isOn: $diagnosticsEnabled) {
+                diagnosticLabel("Verificação local", detail: "Executar apenas diagnóstico do CHZ PRIV", symbol: "waveform.path.ecg")
+            }
+            .tint(AppTheme.accent)
+            divider
+            diagnosticRow("Integridade do app", value: diagnosticsEnabled ? "VERIFICADA" : "AGUARDANDO", color: diagnosticsEnabled ? AppTheme.success : AppTheme.secondaryText, symbol: "checkmark.shield")
+            divider
+            diagnosticRow("Logs da sessão", value: showLocalLogs ? "VISÍVEIS" : "OCULTOS", color: AppTheme.secondaryText, symbol: "doc.text.magnifyingglass")
+        }
+    }
+
+    private var settingsSection: some View {
+        panelSection(title: "PREFERÊNCIAS") {
+            Toggle(isOn: $showLocalLogs) {
+                diagnosticLabel("Mostrar logs", detail: "Exibir atividade do app no painel principal", symbol: "text.line.first.and.arrowtriangle.forward")
+            }
+            .tint(AppTheme.accent)
+            divider
+            diagnosticRow("Versão do sistema", value: AppInfo.osVersion, color: AppTheme.secondaryText, symbol: "iphone")
+        }
+    }
+
+    private var safetyNote: some View {
+        HStack(alignment: .top, spacing: 9) {
+            Image(systemName: "lock.shield.fill")
+                .foregroundStyle(AppTheme.accentBright)
+            Text("Este painel controla somente estados, diagnósticos e preferências do CHZ PRIV. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(AppTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 3)
+    }
+
+    private func panelSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 13, weight: .bold, design: .monospaced))
+                .tracking(0.8)
+                .foregroundStyle(AppTheme.secondaryText)
+            VStack(spacing: 0) {
+                content()
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 5)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
+            }
+        }
+    }
+
+    private func diagnosticLabel(_ title: String, detail: String, symbol: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: symbol)
+                .foregroundStyle(AppTheme.accentBright)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(AppTheme.primaryText)
+                Text(detail)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+    }
+
+    private func diagnosticRow(_ title: String, value: String, color: Color, symbol: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: symbol)
+                .foregroundStyle(AppTheme.accentBright)
+                .frame(width: 24)
+            Text(title)
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundStyle(AppTheme.primaryText)
+            Spacer(minLength: 8)
+            Text(value)
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(minHeight: 44)
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.10))
+            .frame(height: 0.7)
+    }
+}
+
+#if DEBUG
+#Preview("Painel External") {
+    ExternalPanelView(isFreeFireMax: false, licenseViewModel: LicenseViewModel())
+        .environmentObject(AppState())
+}
+#endif
