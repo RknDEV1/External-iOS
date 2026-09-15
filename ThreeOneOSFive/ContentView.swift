@@ -940,7 +940,7 @@ private struct ExternalPanelView: View {
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .tracking(1.1)
                         .foregroundStyle(AppTheme.accentBright)
-                    Text("Painel External")
+                    Text("External Menu")
                         .font(.system(size: 28, weight: .black, design: .rounded))
                         .foregroundStyle(AppTheme.primaryText)
                 }
