@@ -350,6 +350,7 @@ private struct CHZPrivHomeView: View {
     @State private var didLoadPatches = false
     @State private var patchLoadingCoordinator = PatchLoadingCoordinator()
     @State private var pendingExternalUnlockID: UUID?
+    @State private var pendingExternalPasswordItem: PatchLibraryItem?
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -412,10 +413,16 @@ private struct CHZPrivHomeView: View {
         .onReceive(patchStore.$items) { _ in
             continuePendingExternalActivationIfReady()
         }
-        .sheet(item: $patchStore.passwordRequest, onDismiss: {
+        .sheet(item: $pendingExternalPasswordItem, onDismiss: {
+            if patchStore.passwordRequest != nil {
+                patchStore.cancelUnlock()
+            }
             continuePendingExternalActivationIfReady()
-        }) { request in
-            ExternalPatchUnlockView(request: request, store: patchStore)
+        }) { item in
+            ExternalPatchUnlockView(
+                request: PatchPasswordRequest(summary: item.summary),
+                store: patchStore
+            )
         }
     }
 
@@ -689,6 +696,7 @@ private struct CHZPrivHomeView: View {
                 return
             }
             pendingExternalUnlockID = item.id
+            pendingExternalPasswordItem = item
             appendLog("Senha necessária para desbloquear o patch External", level: .progress)
             patchStore.requestUnlock(for: item)
             return
@@ -717,6 +725,7 @@ private struct CHZPrivHomeView: View {
               unlockedItem.project != nil,
               !isWorking else { return }
         pendingExternalUnlockID = nil
+        pendingExternalPasswordItem = nil
         let prefix = isFreeFireMax ? "FFM -" : "FF -"
         freeFirePatches = patchStore.items.filter { item in
             item.packageURL.lastPathComponent
