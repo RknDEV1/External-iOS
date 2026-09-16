@@ -41,11 +41,6 @@ struct CHZAccessOverlay: View {
                 .buttonStyle(.plain).foregroundStyle(.white)
                 .background(Color.red.opacity(0.82), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .disabled(isSubmitting || key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || secondsRemaining == 0)
-                Button("Suporte") {
-                    guard let url = URL(string: "https://help.manus.im") else { return }
-                    UIApplication.shared.open(url)
-                }
-                .font(.system(size: 12, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.68)).buttonStyle(.plain)
                 if let errorMessage {
                     Text(errorMessage).font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.red.opacity(0.95)).multilineTextAlignment(.center)
                 }
