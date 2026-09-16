@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>RKN</string>
+    <string>CHZ PRIV</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>UIAppFonts</key>
@@ -17,7 +17,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>RKN</string>
+    <string>CHZ PRIV</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -81,9 +81,9 @@
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>RKN needs access to photos for wallpaper customization.</string>
+    <string>CHZ PRIV needs access to photos for wallpaper customization.</string>
     <key>NSDocumentsFolderUsageDescription</key>
-    <string>RKN needs access to documents.</string>
+    <string>CHZ PRIV needs access to documents.</string>
     <key>UIApplicationSceneManifest</key>
     <dict>
         <key>UIApplicationSupportsMultipleScenes</key>

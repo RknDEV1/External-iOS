@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    // Identidade RKN: fundo preto, vermelho vivo, branco e cinza.
+    // Identidade CHZ PRIV: fundo preto, vermelho vivo, branco e cinza.
     static let accent = Color(red: 1.00, green: 0.015, blue: 0.055)
     static let accentBright = Color(red: 1.00, green: 0.16, blue: 0.19)
     static let accentSoft = Color(red: 1.00, green: 0.015, blue: 0.055).opacity(0.16)
@@ -36,7 +36,7 @@ struct CHZPrivWordmark: View {
 
     var body: some View {
         VStack(spacing: -size * 0.08) {
-            Text("RKN")
+            Text("CHZ PRIV")
                 .font(.custom(AppTheme.brandFontName, size: size))
                 .fontWeight(.black)
                 .italic()
@@ -54,7 +54,7 @@ struct CHZPrivWordmark: View {
                 .shadow(color: .white.opacity(0.30), radius: 0.45)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("RKN")
+        .accessibilityLabel("CHZ PRIV")
     }
 }
 
@@ -139,7 +139,7 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Text("RKN")
+        Text("CHZ PRIV")
             .font(.custom(AppTheme.brandFontName, size: size * 0.46))
             .fontWeight(.black)
             .italic()

@@ -780,7 +780,7 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 34, height: 34)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("RKN // SYSTEM LOG")
+                    Text("CHZ PRIV // SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
                         .foregroundStyle(Color.green.opacity(0.96))
@@ -1101,7 +1101,7 @@ private struct ExternalPanelView: View {
                 }
                 .frame(width: 34, height: 34)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("RKN // SYSTEM LOG")
+                    Text("CHZ PRIV // SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
                         .foregroundStyle(Color.green.opacity(0.96))
@@ -1170,7 +1170,7 @@ private struct ExternalPanelView: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("RKN / EXTERNAL")
+                    Text("CHZ PRIV / EXTERNAL")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .tracking(1.1)
                         .foregroundStyle(AppTheme.accentBright)
@@ -1183,7 +1183,7 @@ private struct ExternalPanelView: View {
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(AppTheme.accentBright)
             }
-            Text("Central de status, diagnóstico e configurações do próprio RKN.")
+            Text("Central de status, diagnóstico e configurações do próprio CHZ PRIV.")
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
         }
@@ -1224,7 +1224,7 @@ private struct ExternalPanelView: View {
     private var diagnosticsSection: some View {
         panelSection(title: "DIAGNÓSTICO") {
             Toggle(isOn: $diagnosticsEnabled) {
-                diagnosticLabel("Verificação local", detail: "Executar apenas diagnóstico do RKN", symbol: "waveform.path.ecg")
+                diagnosticLabel("Verificação local", detail: "Executar apenas diagnóstico do CHZ PRIV", symbol: "waveform.path.ecg")
             }
             .tint(AppTheme.accent)
             divider
@@ -1486,7 +1486,7 @@ private struct ExternalPanelView: View {
         HStack(alignment: .top, spacing: 9) {
             Image(systemName: "lock.shield.fill")
                 .foregroundStyle(AppTheme.accentBright)
-            Text("Este painel controla somente estados, diagnósticos e preferências do RKN. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
+            Text("Este painel controla somente estados, diagnósticos e preferências do CHZ PRIV. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
