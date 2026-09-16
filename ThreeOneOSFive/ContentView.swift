@@ -489,12 +489,18 @@ private struct CHZPrivHomeView: View {
             .padding(.top, 6)
     }
 
+    private var visibleCategories: [PatchCategory] {
+        [PatchCategory.avatar, .cache, .external].filter { category in
+            freeFirePatches.contains { $0.category == category }
+        }
+    }
+
     private var categoryOverview: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 10) {
-                categoryOverviewCard(.avatar)
-                categoryOverviewCard(.cache)
-                categoryOverviewCard(.external)
+                ForEach(visibleCategories, id: \.rawValue) { category in
+                    categoryOverviewCard(category)
+                }
             }
             .padding(.horizontal, 1)
         }
@@ -526,9 +532,9 @@ private struct CHZPrivHomeView: View {
 
     private var functions: some View {
         VStack(alignment: .leading, spacing: 15) {
-            categorySection(.avatar)
-            categorySection(.cache)
-            categorySection(.external)
+            ForEach(visibleCategories, id: \.rawValue) { category in
+                categorySection(category)
+            }
         }
     }
 

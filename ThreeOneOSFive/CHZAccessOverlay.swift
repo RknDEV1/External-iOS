@@ -3,49 +3,91 @@ import UIKit
 
 struct CHZAccessOverlay: View {
     @Binding var isPresented: Bool
+    let onAuthenticated: () -> Void
+
     @State private var key = ""
     @State private var secondsRemaining = 30
     @State private var isSubmitting = false
+    @State private var didCompleteAuthentication = false
     @State private var errorMessage: String?
+    @FocusState private var isKeyFieldFocused: Bool
+
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.62).ignoresSafeArea()
+
             VStack(spacing: 16) {
                 ZStack {
-                    Circle().fill(Color.white.opacity(0.07)).frame(width: 54, height: 54)
+                    Circle()
+                        .fill(Color.white.opacity(0.07))
+                        .frame(width: 54, height: 54)
                         .overlay(Circle().stroke(Color.red.opacity(0.72), lineWidth: 1))
+
                     Image(systemName: secondsRemaining == 0 ? "lock.slash" : "lock.fill")
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(Color.red.opacity(0.95))
                 }
-                Text("CHZ PRIV").font(.system(size: 18, weight: .bold, design: .rounded)).tracking(1.3).foregroundStyle(.white)
-                Text("Acesso protegido").font(.system(size: 12, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.62))
+
+                Text("CHZ PRIV")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .tracking(1.3)
+                    .foregroundStyle(.white)
+
+                Text("Acesso protegido")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.62))
+
                 SecureField("Insira sua key", text: $key)
+                    .focused($isKeyFieldFocused)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled(true)
-                    .padding(.horizontal, 13).frame(height: 44)
+                    .submitLabel(.go)
+                    .onSubmit(submit)
+                    .padding(.horizontal, 13)
+                    .frame(height: 44)
                     .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(Color.red.opacity(0.56), lineWidth: 1))
                     .foregroundStyle(.white)
+                    .disabled(isSubmitting || secondsRemaining == 0)
+
                 HStack {
-                    Text("Tempo restante").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.55))
+                    Text("Tempo restante")
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.55))
                     Spacer()
-                    Text("00:\(String(format: "%02d", secondsRemaining))").font(.system(size: 12, weight: .bold, design: .monospaced)).foregroundStyle(secondsRemaining <= 5 ? .red : .white.opacity(0.82))
+                    Text("00:\(String(format: "%02d", secondsRemaining))")
+                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .foregroundStyle(secondsRemaining <= 5 ? .red : .white.opacity(0.82))
                 }
+
                 Button(action: submit) {
-                    Group { if isSubmitting { ProgressView().tint(.white) } else { Text("Continuar") } }
-                        .font(.system(size: 14, weight: .bold, design: .rounded)).frame(maxWidth: .infinity).frame(height: 42)
+                    ZStack {
+                        Text("Continuar").opacity(isSubmitting ? 0 : 1)
+                        if isSubmitting {
+                            ProgressView().tint(.white)
+                        }
+                    }
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 42)
                 }
-                .buttonStyle(.plain).foregroundStyle(.white)
+                .buttonStyle(.plain)
+                .foregroundStyle(.white)
                 .background(Color.red.opacity(0.82), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .disabled(isSubmitting || key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || secondsRemaining == 0)
-                if let errorMessage {
-                    Text(errorMessage).font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.red.opacity(0.95)).multilineTextAlignment(.center)
-                }
+                .disabled(isSubmitting || normalizedKey.isEmpty || secondsRemaining == 0)
+
+                Text(errorMessage ?? " ")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.red.opacity(0.95))
+                    .multilineTextAlignment(.center)
+                    .frame(minHeight: 28, alignment: .top)
+                    .opacity(errorMessage == nil ? 0 : 1)
             }
-            .padding(.horizontal, 22).padding(.top, 22).padding(.bottom, 18)
+            .padding(.horizontal, 22)
+            .padding(.top, 22)
+            .padding(.bottom, 18)
             .frame(width: min(UIScreen.main.bounds.width - 42, 330))
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .background(Color.black.opacity(0.80), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -55,27 +97,42 @@ struct CHZAccessOverlay: View {
         .onReceive(timer) { _ in tick() }
     }
 
+    private var normalizedKey: String {
+        key.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func tick() {
-        guard isPresented, secondsRemaining > 0 else { return }
+        guard isPresented, !didCompleteAuthentication, secondsRemaining > 0 else { return }
         secondsRemaining -= 1
         if secondsRemaining == 0 {
+            isKeyFieldFocused = false
             errorMessage = "Tempo expirado. Valide sua key para continuar."
         }
     }
 
     private func submit() {
-        guard secondsRemaining > 0, !isSubmitting else { return }
+        guard secondsRemaining > 0, !isSubmitting, !didCompleteAuthentication, !normalizedKey.isEmpty else { return }
+        isKeyFieldFocused = false
         isSubmitting = true
         errorMessage = nil
-        let normalizedKey = key.trimmingCharacters(in: .whitespacesAndNewlines)
-        CHZAuthManager.shared().login(withKey: normalizedKey, success: {
+        let submittedKey = normalizedKey
+
+        CHZAuthManager.shared().login(withKey: submittedKey, success: {
             DispatchQueue.main.async {
+                guard !didCompleteAuthentication else { return }
+                didCompleteAuthentication = true
                 isSubmitting = false
-                isPresented = false
-                NotificationCenter.default.post(name: Notification.Name("CHZLoginDidAuthenticateNotification"), object: nil)
+                NotificationCenter.default.post(
+                    name: Notification.Name("CHZLoginDidAuthenticateNotification"),
+                    object: nil
+                )
+                withAnimation(.easeOut(duration: 0.18)) {
+                    onAuthenticated()
+                }
             }
         }, failure: { message in
             DispatchQueue.main.async {
+                guard !didCompleteAuthentication else { return }
                 isSubmitting = false
                 errorMessage = message
             }
