@@ -619,6 +619,8 @@ private struct CHZPrivHomeView: View {
         let normalized = rawTitle
             .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
             .uppercased()
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "-", with: "")
         if normalized.contains("100") && normalized.contains("BAYPSS") {
             return "Hs Pescoço Baixo"
         }
@@ -635,8 +637,9 @@ private struct CHZPrivHomeView: View {
         let filename = item.packageURL.deletingPathExtension().lastPathComponent
             .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
             .uppercased()
-            .replacingOccurrences(of: "-", with: " ")
-            .replacingOccurrences(of: "+", with: " ")
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: "+", with: "")
 
         if filename.contains("100") && filename.contains("BAYPSS") {
             return "Hs no pescoço do inimigo"

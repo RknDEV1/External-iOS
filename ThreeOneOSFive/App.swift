@@ -125,7 +125,11 @@ private struct FreeFireSelectionView: View {
     }
 
     private var hasFreeFireMaxPatch: Bool {
-        Bundle.main.url(forResource: "MenuFFM(1)_Chz_Priv", withExtension: "3105") != nil
+        let resources = Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil) ?? []
+        return resources.contains { url in
+            let name = url.deletingPathExtension().lastPathComponent
+            return name.hasPrefix("FFM - ")
+        }
     }
 
     var body: some View {
