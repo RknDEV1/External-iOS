@@ -984,7 +984,42 @@ private struct ExternalPanelView: View {
     @State private var activeExternalPatchIDs = Set<String>()
     @State private var workingExternalPatchID: String?
     @State private var externalPatchMessage: String?
-    @State private var externalLog: [String] = []
+    private enum ExternalLogLevel: Equatable {
+        case info, progress, success, warning
+
+        var tint: Color {
+            switch self {
+            case .info: return AppTheme.secondaryText
+            case .progress: return AppTheme.accentBright
+            case .success: return AppTheme.success
+            case .warning: return .orange
+            }
+        }
+
+        var symbol: String {
+            switch self {
+            case .info: return "info.circle.fill"
+            case .progress: return "arrow.triangle.2.circlepath"
+            case .success: return "checkmark.circle.fill"
+            case .warning: return "exclamationmark.triangle.fill"
+            }
+        }
+    }
+
+    private struct ExternalLogEntry: Identifiable {
+        let id = UUID()
+        let timestamp: String
+        let message: String
+        let level: ExternalLogLevel
+    }
+
+    @State private var externalLog: [ExternalLogEntry] = [
+        ExternalLogEntry(
+            timestamp: Date().formatted(date: .omitted, time: .shortened),
+            message: "Sistema pronto — aguardando funções",
+            level: .info
+        )
+    ]
 
     private struct ExternalPatchFunction: Identifiable {
         let id: String
@@ -1020,19 +1055,29 @@ private struct ExternalPanelView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(alignment: .leading, spacing: 14) {
-                compactExternalHeader
+            LazyVStack(alignment: .leading, spacing: 13) {
+                CHZPrivWordmark(size: 40)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 6)
+                externalActivityLogView
                 externalFunctionsSection
-                externalLogSection
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.shield")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(AppTheme.accent)
+                    Text("Backup original protegido")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+                .padding(.top, 18)
             }
             .padding(.horizontal, 16)
-            .padding(.top, 12)
+            .padding(.top, 10)
             .padding(.bottom, 112)
         }
+        .chzPrivScrollBounceBehavior()
         .scrollIndicators(.hidden)
         .background(AppTheme.pageBackground.ignoresSafeArea())
-        .navigationTitle("Painel External")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var compactExternalHeader: some View {
@@ -1048,19 +1093,82 @@ private struct ExternalPanelView: View {
     }
 
     private var externalLogSection: some View {
-        panelSection(title: "LOG") {
-            if externalLog.isEmpty {
-                Text("Aguardando ativação…")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundStyle(AppTheme.secondaryText)
-            } else {
-                ForEach(Array(externalLog.enumerated()), id: \.offset) { _, line in
-                    Text(line)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+        externalActivityLogView
+    }
+
+    private var externalActivityLogView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle().fill(AppTheme.accent.opacity(0.13))
+                    Image(systemName: "waveform.path.ecg")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(AppTheme.accentBright)
+                }
+                .frame(width: 34, height: 34)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("CHZ PRIV // SYSTEM LOG")
+                        .font(.system(size: 15, weight: .black, design: .monospaced))
+                        .tracking(0.55)
+                        .foregroundStyle(Color.green.opacity(0.96))
+                    Text("PROCESSO EM TEMPO REAL · \(activeExternalPatchIDs.count) PATCH(S) ATIVO(S)")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Color.green.opacity(0.62))
+                }
+                Spacer()
+                Circle()
+                    .fill(externalLog.last?.level.tint ?? AppTheme.secondaryText)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: (externalLog.last?.level.tint ?? AppTheme.secondaryText).opacity(0.65), radius: 5)
+            }
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 6) {
+                        ForEach(externalLog) { entry in
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: entry.level.symbol)
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundStyle(entry.level.tint)
+                                    .frame(width: 16)
+                                    .padding(.top, 1)
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text("› \(entry.message)")
+                                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                        .lineLimit(3)
+                                        .foregroundStyle(entry.level == .warning ? .orange : Color.green.opacity(0.88))
+                                    Text(entry.timestamp)
+                                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                                        .foregroundStyle(Color.green.opacity(0.42))
+                                }
+                                Spacer(minLength: 0)
+                            }
+                            .id(entry.id)
+                        }
+                    }
+                }
+                .frame(maxHeight: 158)
+                .onChange(of: externalLog.count) { _ in
+                    if let last = externalLog.last {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            proxy.scrollTo(last.id, anchor: .bottom)
+                        }
+                    }
                 }
             }
+        }
+        .padding(15)
+        .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .background(Color.green.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .stroke(AppTheme.outline, lineWidth: 1.05)
+        }
+        .overlay(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .fill(LinearGradient(colors: [.white.opacity(0.10), .clear], startPoint: .topLeading, endPoint: .center))
+                .frame(height: 24)
+                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .allowsHitTesting(false)
         }
     }
 
@@ -1259,9 +1367,18 @@ private struct ExternalPanelView: View {
     }
 
     private func appendExternalLog(_ line: String) {
-        externalLog.append("\(Date().formatted(date: .omitted, time: .shortened))  \(line)")
-        if externalLog.count > 24 {
-            externalLog.removeFirst(externalLog.count - 24)
+        let level: ExternalLogLevel
+        if line.contains("[ERRO]") { level = .warning }
+        else if line.contains("[OK]") { level = .success }
+        else if line.contains("[PROCESSO]") { level = .progress }
+        else { level = .info }
+        externalLog.append(ExternalLogEntry(
+            timestamp: Date().formatted(date: .omitted, time: .shortened),
+            message: line,
+            level: level
+        ))
+        if externalLog.count > 30 {
+            externalLog.removeFirst(externalLog.count - 30)
         }
     }
 
