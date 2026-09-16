@@ -9,7 +9,7 @@ struct LogView: View {
 
     private var shareText: String {
         var lines = [
-            "CHZ PRIV Log",
+            "RKN Log",
             "iOS \(AppInfo.osVersion) (\(AppInfo.osBuild)) — \(AppInfo.machineName)",
             "Generated: \(Date())",
             ""

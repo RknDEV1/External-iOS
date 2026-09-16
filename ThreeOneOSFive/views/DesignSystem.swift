@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    // Identidade CHZ PRIV: fundo preto, vermelho vivo, branco e cinza.
+    // Identidade RKN: fundo preto, vermelho vivo, branco e cinza.
     static let accent = Color(red: 1.00, green: 0.015, blue: 0.055)
     static let accentBright = Color(red: 1.00, green: 0.16, blue: 0.19)
     static let accentSoft = Color(red: 1.00, green: 0.015, blue: 0.055).opacity(0.16)
@@ -36,7 +36,7 @@ struct CHZPrivWordmark: View {
 
     var body: some View {
         VStack(spacing: -size * 0.08) {
-            Text("CHZ")
+            Text("RKN")
                 .font(.custom(AppTheme.brandFontName, size: size))
                 .fontWeight(.black)
                 .italic()
@@ -44,7 +44,7 @@ struct CHZPrivWordmark: View {
                 .shadow(color: AppTheme.accent.opacity(0.90), radius: 1.5)
                 .shadow(color: AppTheme.accent.opacity(0.72), radius: 0, x: 0.55, y: 0)
                 .shadow(color: AppTheme.accent.opacity(0.45), radius: 0.45)
-            Text("PRIV")
+            Text("")
                 .font(.custom(AppTheme.brandFontName, size: size * 0.94))
                 .fontWeight(.black)
                 .italic()
@@ -54,7 +54,7 @@ struct CHZPrivWordmark: View {
                 .shadow(color: .white.opacity(0.30), radius: 0.45)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("CHZ PRIV")
+        .accessibilityLabel("RKN")
     }
 }
 
@@ -139,20 +139,12 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Group {
-            if let icon = UIImage(named: "CHZPrivLogo") {
-                Image(uiImage: icon)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.system(size: size * 0.45, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(AppTheme.accent)
-            }
-        }
-        .frame(width: size, height: size)
+        Text("RKN")
+            .font(.custom(AppTheme.brandFontName, size: size * 0.46))
+            .fontWeight(.black)
+            .italic()
+            .foregroundStyle(.white)
+            .frame(width: size, height: size)
         .background(AppTheme.accent)
         .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
         .overlay {

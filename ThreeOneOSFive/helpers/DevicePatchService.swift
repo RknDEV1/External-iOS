@@ -58,9 +58,9 @@ enum DevicePatchService {
         return PatchTransaction.latestReceipt(projectID: projectID, backupRoot: backupRoot)
     }
 
-    // MARK: - CHZ PRIV-only External Menu operations
+    // MARK: - RKN-only External Menu operations
 
-    /// Resources shipped with CHZ PRIV. They are treated as inert data and never
+    /// Resources shipped with RKN. They are treated as inert data and never
     /// resolved as paths outside the app's own container.
     static func embeddedExternalArtifacts() -> [URL] {
         (Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil) ?? [])

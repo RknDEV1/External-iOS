@@ -13,7 +13,7 @@ struct LicenseSnapshot: Equatable {
     }
 
     var status: Status = .loading
-    var product = "CHZ PRIV"
+    var product = "RKN"
     var expiration: Date?
     var deviceID = "Indisponível"
 }
@@ -33,7 +33,7 @@ struct CHZLoginKeychainProvider: LicenseSessionProviding {
         let status: LicenseSnapshot.Status = hasSession ? .active : .invalid
         let snapshot = LicenseSnapshot(
             status: status,
-            product: "CHZ PRIV",
+            product: "RKN",
             expiration: nil,
             deviceID: currentDeviceID
         )
@@ -86,7 +86,7 @@ final class LicenseViewModel: ObservableObject {
     func markAuthenticatedInCurrentProcess() {
         sessionConfirmedInCurrentProcess = true
         snapshot.status = .active
-        snapshot.product = "CHZ PRIV"
+        snapshot.product = "RKN"
         isValidating = false
         requiresLogin = false
     }

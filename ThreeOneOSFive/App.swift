@@ -8,7 +8,7 @@ struct ThreeOneOSFiveApp: App {
     @StateObject private var fileOperationCoordinator = FileOperationCoordinator()
     @StateObject private var authenticationDependency = AuthenticationDependencyState()
     @AppStorage(AppLanguage.storageKey) private var languageCode = AppLanguage.english.rawValue
-    // A interface CHZ PRIV abre após a seleção do jogo.
+    // A interface RKN abre após a seleção do jogo.
     @State private var showOnboarding = false
     @State private var showGamePicker = true
     @State private var selectedEdition: GameEdition = .freeFire
@@ -156,7 +156,7 @@ private struct FreeFireSelectionView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     HStack {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("CHZ PRIV / GAME SELECT")
+                            Text("RKN / GAME SELECT")
                                 .font(.system(size: 11, weight: .bold, design: .monospaced))
                                 .tracking(1.2)
                                 .foregroundStyle(AppTheme.accentBright)
@@ -182,7 +182,7 @@ private struct FreeFireSelectionView: View {
                             .tracking(0.8)
                             .foregroundStyle(AppTheme.success)
                         Spacer()
-                        Text("CHZ PRIV")
+                        Text("RKN")
                             .font(.system(size: 10, weight: .bold, design: .monospaced))
                             .foregroundStyle(AppTheme.tertiaryText)
                     }
