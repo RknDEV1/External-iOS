@@ -558,6 +558,7 @@ private struct CHZPrivHomeView: View {
 
     private func functionRow(item: PatchLibraryItem) -> some View {
         let title = displayTitle(for: item)
+        let description = patchDescription(for: item)
         return HStack(spacing: 12) {
                 Image(systemName: item.category.symbol)
                 .font(.system(size: 20, weight: .semibold))
@@ -572,10 +573,12 @@ private struct CHZPrivHomeView: View {
                     .tracking(0.25)
                     .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(2)
-                Text(patchDescription(for: item))
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(AppTheme.tertiaryText)
-                    .lineLimit(2)
+                if !description.isEmpty {
+                    Text(description)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(AppTheme.tertiaryText)
+                        .lineLimit(2)
+                }
             }
             Spacer(minLength: 6)
             if workingPatchID == item.id {
@@ -623,32 +626,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func patchDescription(for item: PatchLibraryItem) -> String {
-        let filename = item.packageURL.deletingPathExtension().lastPathComponent
-            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-            .uppercased()
-            .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: "-", with: "")
-            .replacingOccurrences(of: "+", with: "")
-
-        if filename.contains("100") && filename.contains("BAYPSS") {
-            return "Hs no pescoço do inimigo"
-        }
-        if filename.contains("PEITO") && filename.contains("PESCO") {
-            return "Hs no pescoço e peito do inimigo"
-        }
-        if filename.contains("PESCO") && filename.contains("ALTO") {
-            return "Hs no pescoço e acima do inimigo"
-        }
-        if filename.contains("ALTO") && filename.contains("ANTENA") {
-            return "Hs acima da cabeça do inimigo"
-        }
-        if filename.contains("ALTO") {
-            return "Hs acima da cabeça do inimigo"
-        }
-        if filename.contains("PESCO") {
-            return "Hs apenas no pescoço do inimigo"
-        }
-        return ""
+        ""
     }
 
     private func loadPatchesIfNeeded() {
