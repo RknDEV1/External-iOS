@@ -112,6 +112,23 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertFalse(project.contains("MenuFFTH_Chz_Priv(1).3105"))
     }
 
+    func testRestoreSnapshotsUnexpectedTargetBeforeVerifiedOriginal() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/helpers/PatchTransaction.swift")
+        XCTAssertTrue(source.contains("unexpected-\\(UUID().uuidString)"))
+        XCTAssertTrue(source.contains("snapshotted before restore"))
+        XCTAssertTrue(source.contains("digestFile(snapshot) == currentDigest"))
+    }
+
+    func testExternalCardMatchesInjectorCardStructure() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        XCTAssertTrue(source.contains("private var externalFunctions: [ExternalPatchFunction]"))
+        XCTAssertTrue(source.contains("RKN // SYSTEM LOG"))
+        XCTAssertTrue(source.contains("stroke(AppTheme.outline, lineWidth: 1.0)"))
+        XCTAssertTrue(source.contains("stroke(AppTheme.outlineStrong, lineWidth: 1.15)"))
+        XCTAssertTrue(source.contains("ProgressView()"))
+        XCTAssertTrue(source.contains("toggleStyle(CHZSwitchStyle())"))
+    }
+
     private func loadProjectFile(_ relativePath: String) throws -> String {
         let testFile = URL(fileURLWithPath: #filePath)
         let repositoryRoot = testFile

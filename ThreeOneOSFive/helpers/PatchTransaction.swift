@@ -364,10 +364,20 @@ enum PatchTransaction {
                 fileManager: fileManager
             )
 
-            if requirePatchedDigest {
-                guard fileManager.fileExists(atPath: target.path),
-                      try digestFile(target) == record.replacementDigest else {
-                    throw PatchPackageError.restoreFailed
+            if requirePatchedDigest, fileManager.fileExists(atPath: target.path) {
+                let currentDigest = try digestFile(target)
+                if currentDigest != record.replacementDigest {
+                    // Preserve an unexpected current file before restoring the
+                    // verified original. This keeps the safety invariant: no
+                    // unverified target is overwritten without a snapshot.
+                    let snapshot = transactionDirectory.appendingPathComponent(
+                        "\(record.ruleID.uuidString).unexpected-\(UUID().uuidString)"
+                    )
+                    try fileManager.copyItem(at: target, to: snapshot)
+                    guard try digestFile(snapshot) == currentDigest else {
+                        throw PatchPackageError.restoreFailed
+                    }
+                    log("patch: unexpected target snapshotted before restore — \(record.relativePath)")
                 }
             }
             if record.originalExisted {

@@ -1326,6 +1326,10 @@ private struct ExternalPanelView: View {
         .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
+                .stroke(AppTheme.outline, lineWidth: 1.0)
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.15)
         }
         .shadow(color: AppTheme.accent.opacity(0.12), radius: 5, y: 3)
