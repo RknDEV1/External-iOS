@@ -345,6 +345,7 @@ private struct CHZPrivHomeView: View {
     @State private var freeFirePatches: [PatchLibraryItem] = []
     @State private var enabledPatchIDs = Set<UUID>()
     @State private var isWorking = false
+    @State private var workingPatchID: UUID?
     @State private var didLoadPatches = false
     @State private var patchLoadingCoordinator = PatchLoadingCoordinator()
     @State private var activityLog = [LogEntry(
@@ -572,6 +573,11 @@ private struct CHZPrivHomeView: View {
                     .lineLimit(2)
             }
             Spacer(minLength: 6)
+            if workingPatchID == item.id {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(AppTheme.accentBright)
+            }
             Toggle("\(title)", isOn: Binding(
                 get: { enabledPatchIDs.contains(item.id) },
                 set: { updatePatchState(item: item, isEnabled: $0) }
@@ -702,6 +708,7 @@ private struct CHZPrivHomeView: View {
         }
         let patchName = baseProject.name
         isWorking = true
+        workingPatchID = item.id
 
         if isEnabled {
             activityLog.removeAll(keepingCapacity: true)
@@ -732,12 +739,14 @@ private struct CHZPrivHomeView: View {
                 }
                 await MainActor.run {
                     enabledPatchIDs.insert(item.id)
+                    workingPatchID = nil
                     isWorking = false
                     SoundEffectManager.shared.play(.confirmation)
                     appendLog("Patch aplicado e verificado", level: .success)
                 }
             } catch {
                 await MainActor.run {
+                    workingPatchID = nil
                     isWorking = false
                     appendLog("Falha ao ativar: \(error.localizedDescription)", level: .warning)
                 }
@@ -753,12 +762,14 @@ private struct CHZPrivHomeView: View {
                     _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
                     await MainActor.run {
                         enabledPatchIDs.remove(item.id)
+                        workingPatchID = nil
                         isWorking = false
                         SoundEffectManager.shared.play(.confirmation)
                         appendLog("Arquivo original interno restaurado", level: .success)
                     }
                 } catch {
                     await MainActor.run {
+                        workingPatchID = nil
                         isWorking = false
                         appendLog("Falha ao restaurar o arquivo interno: \(error.localizedDescription)", level: .warning)
                     }
@@ -777,12 +788,14 @@ private struct CHZPrivHomeView: View {
                 try DevicePatchService.restore(receipt: receipt)
                 await MainActor.run {
                     enabledPatchIDs.remove(item.id)
+                    workingPatchID = nil
                     isWorking = false
                     SoundEffectManager.shared.play(.confirmation)
                     appendLog("Arquivo original restaurado", level: .success)
                 }
             } catch {
                 await MainActor.run {
+                    workingPatchID = nil
                     isWorking = false
                     appendLog("Falha ao restaurar: \(error.localizedDescription)", level: .warning)
                 }
