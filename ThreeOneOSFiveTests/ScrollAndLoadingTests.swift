@@ -129,6 +129,16 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(source.contains("toggleStyle(CHZSwitchStyle())"))
     }
 
+    func testExternalActivationRequiresEnvelopePasswordAndVerifiedReceipt() throws {
+        let service = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        XCTAssertTrue(service.contains("PatchPackageCodec.decode(data, password: \"OG\")"))
+        XCTAssertTrue(service.contains("ExternalInstallReceipt"))
+        XCTAssertTrue(service.contains("verifyExternalWorkingFile"))
+        XCTAssertTrue(source.contains("try DevicePatchService.verifyExternalWorkingFile"))
+        XCTAssertTrue(source.contains("licença ausente ou inválida"))
+    }
+
     private func loadProjectFile(_ relativePath: String) throws -> String {
         let testFile = URL(fileURLWithPath: #filePath)
         let repositoryRoot = testFile

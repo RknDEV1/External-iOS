@@ -8,7 +8,20 @@ struct ExternalArtifactReport: Codable, Equatable, Identifiable {
     let sha256: String
     let validatedAt: Date
     let storageURL: URL
+    let packageID: UUID?
+    let schemaVersion: Int?
     var diagnosticEnabled: Bool
+}
+
+private struct ExternalInstallReceipt: Codable {
+    let sourceFilename: String
+    let sha256: String
+    let packageID: UUID?
+    let schemaVersion: Int?
+    let editionKey: String
+    let destinationFilename: String
+    let originalSha256: String?
+    let installedAt: Date
 }
 
 struct ExternalBackupReceipt: Codable, Equatable, Identifiable {
@@ -74,7 +87,14 @@ enum DevicePatchService {
         guard bundledURL.isFileURL, bundledURL.pathExtension.lowercased() == "3105" else {
             throw PatchPackageError.unsupportedFormat
         }
-        let report = try validateExternalArtifact(at: bundledURL)
+        let data = try Data(contentsOf: bundledURL, options: [.mappedIfSafe])
+        let summary = try PatchPackageCodec.inspect(data)
+        if summary.isPasswordProtected {
+            _ = try PatchPackageCodec.decode(data, password: "OG")
+        } else {
+            _ = try PatchPackageCodec.decode(data, password: nil)
+        }
+        let report = try validateExternalArtifact(at: bundledURL, packageSummary: summary)
         guard let expected = expectedEmbeddedSHA256(for: report.filename),
               report.sha256.caseInsensitiveCompare(expected) == .orderedSame else {
             log("external: rejected catalog digest for \(report.filename)")
@@ -98,8 +118,8 @@ enum DevicePatchService {
         return entries.first(where: { $0.file == filename })?.sha256
     }
 
-    /// Installs only into the app-private working area. The operation is
-    /// transactional: write temporary data, verify its digest, then replace.
+    /// Installs only into the app-private working area. A receipt is written
+    /// only after the copied payload and its destination digest are verified.
     static func installExternalArtifact(_ report: ExternalArtifactReport, editionKey: String) throws -> URL {
         let source = try privateOwnedFile(report.storageURL)
         let root = try externalRoot()
@@ -111,11 +131,10 @@ enum DevicePatchService {
         let temporary = working.appendingPathComponent(".\(safeKey).\(UUID().uuidString).tmp")
         let original = working.appendingPathComponent("\(safeKey).original.3105")
         let originalAbsentMarker = working.appendingPathComponent("\(safeKey).original.absent")
+        let receiptURL = working.appendingPathComponent("\(safeKey).receipt.plist")
 
-        // Capture the baseline exactly once per activation cycle. If no working
-        // file existed yet, persist that fact so deactivation can remove the
-        // generated working copy instead of failing to restore.
-        if !FileManager.default.fileExists(atPath: original.path),
+        if !FileManager.default.fileExists(atPath: receiptURL.path),
+           !FileManager.default.fileExists(atPath: original.path),
            !FileManager.default.fileExists(atPath: originalAbsentMarker.path) {
             if FileManager.default.fileExists(atPath: destination.path) {
                 try FileManager.default.copyItem(at: destination, to: original)
@@ -123,6 +142,7 @@ enum DevicePatchService {
                 try Data("original-absent".utf8).write(to: originalAbsentMarker, options: [.atomic, .completeFileProtection])
             }
         }
+
         try FileManager.default.copyItem(at: source, to: temporary)
         let copiedData = try Data(contentsOf: temporary, options: [.mappedIfSafe])
         guard sha256(copiedData) == report.sha256 else {
@@ -131,15 +151,40 @@ enum DevicePatchService {
         }
         try? FileManager.default.removeItem(at: destination)
         try FileManager.default.moveItem(at: temporary, to: destination)
-        log("external: installed \(report.filename) into private working file \(destination.lastPathComponent)")
+        let installedData = try Data(contentsOf: destination, options: [.mappedIfSafe])
+        guard sha256(installedData) == report.sha256 else {
+            throw PatchPackageError.restoreFailed
+        }
+        let originalDigest: String?
+        if FileManager.default.fileExists(atPath: original.path) {
+            originalDigest = sha256(try Data(contentsOf: original, options: [.mappedIfSafe]))
+        } else {
+            originalDigest = nil
+        }
+        let receipt = ExternalInstallReceipt(
+            sourceFilename: report.filename,
+            sha256: report.sha256,
+            packageID: report.packageID,
+            schemaVersion: report.schemaVersion,
+            editionKey: editionKey,
+            destinationFilename: destination.lastPathComponent,
+            originalSha256: originalDigest,
+            installedAt: Date()
+        )
+        try writeInstallReceipt(receipt, to: receiptURL)
+        log("external: verified activation \(report.filename) → \(destination.lastPathComponent)")
         return destination
     }
 
     static func hasExternalWorkingFile(editionKey: String) -> Bool {
-        guard let root = try? externalRoot() else { return false }
-        let working = root.appendingPathComponent("Working", isDirectory: true)
-        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
-        return FileManager.default.fileExists(atPath: working.appendingPathComponent("\(safeKey).3105").path)
+        guard let state = try? readExternalState(editionKey: editionKey) else { return false }
+        return state.verified
+    }
+
+    static func verifyExternalWorkingFile(editionKey: String) throws {
+        let state = try readExternalState(editionKey: editionKey)
+        guard state.verified else { throw PatchPackageError.restoreFailed }
+        log("external: activation receipt and working hash verified")
     }
 
     static func restoreExternalWorkingFile(editionKey: String) throws -> URL {
@@ -149,34 +194,88 @@ enum DevicePatchService {
         let destination = working.appendingPathComponent("\(safeKey).3105")
         let original = working.appendingPathComponent("\(safeKey).original.3105")
         let originalAbsentMarker = working.appendingPathComponent("\(safeKey).original.absent")
+        let receiptURL = working.appendingPathComponent("\(safeKey).receipt.plist")
+        let receipt = try readInstallReceipt(from: receiptURL)
+        guard receipt.editionKey == editionKey,
+              receipt.destinationFilename == destination.lastPathComponent else {
+            throw PatchPackageError.restoreFailed
+        }
+
+        if FileManager.default.fileExists(atPath: destination.path) {
+            let currentData = try Data(contentsOf: destination, options: [.mappedIfSafe])
+            if sha256(currentData) != receipt.sha256 {
+                let conflict = working.appendingPathComponent("\(safeKey).unexpected-\(UUID().uuidString).3105")
+                try FileManager.default.copyItem(at: destination, to: conflict)
+                let conflictData = try Data(contentsOf: conflict, options: [.mappedIfSafe])
+                guard sha256(conflictData) == sha256(currentData) else { throw PatchPackageError.restoreFailed }
+                log("external: unexpected working file preserved before restore")
+            }
+        }
 
         if FileManager.default.fileExists(atPath: originalAbsentMarker.path) {
-            // The baseline was an absent file; restore means removing the
-            // generated working copy and clearing the cycle marker.
             try? FileManager.default.removeItem(at: destination)
             try FileManager.default.removeItem(at: originalAbsentMarker)
-            log("external: restored private working state (original file was absent)")
+            try FileManager.default.removeItem(at: receiptURL)
+            log("external: verified restore completed (original file was absent)")
             return destination
         }
 
-        guard FileManager.default.fileExists(atPath: original.path) else {
+        guard FileManager.default.fileExists(atPath: original.path),
+              let expectedOriginalHash = receipt.originalSha256 else {
             throw PatchPackageError.invalidProject
         }
         let temporary = working.appendingPathComponent(".restore-\(UUID().uuidString).tmp")
         try FileManager.default.copyItem(at: original, to: temporary)
         let restoredData = try Data(contentsOf: temporary, options: [.mappedIfSafe])
-        guard !restoredData.isEmpty else {
+        guard sha256(restoredData) == expectedOriginalHash else {
             try? FileManager.default.removeItem(at: temporary)
             throw PatchPackageError.restoreFailed
         }
         try? FileManager.default.removeItem(at: destination)
         try FileManager.default.moveItem(at: temporary, to: destination)
         try FileManager.default.removeItem(at: original)
-        log("external: restored private working file \(destination.lastPathComponent)")
+        try FileManager.default.removeItem(at: receiptURL)
+        log("external: verified original restore completed")
         return destination
     }
 
+    private struct ExternalState {
+        let verified: Bool
+    }
+
+    private static func readExternalState(editionKey: String) throws -> ExternalState {
+        let working = try externalRoot().appendingPathComponent("Working", isDirectory: true)
+        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        let destination = working.appendingPathComponent("\(safeKey).3105")
+        let receiptURL = working.appendingPathComponent("\(safeKey).receipt.plist")
+        let receipt = try readInstallReceipt(from: receiptURL)
+        guard receipt.editionKey == editionKey,
+              receipt.destinationFilename == destination.lastPathComponent,
+              FileManager.default.fileExists(atPath: destination.path) else {
+            throw PatchPackageError.restoreFailed
+        }
+        let data = try Data(contentsOf: destination, options: [.mappedIfSafe])
+        return ExternalState(verified: sha256(data) == receipt.sha256)
+    }
+
+    private static func writeInstallReceipt(_ receipt: ExternalInstallReceipt, to url: URL) throws {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        try encoder.encode(receipt).write(to: url, options: [.atomic, .completeFileProtection])
+    }
+
+    private static func readInstallReceipt(from url: URL) throws -> ExternalInstallReceipt {
+        try PropertyListDecoder().decode(ExternalInstallReceipt.self, from: Data(contentsOf: url))
+    }
+
     static func validateExternalArtifact(at sourceURL: URL) throws -> ExternalArtifactReport {
+        try validateExternalArtifact(at: sourceURL, packageSummary: nil)
+    }
+
+    private static func validateExternalArtifact(
+        at sourceURL: URL,
+        packageSummary: PatchPackageSummary?
+    ) throws -> ExternalArtifactReport {
         guard sourceURL.pathExtension.lowercased() == "3105" else {
             throw PatchPackageError.unsupportedFormat
         }
@@ -201,6 +300,8 @@ enum DevicePatchService {
             sha256: hash,
             validatedAt: Date(),
             storageURL: destination,
+            packageID: packageSummary?.packageID,
+            schemaVersion: packageSummary?.schemaVersion,
             diagnosticEnabled: false
         )
         log("external: validated \(report.filename) sha256=\(hash)")

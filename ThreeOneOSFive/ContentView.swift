@@ -707,11 +707,12 @@ private struct CHZPrivHomeView: View {
             return
         }
 
-        guard let baseProject = item.project else {
+        let baseProject = item.project
+        guard baseProject != nil || isInternalMenuPatch(item) else {
             appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
             return
         }
-        let patchName = baseProject.name
+        let patchName = baseProject?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
         isWorking = true
         workingPatchID = item.id
 
@@ -729,14 +730,16 @@ private struct CHZPrivHomeView: View {
         }
     }
 
-    private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject, patchName: String) {
+    private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject?, patchName: String) {
         Task.detached(priority: .userInitiated) {
             do {
                 if isInternalMenuPatch(item) {
                     let report = try DevicePatchService.validateEmbeddedExternalArtifact(item.packageURL)
                     let editionKey = externalEditionKey(for: item)
                     _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+                    try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
                 } else {
+                    guard let baseProject else { throw PatchPackageError.invalidProject }
                     let project = item.summary.schemaVersion >= 2
                         ? try PatchProjectLibrary.synchronizeWorkspace(item: item)
                         : baseProject
@@ -1374,10 +1377,19 @@ private struct ExternalPanelView: View {
         } else {
             sourceURL = nil
         }
+        if enabled && !licenseViewModel.isActive {
+            appendExternalLog("[ERRO] Ativação bloqueada: licença ausente ou inválida")
+            externalPatchMessage = "Ativação bloqueada pela licença."
+            return
+        }
         workingExternalPatchID = function.id
         let action = enabled ? "ATIVAR" : "DESATIVAR"
         appendExternalLog("[\(action)] \(function.title)")
         appendExternalLog(enabled ? "[PROCESSO] 3105 iniciou a validação e aplicação" : "[PROCESSO] 3105 iniciou a restauração do original")
+        if enabled {
+            appendExternalLog("[PROCESSO] Envelope .3105 e senha OG em validação")
+            appendExternalLog("[PROCESSO] Confirmando edição, hash e recibo interno")
+        }
         externalPatchMessage = enabled ? "Processando ativação…" : "Processando restauração…"
         Task.detached(priority: .userInitiated) {
             do {
@@ -1386,6 +1398,7 @@ private struct ExternalPanelView: View {
                     guard let sourceURL else { throw PatchPackageError.invalidProject }
                     let report = try DevicePatchService.validateEmbeddedExternalArtifact(sourceURL)
                     _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+                    try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
                 } else {
                     _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
                 }
@@ -1393,8 +1406,8 @@ private struct ExternalPanelView: View {
                     if enabled { activeExternalPatchIDs.insert(function.id) }
                     else { activeExternalPatchIDs.remove(function.id) }
                     workingExternalPatchID = nil
-                    externalPatchMessage = enabled ? "Função ativada." : "Função desativada."
-                    appendExternalLog(enabled ? "[OK] Função ativada pelo 3105" : "[OK] Original restaurado pelo 3105")
+                    externalPatchMessage = enabled ? "Função ativada e verificada." : "Função desativada e original restaurado."
+                    appendExternalLog(enabled ? "[OK] Recibo e hash confirmados; função ativada" : "[OK] Original restaurado e verificado")
                 }
             } catch {
                 await MainActor.run {
