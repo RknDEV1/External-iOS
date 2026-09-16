@@ -7,10 +7,8 @@ struct ThreeOneOSFiveApp: App {
     @StateObject private var patchDraftCoordinator = PatchDraftCoordinator()
     @StateObject private var fileOperationCoordinator = FileOperationCoordinator()
     @AppStorage(AppLanguage.storageKey) private var languageCode = AppLanguage.english.rawValue
-    // O overlay CHZ PRIV aparece antes do restante do app.
+    // O app inicia diretamente no fluxo normal do 3105.
     @State private var showOnboarding = false
-    @State private var isCHZAccessAuthorized = false
-    @State private var isCHZAccessExpired = false
     @State private var showGamePicker = true
     @State private var selectedEdition: GameEdition = .freeFire
     @State private var showAttribution = false
@@ -50,8 +48,8 @@ struct ThreeOneOSFiveApp: App {
                     .environmentObject(fileOperationCoordinator)
                     .environment(\.appLanguage, language)
                     .environment(\.locale, language.locale)
-                    .opacity(isCHZAccessAuthorized && !showOnboarding && !showGamePicker ? 1 : 0)
-                    .allowsHitTesting(isCHZAccessAuthorized && !showOnboarding && !showGamePicker)
+                    .opacity(showOnboarding || showGamePicker ? 0 : 1)
+                    .allowsHitTesting(!showOnboarding && !showGamePicker)
 
                 if showGamePicker && !showOnboarding {
                     FreeFireSelectionView { edition in
@@ -64,20 +62,6 @@ struct ThreeOneOSFiveApp: App {
                     .environment(\.locale, language.locale)
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
                     .zIndex(1)
-                }
-
-                if !isCHZAccessAuthorized {
-                    CHZAccessOverlay(
-                        isAuthorized: $isCHZAccessAuthorized,
-                        isExpired: $isCHZAccessExpired,
-                        onAuthorized: {
-                            log("auth: CHZ PRIV access authorized")
-                        },
-                        onExpired: {
-                            log("auth: CHZ PRIV access expired; app content locked")
-                        }
-                    )
-                    .zIndex(2)
                 }
 
                 if showOnboarding {
@@ -95,7 +79,7 @@ struct ThreeOneOSFiveApp: App {
                                         .zIndex(1)
                 }
             }
-            .displayIdentityAttribution(isPresented: $showAttribution, enabled: isCHZAccessAuthorized && !showOnboarding && !showGamePicker)
+            .displayIdentityAttribution(isPresented: $showAttribution, enabled: !showOnboarding && !showGamePicker)
             .sheet(isPresented: $showAttribution) {
                 DisplayAttributionSheet()
             }

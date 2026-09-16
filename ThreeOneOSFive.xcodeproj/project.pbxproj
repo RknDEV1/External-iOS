@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3105L401 /* Fortnite.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3105L400; };
-3105Z011 /* CHZAccessOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105Z010; };
-3105Z200 /* ChzLogin.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3105Z100; };
-3105Z201 /* ChzLogin.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3105Z100; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3105A200 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105A020; };
 		3105A201 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105A021; };
 		3105A243 /* LicenseInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105A242; };
@@ -118,8 +115,6 @@
 		3105P115 /* FFM - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
 		3105P116 /* FFM - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
 		3105P117 /* FFM - Esp+aimbot.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - Esp+aimbot.3105"; sourceTree = "<group>"; };
-3105Z010 /* CHZAccessOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHZAccessOverlay.swift; sourceTree = "<group>"; };
-3105Z100 /* ChzLogin.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = "Frameworks/ChzLogin.xcframework"; sourceTree = "<group>"; };
 
 		3105A010 /* 3105.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3105.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3105A020 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -210,17 +205,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3105Z300 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				3105Z201 /* ChzLogin.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,7 +212,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3105Z200 /* ChzLogin.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,7 +224,6 @@
 				3105A401 /* ThreeOneOSFive */,
 				3105A402 /* Products */,
 				3105T400 /* ThreeOneOSFiveTests */,
-				3105Z100 /* ChzLogin.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -251,7 +233,6 @@
 				3105A050 /* ThreeOneOSFive-Bridging-Header.h */,
 				3105A060 /* Info.plist */,
 				3105A020 /* App.swift */,
-				3105Z010 /* CHZAccessOverlay.swift */,
 				3105A021 /* ContentView.swift */,
 				3105A242 /* LicenseInfoView.swift */,
 				3105A403 /* exploit */,
@@ -394,7 +375,6 @@
 				3105A700 /* Sources */,
 				3105A300 /* Frameworks */,
 				3105A800 /* Resources */,
-				3105Z300 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -542,7 +522,6 @@
 					3105I201,
 					3105K201,
 					3105K202,
-					3105Z011,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,7 +583,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ThreeOneOSFive/Info.plist;
 					INFOPLIST_KEY_CFBundleDisplayName = "External Chz";
-					FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -651,7 +629,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ThreeOneOSFive/Info.plist;
 					INFOPLIST_KEY_CFBundleDisplayName = "External Chz";
-					FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Frameworks";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
