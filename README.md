@@ -5,11 +5,11 @@
 <h1 align="center">3105</h1>
 
 <p align="center">
-  A native iOS workspace for app-container files, portable patches, limited cleanup, and PosterBoard wallpaper packages.
+  An iOS content hub and manager for patches, app data, dialer themes, and PosterBoard wallpapers.
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-1.1.0-E6753A?style=flat-square">
+  <img alt="Version" src="https://img.shields.io/badge/version-2.0-E6753A?style=flat-square">
   <img alt="iOS" src="https://img.shields.io/badge/iOS-17.0–18.7.1%20%7C%2026.0–26.6.1%20%7C%2027%20beta%201–4-222222?style=flat-square">
   <img alt="Swift" src="https://img.shields.io/badge/Swift-5-F05138?style=flat-square&logo=swift&logoColor=white">
   <img alt="Languages" src="https://img.shields.io/badge/languages-English%20%7C%20Tiếng%20Việt%20%7C%20简体中文-E6753A?style=flat-square">
@@ -28,38 +28,36 @@
 ## Preview
 
 <p align="center">
-  <img src="docs/images/home.png" width="245" alt="3105 Home">
+  <img src="docs/images/home-2.0.png" width="245" alt="3105 2.0 Home">
   &nbsp;
-  <img src="docs/images/patches.png" width="245" alt="3105 Patches">
+  <img src="docs/images/sources-2.0.png" width="245" alt="3105 2.0 Sources">
   &nbsp;
-  <img src="docs/images/cleaner.png" width="245" alt="3105 Cleaner">
+  <img src="docs/images/installed-2.0.png" width="245" alt="3105 2.0 Installed library">
 </p>
 
-## What's new in 1.1.0
+## What's new in 2.0
 
-- **Broader iOS support** — verified range now includes iOS 17.0–17.7.x (kernel exploit), iOS 18.0–18.7.1 (kernel exploit), iOS 26.0–26.6.1 and iOS 27 Developer Beta 1–4 / Public Beta 1–2.
-- **Wrong-password feedback** — importing a `.3105` patch with an incorrect password now shows "Incorrect password" instead of failing silently.
-- **Onboarding for reinstalls** — onboarding reappears after overwriting the app with the same version, so fresh and overwritten installs both see the guided setup.
+- **A new content marketplace** — discover patches, wallpapers, dialer themes, and 3105 features from For You, New, or individual sources, with clear download progress and installation results.
+- **A simpler Installed library** — manage every downloaded item in one place, with its name, icon, and content type. Update indicators appear when a newer package is available.
+- **More flexible patches** — one patch can target multiple apps and App Groups, find the matching data on each device, and apply the portions available on that device.
+- **User-configurable patches** — creators can expose text fields, switches, and choices. Patches can replace files, edit plist/JSON content, and optionally use a password.
+- **Safer recovery** — improved backup, reset, restore, and active-patch removal flows, with clearer feedback after every action.
+- **Dialer themes** — `.3105pass` packages can follow the light, dark, and bold keypad style detected on the device.
+- **Repository wallpapers** — download and manage `.tendies` packages in the app, view images inside package descriptions, and remove installed wallpapers from Installed.
+- **A redesigned Files experience** — clear Workspace, Application, and App Group areas, plus hidden files, tabs, favorites, file information, and a simple plist editor.
+- **Installable 3105 features** — Cleaner can be installed or removed like other content; supported iOS 27 builds also offer Lock Screen Footnote and Supervised mode.
+- **Clearer interface and status** — Home, Sources, package details, and Installed now share one visual language and explain compatibility, downloads, installation, and errors more clearly.
 
-See the complete [Patch workspace guide](docs/PATCH_GUIDE.md).
-
-## What's new in 1.0.1
-
-- **Patch workspace v2** — build patches as a normal bundle-based directory tree under `On My iPhone/3105/Patches`; Apply and Export synchronize the workspace automatically.
-- **Safer recovery** — original files are journaled before writes; Restore puts existing files back, removes files introduced by the patch, and removes patch-created directories once empty.
-- **More capable Files tab** — independent tabs, preserved folder position, multi-selection, ZIP creation and extraction, plus a denser and more consistent grouped layout.
-- **Responsive navigation** — iPad split-view and landscape support, optional Cleaner/Wallpaper tabs, stable search fields, and refined icon/row sizing.
-- **Wallpaper guidance** — corrected PosterBoard activation steps, including the iOS 27 Collections prerequisite.
-
-See the complete [Patch workspace guide](docs/PATCH_GUIDE.md).
+Compared with 1.1.1, version 2.0 turns 3105 from a collection of separate tools into one place to discover, install, and manage content.
 
 ## Highlights
 
-- **App Data Browser** — resolves volatile container UUIDs to stable app bundle identifiers and exposes a native file workspace.
-- **File operations** — search, preview, share, import multiple files, copy, move, paste, rename, delete, create files and folders, make ZIP archives, and safely handle name conflicts.
-- **Portable `.3105` patches** — bundle-based rules survive container-ID changes between devices; projects may include files or folders, support optional password protection, and can be imported from Files or a secure website link.
-- **Limited Cleaner** — scans only each app's `Library/Caches` and `tmp`, sorts recoverable size in either direction, supports bulk selection, and requires confirmation before deletion.
-- **Wallpaper Lab** — imports `.tendies` packages, validates payloads, journals installed items, and resets only content installed by 3105.
+- **Repository marketplace** — browse multiple sources and install supported content directly in 3105.
+- **Installed library** — keep patches, wallpapers, dialer themes, and 3105 features together with clear type labels and package icons.
+- **Application and App Group browser** — locate app data by a recognizable app name or stable identifier.
+- **File operations** — search, preview, share, import, copy, move, rename, delete, create and extract ZIP archives, use tabs, and save favorites.
+- **Portable `.3105` patches** — target multiple apps or App Groups, expose user choices, use optional passwords, and restore original files after use.
+- **Additional packages** — install `.3105pass` dialer themes, `.tendies` wallpapers, and built-in 3105 features.
 - **No jailbreak installation** — 3105 does not install a persistent jailbreak, bootstrap, or daemon and does not inject code into third-party apps. Because it still uses device exploits and can modify app data, no universal guarantee can be made against every app's integrity or jailbreak-detection policy.
 - **Localized interface** — English, Vietnamese, and Simplified Chinese.
 
