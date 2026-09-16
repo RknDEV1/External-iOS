@@ -169,8 +169,10 @@ final class PatchProjectStore: ObservableObject {
     }
 
     @discardableResult
-    func requestUnlock(for item: PatchLibraryItem) -> Bool {
-        guard item.isLocked, !isBusy else { return false }
+    func requestUnlock(for item: PatchLibraryItem, force: Bool = false) -> Bool {
+        // External protegidos podem exigir a senha novamente em cada ativação.
+        // Os demais patches preservam o comportamento persistente original.
+        guard (force || item.isLocked), !isBusy else { return false }
         do {
             let data = try PatchProjectLibrary.readPackage(at: item.packageURL)
             pendingUnlock = PendingUnlock(data: data, summary: item.summary, existingURL: item.packageURL)

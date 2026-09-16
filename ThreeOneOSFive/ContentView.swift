@@ -661,20 +661,24 @@ private struct CHZPrivHomeView: View {
         }
     }
 
-    private func updatePatchState(item: PatchLibraryItem, isEnabled: Bool) {
-        guard let baseProject = item.project else {
-            guard isEnabled, item.category == .external, item.summary.isPasswordProtected else {
-                appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
-                return
-            }
+    private func updatePatchState(item: PatchLibraryItem, isEnabled: Bool, afterUnlock: Bool = false) {
+        // Todo External protegido pede CHZ no início de cada ativação,
+        // mesmo que o pacote tenha sido desbloqueado em uma sessão anterior.
+        // A retomada após uma senha correta usa afterUnlock para não reabrir a folha.
+        if isEnabled, !afterUnlock, item.category == .external, item.summary.isPasswordProtected {
             pendingExternalUnlockID = item.id
-            guard patchStore.requestUnlock(for: item) else {
+            guard patchStore.requestUnlock(for: item, force: true) else {
                 pendingExternalUnlockID = nil
                 pendingExternalPasswordItem = nil
                 return
             }
             pendingExternalPasswordItem = item
-            appendLog("Senha necessária para desbloquear o patch External", level: .progress)
+            appendLog("Senha necessária para ativar o patch External", level: .progress)
+            return
+        }
+
+        guard let baseProject = item.project else {
+            appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
             return
         }
         let patchName = baseProject.name
@@ -709,7 +713,7 @@ private struct CHZPrivHomeView: View {
                 .uppercased()
                 .hasPrefix(prefix)
         }
-        updatePatchState(item: unlockedItem, isEnabled: true)
+        updatePatchState(item: unlockedItem, isEnabled: true, afterUnlock: true)
     }
 
     private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject, patchName: String) {
