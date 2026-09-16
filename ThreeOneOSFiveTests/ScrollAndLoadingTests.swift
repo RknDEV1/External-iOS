@@ -129,6 +129,17 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(source.contains("toggleStyle(CHZSwitchStyle())"))
     }
 
+    func testExternalPasswordUnlockClosesSheetAfterSuccess() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        let store = try loadProjectFile("ThreeOneOSFive/helpers/PatchProjectStore.swift")
+        XCTAssertTrue(source.contains(".onReceive(patchStore.$unlockedPackageID.compactMap { $0 })"))
+        XCTAssertTrue(source.contains("pendingExternalPasswordItem = nil"))
+        XCTAssertTrue(source.contains("pendingExternalUnlockID = nil"))
+        XCTAssertTrue(source.contains("guard patchStore.requestUnlock(for: item) else"))
+        XCTAssertTrue(store.contains("@Published private(set) var unlockedPackageID: UUID?"))
+        XCTAssertTrue(store.contains("markUnlockSucceeded(packageID: pending.summary.packageID)"))
+    }
+
     func testExternalCategoryUsesOriginal3105PatchPath() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
         let serviceSource = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")

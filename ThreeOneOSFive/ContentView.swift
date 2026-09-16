@@ -421,6 +421,7 @@ private struct CHZPrivHomeView: View {
             if patchStore.passwordRequest != nil {
                 patchStore.cancelUnlock()
             }
+            pendingExternalUnlockID = nil
             continuePendingExternalActivationIfReady()
         }) { item in
             ExternalPatchUnlockView(
@@ -663,9 +664,13 @@ private struct CHZPrivHomeView: View {
                 return
             }
             pendingExternalUnlockID = item.id
+            guard patchStore.requestUnlock(for: item) else {
+                pendingExternalUnlockID = nil
+                pendingExternalPasswordItem = nil
+                return
+            }
             pendingExternalPasswordItem = item
             appendLog("Senha necessária para desbloquear o patch External", level: .progress)
-            patchStore.requestUnlock(for: item)
             return
         }
         let patchName = baseProject.name

@@ -168,17 +168,20 @@ final class PatchProjectStore: ObservableObject {
         }
     }
 
-    func requestUnlock(for item: PatchLibraryItem) {
-        guard item.isLocked, !isBusy else { return }
+    @discardableResult
+    func requestUnlock(for item: PatchLibraryItem) -> Bool {
+        guard item.isLocked, !isBusy else { return false }
         do {
             let data = try PatchProjectLibrary.readPackage(at: item.packageURL)
             pendingUnlock = PendingUnlock(data: data, summary: item.summary, existingURL: item.packageURL)
             passwordRequest = PatchPasswordRequest(summary: item.summary)
+            return true
         } catch let error as PatchPackageError {
             present(error)
         } catch {
             present(.unsupportedFormat)
         }
+        return false
     }
 
     func unlock(password: String) {
