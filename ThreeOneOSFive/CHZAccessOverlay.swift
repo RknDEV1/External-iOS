@@ -14,107 +14,58 @@ struct CHZAccessOverlay: View {
     @State private var errorMessage: String?
     @State private var timer: Timer?
 
-    private let red = Color(red: 0.92, green: 0.08, blue: 0.10)
+    private let red = Color(red: 0.94, green: 0.10, blue: 0.12)
+    private let panel = Color(red: 0.045, green: 0.035, blue: 0.042)
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.76)
+            Color.black.opacity(0.68)
                 .ignoresSafeArea()
 
-            VStack(spacing: 16) {
-                Image(systemName: isExpired ? "lock.slash.fill" : "lock.fill")
-                    .font(.system(size: 29, weight: .semibold))
-                    .foregroundStyle(red)
-                    .frame(width: 54, height: 54)
-                    .background(Color.black)
-                    .overlay(Circle().stroke(red.opacity(0.85), lineWidth: 1.2))
+            VStack(spacing: 0) {
+                lockMark
+                    .padding(.top, 24)
+                    .padding(.bottom, 14)
 
                 Text("CHZ PRIV")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .tracking(2.4)
+                    .font(.system(size: 19, weight: .bold, design: .rounded))
+                    .tracking(2.2)
                     .foregroundStyle(.white)
 
                 if isExpired {
-                    Text("TEMPO ESGOTADO")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(red)
-                    Text("O acesso foi bloqueado. Abra o app novamente para tentar outra vez.")
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.white.opacity(0.68))
-                        .fixedSize(horizontal: false, vertical: true)
+                    expiredContent
                 } else {
-                    Text("INSIRA SUA KEY PARA CONTINUAR")
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .tracking(0.8)
-                        .foregroundStyle(.white.opacity(0.64))
-
-                    SecureField("KEY", text: $key)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .font(.system(size: 14, weight: .medium, design: .monospaced))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 13)
-                        .frame(height: 44)
-                        .background(Color.black.opacity(0.72))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 9)
-                                .stroke(red.opacity(0.82), lineWidth: 1)
-                        )
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "timer")
-                        Text("\(remainingSeconds)s")
-                    }
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(remainingSeconds <= 5 ? red : .white.opacity(0.7))
-
-                    Button(action: submit) {
-                        HStack(spacing: 8) {
-                            if isSubmitting {
-                                ProgressView()
-                                    .tint(.white)
-                                    .scaleEffect(0.78)
-                            }
-                            Text(isSubmitting ? "VALIDANDO" : "CONTINUAR")
-                        }
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .tracking(1.1)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 42)
-                        .background(red.opacity(key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.28 : 0.9))
-                        .clipShape(RoundedRectangle(cornerRadius: 9))
-                    }
-                    .disabled(isSubmitting || key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.system(size: 11, weight: .medium, design: .rounded))
-                            .foregroundStyle(red)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    accessContent
                 }
             }
             .padding(.horizontal, 22)
-            .padding(.top, 22)
-            .padding(.bottom, 20)
-            .frame(width: min(340, UIScreen.main.bounds.width - 40))
+            .padding(.bottom, 22)
+            .frame(width: min(346, UIScreen.main.bounds.width - 36))
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(red: 0.025, green: 0.015, blue: 0.018))
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(panel.opacity(0.78))
+                    )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(red, lineWidth: 1.35)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(
+                        LinearGradient(
+                            colors: [red.opacity(0.92), red.opacity(0.28), red.opacity(0.76)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.1
+                    )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 13)
-                    .stroke(red.opacity(0.22), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(.white.opacity(0.07), lineWidth: 1)
                     .padding(4)
             )
-            .shadow(color: red.opacity(0.2), radius: 18, x: 0, y: 8)
+            .shadow(color: red.opacity(0.18), radius: 28, x: 0, y: 14)
             .accessibilityElement(children: .contain)
             .accessibilityLabel("Acesso CHZ PRIV")
         }
@@ -123,6 +74,110 @@ struct CHZAccessOverlay: View {
             timer?.invalidate()
             timer = nil
         }
+    }
+
+    private var lockMark: some View {
+        ZStack {
+            Circle()
+                .fill(.thinMaterial)
+                .overlay(Circle().fill(Color.black.opacity(0.24)))
+                .overlay(Circle().stroke(red.opacity(0.72), lineWidth: 1))
+                .frame(width: 58, height: 58)
+
+            Image(systemName: isExpired ? "lock.slash" : "lock")
+                .font(.system(size: 25, weight: .medium))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(red)
+        }
+        .accessibilityHidden(true)
+    }
+
+    private var accessContent: some View {
+        VStack(spacing: 13) {
+            Text("INSIRA SUA KEY")
+                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                .tracking(1.2)
+                .foregroundStyle(.white.opacity(0.58))
+                .padding(.top, 7)
+
+            HStack(spacing: 10) {
+                Image(systemName: "key.fill")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(red.opacity(0.9))
+
+                SecureField("Key de acesso", text: $key)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .font(.system(size: 15, weight: .regular, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            .padding(.horizontal, 14)
+            .frame(height: 48)
+            .background(Color.black.opacity(0.28), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .stroke(.white.opacity(0.12), lineWidth: 1)
+            )
+
+            HStack(spacing: 6) {
+                Image(systemName: "timer")
+                Text("\(remainingSeconds)s")
+            }
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .foregroundStyle(remainingSeconds <= 5 ? red : .white.opacity(0.55))
+
+            Button(action: submit) {
+                HStack(spacing: 8) {
+                    if isSubmitting {
+                        ProgressView()
+                            .tint(.white)
+                            .scaleEffect(0.78)
+                    }
+                    Text(isSubmitting ? "VALIDANDO" : "CONTINUAR")
+                }
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .tracking(0.8)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(
+                    LinearGradient(
+                        colors: [red.opacity(key.isEmpty ? 0.30 : 0.92), red.opacity(key.isEmpty ? 0.18 : 0.68)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: RoundedRectangle(cornerRadius: 13, style: .continuous)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(isSubmitting || key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 11, weight: .regular, design: .rounded))
+                    .foregroundStyle(red)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    private var expiredContent: some View {
+        VStack(spacing: 10) {
+            Text("TEMPO ESGOTADO")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .tracking(1)
+                .foregroundStyle(red)
+                .padding(.top, 15)
+
+            Text("O acesso foi bloqueado. Abra o app novamente para tentar outra vez.")
+                .font(.system(size: 12, weight: .regular, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white.opacity(0.62))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.top, 4)
     }
 
     private func startTimer() {
