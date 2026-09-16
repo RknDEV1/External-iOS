@@ -1,5 +1,4 @@
 import Foundation
-import Security
 import SwiftUI
 import UIKit
 
@@ -22,17 +21,14 @@ protocol LicenseSessionProviding {
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void)
 }
 
-struct CHZLoginKeychainProvider: LicenseSessionProviding {
+struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
     private var currentDeviceID: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
     }
 
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
-        let manager = CHZAuthManager.shared()
-        let hasSession = manager.hasValidSavedSession()
-        let status: LicenseSnapshot.Status = hasSession ? .active : .invalid
         let snapshot = LicenseSnapshot(
-            status: status,
+            status: .unavailable,
             product: "RKN",
             expiration: nil,
             deviceID: currentDeviceID
@@ -47,12 +43,10 @@ struct CHZLoginKeychainProvider: LicenseSessionProviding {
 final class LicenseViewModel: ObservableObject {
     @Published private(set) var snapshot = LicenseSnapshot()
     @Published private(set) var isValidating = false
-    @Published var requiresLogin = false
-
     private let provider: LicenseSessionProviding
     private var sessionConfirmedInCurrentProcess = false
 
-    init(provider: LicenseSessionProviding = CHZLoginKeychainProvider()) {
+    init(provider: LicenseSessionProviding = UnauthenticatedLicenseProvider()) {
         self.provider = provider
     }
 
@@ -78,24 +72,15 @@ final class LicenseViewModel: ObservableObject {
 
     var expirationText: String {
         guard let expiration = snapshot.expiration else {
-            return snapshot.status == .active ? "VALIDADA PELO CHZLOGIN" : "INDISPONÍVEL"
+            return snapshot.status == .active ? "DISPONÍVEL" : "NÃO CONFIGURADA"
         }
         return expiration.formatted(date: .abbreviated, time: .shortened)
-    }
-
-    func markAuthenticatedInCurrentProcess() {
-        sessionConfirmedInCurrentProcess = true
-        snapshot.status = .active
-        snapshot.product = "RKN"
-        isValidating = false
-        requiresLogin = false
     }
 
     func refresh() {
         guard !sessionConfirmedInCurrentProcess else { return }
         guard !isValidating else { return }
         isValidating = true
-        requiresLogin = false
         snapshot.status = .loading
         provider.validateSavedLicense { [weak self] next in
             guard let self else { return }
@@ -104,7 +89,6 @@ final class LicenseViewModel: ObservableObject {
             if next.status == .active {
                 self.sessionConfirmedInCurrentProcess = true
             }
-            self.requiresLogin = next.status != .active
         }
     }
 }

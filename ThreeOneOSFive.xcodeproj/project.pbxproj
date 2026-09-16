@@ -97,7 +97,6 @@
 		3105P217 /* FFM - Esp+Aim.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P117; };
 		3105P218 /* FFM - Menu FFM.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P118; };
 
-		3105Z001 /* ChzLogin.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3105Z002; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -209,31 +208,9 @@
 		3105A121 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3105A122 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3105B123 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
-		3105Z002 /* ChzLogin.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = "Frameworks/ChzLogin.xcframework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3105Z003 /* Embed Frameworks */ = {
-
-			isa = PBXCopyFilesBuildPhase;
-
-			buildActionMask = 2147483647;
-
-			dstPath = "";
-
-			dstSubfolderSpec = 10;
-
-			files = (
-
-				3105Z001 /* ChzLogin.xcframework in Frameworks */,
-
-			);
-
-			name = "Embed Frameworks";
-
-			runOnlyForDeploymentPostprocessing = 0;
-
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,7 +218,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3105Z001 /* ChzLogin.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,9 +332,10 @@
 				3105J205 /* DisplayIdentityAttribution.swift */,
 				3105K100 /* SoundEffectManager.swift */,
 				3105K101 /* PatchLoadingCoordinator.swift */,
-				3105K102 /* LicenseViewModel.swift */,
-				3105K103 /* AuthenticationDependency.swift */,
-				3105A025 /* Utils.swift */,
+									3105K102 /* LicenseViewModel.swift */,
+
+					3105A025 /* Utils.swift */,
+
 				3105A026 /* SBX.swift */,
 				3105A027 /* MG.swift */,
 			);
@@ -403,7 +380,6 @@
 			buildPhases = (
 				3105A700 /* Sources */,
 				3105A300 /* Frameworks */,
-				3105Z003 /* Embed Frameworks */,
 				3105A800 /* Resources */,
 			);
 			buildRules = (

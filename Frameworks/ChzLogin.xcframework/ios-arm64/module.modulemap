@@ -1,5 +1,0 @@
-framework module ChzLogin {
-    umbrella header "CHZAuthManager.h"
-    export *
-    module * { export * }
-}

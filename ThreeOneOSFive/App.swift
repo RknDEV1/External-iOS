@@ -6,7 +6,6 @@ struct ThreeOneOSFiveApp: App {
     @StateObject private var appState = AppState()
     @StateObject private var patchDraftCoordinator = PatchDraftCoordinator()
     @StateObject private var fileOperationCoordinator = FileOperationCoordinator()
-    @StateObject private var authenticationDependency = AuthenticationDependencyState()
     @AppStorage(AppLanguage.storageKey) private var languageCode = AppLanguage.english.rawValue
     // A interface RKN abre após a seleção do jogo.
     @State private var showOnboarding = false
@@ -79,11 +78,6 @@ struct ThreeOneOSFiveApp: App {
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
                                         .zIndex(1)
                 }
-
-                if !authenticationDependency.isAvailable {
-                    MissingAuthenticationDependencyView()
-                        .zIndex(10)
-                }
             }
             .displayIdentityAttribution(isPresented: $showAttribution, enabled: !showOnboarding && !showGamePicker)
             .sheet(isPresented: $showAttribution) {
@@ -102,7 +96,6 @@ struct ThreeOneOSFiveApp: App {
                 )
             }
             .onAppear {
-                authenticationDependency.verify()
                 if !showOnboarding {
                     appState.detectSupport()
                     checkForUpdate()

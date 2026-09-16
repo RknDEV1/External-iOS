@@ -409,9 +409,6 @@ private struct CHZPrivHomeView: View {
                 licenseViewModel.refresh()
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CHZLoginDidAuthenticateNotification"))) { _ in
-            licenseViewModel.markAuthenticatedInCurrentProcess()
-        }
         .onReceive(patchStore.$items) { _ in
             continuePendingExternalActivationIfReady()
         }
@@ -419,12 +416,6 @@ private struct CHZPrivHomeView: View {
             continuePendingExternalActivationIfReady()
         }) { request in
             ExternalPatchUnlockView(request: request, store: patchStore)
-        }
-        .fullScreenCover(isPresented: $licenseViewModel.requiresLogin) {
-            CHZLoginViewControllerRepresentable()
-                .id("chz-login-\(isFreeFireMax ? "max" : "free")")
-                .ignoresSafeArea()
-                .interactiveDismissDisabled(true)
         }
     }
 
@@ -692,15 +683,6 @@ private struct CHZPrivHomeView: View {
     }
 
     private func updatePatchState(item: PatchLibraryItem, isEnabled: Bool) {
-        if isEnabled && !licenseViewModel.isActive {
-            if licenseViewModel.isValidating {
-                appendLog("Aguardando validação da licença pelo ChzLogin", level: .progress)
-            } else {
-                appendLog("Ativação bloqueada: licença ausente, inválida ou expirada", level: .warning)
-            }
-            return
-        }
-
         guard let baseProject = item.project else {
             guard isEnabled, item.category == .external, item.summary.isPasswordProtected else {
                 appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
@@ -942,14 +924,6 @@ private struct CHZSwitchStyle: ToggleStyle {
     }
 }
 
-
-private struct CHZLoginViewControllerRepresentable: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> CHZLoginViewController {
-        CHZLoginViewController()
-    }
-
-    func updateUIViewController(_ viewController: CHZLoginViewController, context: Context) {}
-}
 
 
 private struct ExternalPatchUnlockView: View {
