@@ -131,6 +131,10 @@ private struct FreeFireSelectionView: View {
         min(108, max(88, UIScreen.main.bounds.width * 0.24))
     }
 
+    private var hasFreeFireMaxPatch: Bool {
+        Bundle.main.url(forResource: "MenuFFM(1)_Chz_Priv", withExtension: "3105") != nil
+    }
+
     var body: some View {
         ZStack {
             AppTheme.pageBackground.ignoresSafeArea()
@@ -208,10 +212,10 @@ private struct FreeFireSelectionView: View {
                     gameCard(
                         title: "Free Fire Max",
                         subtitle: "Edição expandida",
-                        status: "EM DESENVOLVIMENTO",
+                        status: hasFreeFireMaxPatch ? "SUPORTE ATIVO" : "INDISPONÍVEL",
                         artwork: "FreeFireMax",
                         edition: .freeFireMax,
-                        supported: false
+                        supported: hasFreeFireMaxPatch
                     )
 
                     HStack(spacing: 8) {
