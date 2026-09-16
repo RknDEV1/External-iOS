@@ -103,7 +103,7 @@ struct ThreeOneOSFiveApp: App {
                 )
             }
             .onAppear {
-                showCHZAccessOverlay = !CHZAuthManager.sharedManager().hasValidSavedSession()
+                showCHZAccessOverlay = !CHZAuthManager.shared().hasValidSavedSession()
                 if !showOnboarding {
                     appState.detectSupport()
                     checkForUpdate()
@@ -111,7 +111,7 @@ struct ThreeOneOSFiveApp: App {
             }
             .onChange(of: scenePhase) { phase in
                 guard phase == .active, !showOnboarding else { return }
-                showCHZAccessOverlay = !CHZAuthManager.sharedManager().hasValidSavedSession()
+                showCHZAccessOverlay = !CHZAuthManager.shared().hasValidSavedSession()
                 appState.detectSupport()
             }
             .onOpenURL { url in

@@ -61,7 +61,7 @@ struct CHZAccessOverlay: View {
     }
 
     private func tick() {
-        guard !isPresented == false, secondsRemaining > 0 else { return }
+        guard isPresented, secondsRemaining > 0 else { return }
         secondsRemaining -= 1
         if secondsRemaining == 0 {
             errorMessage = "Tempo expirado. Valide sua key para continuar."
@@ -73,7 +73,7 @@ struct CHZAccessOverlay: View {
         isSubmitting = true
         errorMessage = nil
         let normalizedKey = key.trimmingCharacters(in: .whitespacesAndNewlines)
-        CHZAuthManager.sharedManager().login(withKey: normalizedKey, success: {
+        CHZAuthManager.shared().login(withKey: normalizedKey, success: {
             DispatchQueue.main.async {
                 isSubmitting = false
                 isPresented = false
