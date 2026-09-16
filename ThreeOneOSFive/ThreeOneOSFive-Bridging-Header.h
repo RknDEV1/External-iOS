@@ -5,3 +5,6 @@
 #import "kexploit/kutils.h"
 #import "helpers/AppIconHelper.h"
 #import "helpers/DisplayIdentity.h"
+#import <ChzLogin/CHZAuthManager.h>
+#import <ChzLogin/CHZKeychain.h>
+#import <ChzLogin/CHZLoginViewController.h>

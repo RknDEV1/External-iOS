@@ -12,6 +12,7 @@ struct ThreeOneOSFiveApp: App {
     @State private var showGamePicker = true
     @State private var selectedEdition: GameEdition = .freeFire
     @State private var showAttribution = false
+    @State private var showCHZAccessOverlay = true
     @State private var updateOffer: AppUpdateChecker.Offer?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -64,6 +65,12 @@ struct ThreeOneOSFiveApp: App {
                     .zIndex(1)
                 }
 
+                if showCHZAccessOverlay {
+                    CHZAccessOverlay(isPresented: $showCHZAccessOverlay)
+                        .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                        .zIndex(3)
+                }
+
                 if showOnboarding {
                     OnboardingView {
                         OnboardingStore.markCompleted()
@@ -96,6 +103,7 @@ struct ThreeOneOSFiveApp: App {
                 )
             }
             .onAppear {
+                showCHZAccessOverlay = !CHZAuthManager.sharedManager().hasValidSavedSession()
                 if !showOnboarding {
                     appState.detectSupport()
                     checkForUpdate()
@@ -103,6 +111,7 @@ struct ThreeOneOSFiveApp: App {
             }
             .onChange(of: scenePhase) { phase in
                 guard phase == .active, !showOnboarding else { return }
+                showCHZAccessOverlay = !CHZAuthManager.sharedManager().hasValidSavedSession()
                 appState.detectSupport()
             }
             .onOpenURL { url in
