@@ -904,10 +904,11 @@ private struct ExternalPanelView: View {
     @EnvironmentObject private var appState: AppState
     @State private var diagnosticsEnabled = false
     @State private var showLocalLogs = true
-    @State private var showingExternalImporter = false
     @State private var externalReport: ExternalArtifactReport?
     @State private var externalBackup: ExternalBackupReceipt?
     @State private var externalMessage: String?
+    @State private var embeddedArtifacts: [URL] = []
+    @State private var hasPreparedExternalArtifact = false
 
     private var editionName: String {
         isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE"
@@ -936,25 +937,8 @@ private struct ExternalPanelView: View {
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .navigationTitle("Painel External")
         .navigationBarTitleDisplayMode(.inline)
-        .fileImporter(
-            isPresented: $showingExternalImporter,
-            allowedContentTypes: [.data],
-            allowsMultipleSelection: false
-        ) { result in
-            do {
-                guard let url = try result.get().first else { return }
-                let hasAccess = url.startAccessingSecurityScopedResource()
-                defer {
-                    if hasAccess { url.stopAccessingSecurityScopedResource() }
-                }
-                externalReport = try DevicePatchService.validateExternalArtifact(at: url)
-                externalBackup = nil
-                externalMessage = "Arquivo validado e armazenado na área privada do CHZ PRIV."
-            } catch {
-                externalReport = nil
-                externalBackup = nil
-                externalMessage = "Arquivo recusado pela validação."
-            }
+        .onAppear {
+            embeddedArtifacts = DevicePatchService.embeddedExternalArtifacts()
         }
     }
 
@@ -1027,17 +1011,41 @@ private struct ExternalPanelView: View {
     }
 
     private var externalArtifactSection: some View {
-        panelSection(title: "ARQUIVO EXTERNAL") {
-            Button {
-                showingExternalImporter = true
-            } label: {
+        panelSection(title: "ARQUIVOS EMBUTIDOS") {
+            if embeddedArtifacts.isEmpty {
                 diagnosticLabel(
-                    "Validar arquivo .3105",
-                    detail: "Copiar para a área privada e calcular SHA-256",
-                    symbol: "doc.badge.plus"
+                    "Nenhum arquivo .3105 disponível",
+                    detail: "Os recursos ainda não foram incluídos nesta versão.",
+                    symbol: "exclamationmark.triangle"
                 )
+            } else {
+                ForEach(embeddedArtifacts, id: \.self) { bundledURL in
+                    Button {
+                        do {
+                            let report = try DevicePatchService.validateEmbeddedExternalArtifact(bundledURL)
+                            externalReport = report
+                            externalBackup = nil
+                            _ = try DevicePatchService.installExternalArtifact(
+                                report,
+                                editionKey: isFreeFireMax ? "free-fire-max" : "free-fire"
+                            )
+                            hasPreparedExternalArtifact = true
+                            externalMessage = "Arquivo validado, backup original protegido e cópia interna preparada."
+                        } catch {
+                            externalReport = nil
+                            externalBackup = nil
+                            externalMessage = "Não foi possível preparar este arquivo com segurança."
+                        }
+                    } label: {
+                        diagnosticLabel(
+                            bundledURL.deletingPathExtension().lastPathComponent,
+                            detail: "Validar e preparar somente dentro do app",
+                            symbol: "shippingbox.fill"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            .buttonStyle(.plain)
 
             if let report = externalReport {
                 divider
@@ -1068,17 +1076,18 @@ private struct ExternalPanelView: View {
                     .tint(AppTheme.accent)
                     .disabled(externalBackup != nil)
 
-                    Button("Restaurar") {
-                        guard let externalBackup else { return }
+                    Button("Restaurar original") {
                         do {
-                            _ = try DevicePatchService.restoreExternalBackup(externalBackup)
-                            externalMessage = "Backup interno restaurado."
+                            _ = try DevicePatchService.restoreExternalWorkingFile(
+                                editionKey: isFreeFireMax ? "free-fire-max" : "free-fire"
+                            )
+                            externalMessage = "Arquivo original interno restaurado e verificado."
                         } catch {
-                            externalMessage = "Não foi possível restaurar o backup."
+                            externalMessage = "Não existe backup original interno para restaurar."
                         }
                     }
                     .buttonStyle(.bordered)
-                    .disabled(externalBackup == nil)
+                    .disabled(!hasPreparedExternalArtifact)
                 }
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .padding(.vertical, 8)

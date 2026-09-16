@@ -60,6 +60,73 @@ enum DevicePatchService {
 
     // MARK: - CHZ PRIV-only External Menu operations
 
+    /// Resources shipped with CHZ PRIV. They are treated as inert data and never
+    /// resolved as paths outside the app's own container.
+    static func embeddedExternalArtifacts() -> [URL] {
+        (Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil) ?? [])
+            .filter { $0.pathExtension.lowercased() == "3105" }
+            .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
+    }
+
+    /// Validates a bundled artifact and copies it into the app-private quarantine.
+    static func validateEmbeddedExternalArtifact(_ bundledURL: URL) throws -> ExternalArtifactReport {
+        guard bundledURL.isFileURL, bundledURL.pathExtension.lowercased() == "3105" else {
+            throw PatchPackageError.unsupportedFormat
+        }
+        return try validateExternalArtifact(at: bundledURL)
+    }
+
+    /// Installs only into the app-private working area. The operation is
+    /// transactional: write temporary data, verify its digest, then replace.
+    static func installExternalArtifact(_ report: ExternalArtifactReport, editionKey: String) throws -> URL {
+        let source = try privateOwnedFile(report.storageURL)
+        let root = try externalRoot()
+        let working = root.appendingPathComponent("Working", isDirectory: true)
+        try FileManager.default.createDirectory(at: working, withIntermediateDirectories: true)
+
+        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        let destination = working.appendingPathComponent("\(safeKey).3105")
+        let temporary = working.appendingPathComponent(".\(safeKey).\(UUID().uuidString).tmp")
+        let original = working.appendingPathComponent("\(safeKey).original.3105")
+
+        if FileManager.default.fileExists(atPath: destination.path),
+           !FileManager.default.fileExists(atPath: original.path) {
+            try FileManager.default.copyItem(at: destination, to: original)
+        }
+        try FileManager.default.copyItem(at: source, to: temporary)
+        let copiedData = try Data(contentsOf: temporary, options: [.mappedIfSafe])
+        guard sha256(copiedData) == report.sha256 else {
+            try? FileManager.default.removeItem(at: temporary)
+            throw PatchPackageError.restoreFailed
+        }
+        try? FileManager.default.removeItem(at: destination)
+        try FileManager.default.moveItem(at: temporary, to: destination)
+        log("external: installed \(report.filename) into private working file \(destination.lastPathComponent)")
+        return destination
+    }
+
+    static func restoreExternalWorkingFile(editionKey: String) throws -> URL {
+        let root = try externalRoot()
+        let working = root.appendingPathComponent("Working", isDirectory: true)
+        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        let destination = working.appendingPathComponent("\(safeKey).3105")
+        let original = working.appendingPathComponent("\(safeKey).original.3105")
+        guard FileManager.default.fileExists(atPath: original.path) else {
+            throw PatchPackageError.invalidProject
+        }
+        let temporary = working.appendingPathComponent(".restore-\(UUID().uuidString).tmp")
+        try FileManager.default.copyItem(at: original, to: temporary)
+        let restoredData = try Data(contentsOf: temporary, options: [.mappedIfSafe])
+        guard !restoredData.isEmpty else {
+            try? FileManager.default.removeItem(at: temporary)
+            throw PatchPackageError.restoreFailed
+        }
+        try? FileManager.default.removeItem(at: destination)
+        try FileManager.default.moveItem(at: temporary, to: destination)
+        log("external: restored private working file \(destination.lastPathComponent)")
+        return destination
+    }
+
     static func validateExternalArtifact(at sourceURL: URL) throws -> ExternalArtifactReport {
         guard sourceURL.pathExtension.lowercased() == "3105" else {
             throw PatchPackageError.unsupportedFormat
