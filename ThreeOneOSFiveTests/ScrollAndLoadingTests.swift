@@ -131,6 +131,7 @@ final class ScrollAndLoadingTests: XCTestCase {
 
     func testExternalCategoryUsesOriginal3105PatchPath() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        let serviceSource = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")
         XCTAssertTrue(source.contains("categorySection(.external)"))
         XCTAssertTrue(source.contains("guard let baseProject = item.project"))
         guard let applyStart = source.range(of: "private func applyPatch"),
@@ -143,6 +144,8 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(injectorPath.contains("try DevicePatchService.restore(receipt: receipt)"))
         XCTAssertFalse(injectorPath.contains("installExternalArtifact"))
         XCTAssertFalse(injectorPath.contains("restoreExternalWorkingFile"))
+        XCTAssertTrue(serviceSource.contains("PatchPackageCodec.decode(data, password: \"CHZ\")"))
+        XCTAssertFalse(serviceSource.contains("PatchPackageCodec.decode(data, password: \"OG\")"))
     }
 
     private func loadProjectFile(_ relativePath: String) throws -> String {

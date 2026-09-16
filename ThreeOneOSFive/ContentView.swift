@@ -1413,7 +1413,7 @@ private struct ExternalPanelView: View {
         appendExternalLog("[\(action)] \(function.title)")
         appendExternalLog(enabled ? "[PROCESSO] 3105 iniciou a validação e aplicação" : "[PROCESSO] 3105 iniciou a restauração do original")
         if enabled {
-            appendExternalLog("[PROCESSO] Envelope .3105 e senha OG em validação")
+            appendExternalLog("[PROCESSO] Envelope .3105 e senha CHZ em validação")
             appendExternalLog("[PROCESSO] Confirmando edição, hash e recibo interno")
         }
         externalPatchMessage = enabled ? "Processando ativação…" : "Processando restauração…"

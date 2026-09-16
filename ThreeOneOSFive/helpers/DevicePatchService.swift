@@ -90,7 +90,7 @@ enum DevicePatchService {
         let data = try Data(contentsOf: bundledURL, options: [.mappedIfSafe])
         let summary = try PatchPackageCodec.inspect(data)
         if summary.isPasswordProtected {
-            _ = try PatchPackageCodec.decode(data, password: "OG")
+            _ = try PatchPackageCodec.decode(data, password: "CHZ")
         } else {
             _ = try PatchPackageCodec.decode(data, password: nil)
         }

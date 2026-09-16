@@ -108,7 +108,7 @@
     "category": "External",
     "file": "FF - Esp only.3105",
     "path": "External/FF - Esp only.3105",
-    "sha256": "38aad24affd91d87747029dad34d8a0c31ccfd12ad223f607c1557b45ab5ec29",
+    "sha256": "063e0cd8e9ebb76c0aca46f37ac775264c4ff67619b8d860d3eb126660c11d1a",
     "edition": "Free Fire"
   },
   {
@@ -116,7 +116,7 @@
     "category": "External",
     "file": "FF - Esp+Aim.3105",
     "path": "External/FF - Esp+Aim.3105",
-    "sha256": "5497cd420ada6c71d6c2e7c30f5b87fe96729236d4819b4e5eb07697d04a079b",
+    "sha256": "ffed35f8670bfb694a501d164915946d89c844a69afffabfba8b1e0bcfb25274",
     "edition": "Free Fire"
   },
   {
@@ -124,7 +124,7 @@
     "category": "External",
     "file": "FF - Menu FFTH.3105",
     "path": "External/FF - Menu FFTH.3105",
-    "sha256": "8dd18cc1ef609f534f9ed082c3ee0f4403102a9e8d3a87b514fa7600da960f6f",
+    "sha256": "da3ca4e9b827cef3f8631056ba05bfda7d7b1a5c981b96279eead1f800fbfde6",
     "edition": "Free Fire"
   },
   {
@@ -132,7 +132,7 @@
     "category": "External",
     "file": "FFM - Esp+Aim.3105",
     "path": "External/FFM - Esp+Aim.3105",
-    "sha256": "9753e1ce0d384a9ec1f0e732e79fe2b852147a1c87be0c7a6e3f627155c843b9",
+    "sha256": "526e96f368ca2fc8383e0e0fb6c6afae00291c04a273f2a1fb2f66ab7aad98ad",
     "edition": "Free Fire MAX"
   },
   {
@@ -140,7 +140,7 @@
     "category": "External",
     "file": "FFM - Menu FFM.3105",
     "path": "External/FFM - Menu FFM.3105",
-    "sha256": "c4b442b8ec5038a80b45bfce089e191e8877da470aae8470bcb3fff981b8b29f",
+    "sha256": "eaa4bf6f5ff538d7878e57e59c61b365eaf099ed4b612f67cbd7ba629564ab03",
     "edition": "Free Fire MAX"
   }
 ]
