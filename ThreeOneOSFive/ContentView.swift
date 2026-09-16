@@ -979,6 +979,7 @@ private struct ExternalPanelView: View {
     @State private var activeExternalPatchIDs = Set<String>()
     @State private var workingExternalPatchID: String?
     @State private var externalPatchMessage: String?
+    @State private var externalLog: [String] = []
 
     private struct ExternalPatchFunction: Identifiable {
         let id: String
@@ -1015,14 +1016,9 @@ private struct ExternalPanelView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 14) {
-                header
-                environmentSection
-                statusSection
-                diagnosticsSection
+                compactExternalHeader
                 externalFunctionsSection
-                externalArtifactSection
-                settingsSection
-                safetyNote
+                externalLogSection
             }
             .padding(.horizontal, 16)
             .padding(.top, 12)
@@ -1032,6 +1028,35 @@ private struct ExternalPanelView: View {
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .navigationTitle("Painel External")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var compactExternalHeader: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("EXTERNAL / FUNÇÕES")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                .tracking(1.0)
+                .foregroundStyle(AppTheme.accentBright)
+            Text(isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE")
+                .font(.system(size: 24, weight: .black, design: .rounded))
+                .foregroundStyle(AppTheme.primaryText)
+        }
+    }
+
+    private var externalLogSection: some View {
+        panelSection(title: "LOG") {
+            if externalLog.isEmpty {
+                Text("Aguardando ativação de função…")
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundStyle(AppTheme.secondaryText)
+            } else {
+                ForEach(Array(externalLog.enumerated()), id: \.offset) { _, line in
+                    Text(line)
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
+                        .foregroundStyle(AppTheme.secondaryText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
     }
 
     private var header: some View {
@@ -1157,7 +1182,10 @@ private struct ExternalPanelView: View {
             return
         }
         workingExternalPatchID = function.id
-        externalPatchMessage = enabled ? "Validando e preparando \(function.title)…" : "Restaurando o original de \(function.title)…"
+        let action = enabled ? "ATIVAR" : "DESATIVAR"
+        appendExternalLog("[\(action)] \(function.title)")
+        appendExternalLog(enabled ? "[PROCESSO] 3105 iniciou a validação e aplicação" : "[PROCESSO] 3105 iniciou a restauração do original")
+        externalPatchMessage = enabled ? "Processando ativação…" : "Processando restauração…"
         Task.detached(priority: .userInitiated) {
             do {
                 let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
@@ -1171,14 +1199,23 @@ private struct ExternalPanelView: View {
                     if enabled { activeExternalPatchIDs.insert(function.id) }
                     else { activeExternalPatchIDs.remove(function.id) }
                     workingExternalPatchID = nil
-                    externalPatchMessage = enabled ? "Patch validado e preparado internamente." : "Arquivo original restaurado internamente."
+                    externalPatchMessage = enabled ? "Função ativada." : "Função desativada."
+                    appendExternalLog(enabled ? "[OK] Função ativada pelo 3105" : "[OK] Original restaurado pelo 3105")
                 }
             } catch {
                 await MainActor.run {
                     workingExternalPatchID = nil
-                    externalPatchMessage = "Operação interrompida com segurança: \(error.localizedDescription)"
+                    externalPatchMessage = "Operação interrompida."
+                    appendExternalLog("[ERRO] Operação interrompida: \(error.localizedDescription)")
                 }
             }
+        }
+    }
+
+    private func appendExternalLog(_ line: String) {
+        externalLog.append("\(Date().formatted(date: .omitted, time: .shortened))  \(line)")
+        if externalLog.count > 24 {
+            externalLog.removeFirst(externalLog.count - 24)
         }
     }
 
