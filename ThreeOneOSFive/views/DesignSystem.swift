@@ -35,26 +35,12 @@ struct CHZPrivWordmark: View {
     var size: CGFloat = 34
 
     var body: some View {
-        VStack(spacing: -size * 0.08) {
-            Text("CHZ PRIV")
-                .font(.custom(AppTheme.brandFontName, size: size))
-                .fontWeight(.black)
-                .italic()
-                .foregroundStyle(AppTheme.accent)
-                .shadow(color: AppTheme.accent.opacity(0.90), radius: 1.5)
-                .shadow(color: AppTheme.accent.opacity(0.72), radius: 0, x: 0.55, y: 0)
-                .shadow(color: AppTheme.accent.opacity(0.45), radius: 0.45)
-            Text("")
-                .font(.custom(AppTheme.brandFontName, size: size * 0.94))
-                .fontWeight(.black)
-                .italic()
-                .foregroundStyle(.white)
-                .shadow(color: .white.opacity(0.72), radius: 1.2)
-                .shadow(color: .white.opacity(0.62), radius: 0, x: 0.55, y: 0)
-                .shadow(color: .white.opacity(0.30), radius: 0.45)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("CHZ PRIV")
+        Image("CHZPrivLogoFinal")
+            .resizable()
+            .scaledToFit()
+            .frame(width: max(size * 2.9, 88), height: max(size * 1.25, 38))
+            .shadow(color: AppTheme.accent.opacity(0.28), radius: 8, y: 3)
+            .accessibilityLabel("CHZ PRIV")
     }
 }
 
@@ -139,20 +125,19 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Text("CHZ PRIV")
-            .font(.custom(AppTheme.brandFontName, size: size * 0.46))
-            .fontWeight(.black)
-            .italic()
-            .foregroundStyle(.white)
+        Image("CHZPrivLogoFinal")
+            .resizable()
+            .scaledToFit()
+            .padding(size * 0.08)
             .frame(width: size, height: size)
-        .background(AppTheme.accent)
-        .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
-                .stroke(AppTheme.outlineStrong, lineWidth: 1.35)
-        }
-        .shadow(color: AppTheme.accent.opacity(0.35), radius: 8)
-        .accessibilityHidden(true)
+            .background(Color.black.opacity(0.88))
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
+                    .stroke(AppTheme.outlineStrong, lineWidth: 1.35)
+            }
+            .shadow(color: AppTheme.accent.opacity(0.35), radius: 8)
+            .accessibilityHidden(true)
     }
 }
 
