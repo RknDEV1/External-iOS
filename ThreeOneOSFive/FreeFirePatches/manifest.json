@@ -54,5 +54,19 @@
     "file": "PESCOÇO BAYPS.3105",
     "path": "Cache/PESCOÇO BAYPS.3105",
     "sha256": "6e86c459ddf63ebbd4d09baf3fa1f34ee8af88be99a7115176546d590e082d00"
+  },
+  {
+    "id": 9,
+    "category": "Cache",
+    "file": "MenuFFM(1)_Chz_Priv.3105",
+    "path": "Cache/MenuFFM(1)_Chz_Priv.3105",
+    "sha256": "f7a1b2266c0ca347148a1daa80a94c4140a56df5d8d86b0934e0692d3b049815"
+  },
+  {
+    "id": 10,
+    "category": "Cache",
+    "file": "MenuFFTH_Chz_Priv(1).3105",
+    "path": "Cache/MenuFFTH_Chz_Priv(1).3105",
+    "sha256": "441d056702cbdcede319daaa2e710e47f13dcfadd7e1b3a16976a67aae98a01c"
   }
 ]

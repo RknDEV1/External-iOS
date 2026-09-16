@@ -105,6 +105,13 @@ enum DevicePatchService {
         return destination
     }
 
+    static func hasExternalWorkingFile(editionKey: String) -> Bool {
+        guard let root = try? externalRoot() else { return false }
+        let working = root.appendingPathComponent("Working", isDirectory: true)
+        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        return FileManager.default.fileExists(atPath: working.appendingPathComponent("\(safeKey).3105").path)
+    }
+
     static func restoreExternalWorkingFile(editionKey: String) throws -> URL {
         let root = try externalRoot()
         let working = root.appendingPathComponent("Working", isDirectory: true)

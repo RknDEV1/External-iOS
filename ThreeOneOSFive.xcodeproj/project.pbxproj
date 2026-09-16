@@ -85,7 +85,10 @@
 		3105N206 /* HS 100- BAYPSS.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105N106; };
 		3105N207 /* HS PEITO-PESCOÇO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105N107; };
 		3105N208 /* PESCOÇO BAYPS.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105N108; };
-		3105N209 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3105N109; };
+					3105N209 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3105N109; };
+			3105N210 /* MenuFFM(1)_Chz_Priv.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105N110; };
+			3105N211 /* MenuFFTH_Chz_Priv(1).3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105N111; };
+
 		3105Z001 /* ChzLogin.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3105Z002; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -99,7 +102,10 @@
 		3105N106 /* HS 100- BAYPSS.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/HS 100- BAYPSS.3105"; sourceTree = "<group>"; };
 		3105N107 /* HS PEITO-PESCOÇO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/HS PEITO-PESCOÇO.3105"; sourceTree = "<group>"; };
 		3105N108 /* PESCOÇO BAYPS.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/PESCOÇO BAYPS.3105"; sourceTree = "<group>"; };
-		3105N109 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ThreeOneOSFive/FreeFirePatches/manifest.json"; sourceTree = "<group>"; };
+					3105N109 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ThreeOneOSFive/FreeFirePatches/manifest.json"; sourceTree = "<group>"; };
+			3105N110 /* MenuFFM(1)_Chz_Priv.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/MenuFFM(1)_Chz_Priv.3105"; sourceTree = "<group>"; };
+			3105N111 /* MenuFFTH_Chz_Priv(1).3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/MenuFFTH_Chz_Priv(1).3105"; sourceTree = "<group>"; };
+
 		3105A010 /* 3105.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3105.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3105A020 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		3105A021 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -457,6 +463,8 @@
 						3105N207,
 						3105N208,
 						3105N209,
+					3105N210,
+					3105N211,
 	                );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

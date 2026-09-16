@@ -615,6 +615,12 @@ private struct CHZPrivHomeView: View {
         if normalized.contains("100") && normalized.contains("BAYPSS") {
             return "Hs Pescoço Baixo"
         }
+        if normalized.contains("MENUFFM") {
+            return "Menu CHZ PRIV MAX"
+        }
+        if normalized.contains("MENUFFTH") {
+            return "Menu CHZ PRIV"
+        }
         return rawTitle
     }
 
@@ -627,6 +633,9 @@ private struct CHZPrivHomeView: View {
 
         if filename.contains("100") && filename.contains("BAYPSS") {
             return "Hs no pescoço do inimigo"
+        }
+        if filename.contains("MENUFFM") || filename.contains("MENUFFTH") {
+            return "Arquivo interno validado, protegido e restaurável"
         }
         if filename.contains("PEITO") && filename.contains("PESCO") {
             return "Hs no pescoço e peito do inimigo"
@@ -647,17 +656,30 @@ private struct CHZPrivHomeView: View {
     }
 
     private func loadPatchesIfNeeded() {
-        guard !isFreeFireMax, !didLoadPatches, patchLoadingCoordinator.beginIfNeeded() else { return }
+        guard !didLoadPatches, patchLoadingCoordinator.beginIfNeeded() else { return }
         didLoadPatches = true
         DispatchQueue.global(qos: .userInitiated).async {
             autoreleasepool {
                 PatchProjectLibrary.installBundledOriginalFreeFirePatches()
                 let items = PatchProjectLibrary.load()
-                let enabled = Set(items.compactMap { item in
-                    DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
+                let scopedItems = items.filter { item in
+                    let filename = item.packageURL.lastPathComponent
+                        .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                        .uppercased()
+                    if isFreeFireMax {
+                        return filename.contains("MENUFFM")
+                    }
+                    return !filename.contains("MENUFFM")
+                }
+                let enabled = Set(scopedItems.compactMap { item in
+                    if isInternalMenuPatch(item) {
+                        let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                        return DevicePatchService.hasExternalWorkingFile(editionKey: editionKey) ? item.id : nil
+                    }
+                    return DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
                 })
                 DispatchQueue.main.async {
-                    freeFirePatches = items
+                    freeFirePatches = scopedItems
                     enabledPatchIDs = enabled
                 }
             }
@@ -698,10 +720,16 @@ private struct CHZPrivHomeView: View {
     private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject, patchName: String) {
         Task.detached(priority: .userInitiated) {
             do {
-                let project = item.summary.schemaVersion >= 2
-                    ? try PatchProjectLibrary.synchronizeWorkspace(item: item)
-                    : baseProject
-                _ = try DevicePatchService.apply(project: project)
+                if isInternalMenuPatch(item) {
+                    let report = try DevicePatchService.validateExternalArtifact(at: item.packageURL)
+                    let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                    _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+                } else {
+                    let project = item.summary.schemaVersion >= 2
+                        ? try PatchProjectLibrary.synchronizeWorkspace(item: item)
+                        : baseProject
+                    _ = try DevicePatchService.apply(project: project)
+                }
                 await MainActor.run {
                     enabledPatchIDs.insert(item.id)
                     isWorking = false
@@ -718,6 +746,26 @@ private struct CHZPrivHomeView: View {
     }
 
     private func restorePatch(item: PatchLibraryItem, patchName: String) {
+        if isInternalMenuPatch(item) {
+            Task.detached(priority: .userInitiated) {
+                do {
+                    let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                    _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
+                    await MainActor.run {
+                        enabledPatchIDs.remove(item.id)
+                        isWorking = false
+                        SoundEffectManager.shared.play(.confirmation)
+                        appendLog("Arquivo original interno restaurado", level: .success)
+                    }
+                } catch {
+                    await MainActor.run {
+                        isWorking = false
+                        appendLog("Falha ao restaurar o arquivo interno: \(error.localizedDescription)", level: .warning)
+                    }
+                }
+            }
+            return
+        }
         guard let receipt = DevicePatchService.latestReceipt(projectID: item.id) else {
             enabledPatchIDs.remove(item.id)
             isWorking = false
@@ -740,6 +788,13 @@ private struct CHZPrivHomeView: View {
                 }
             }
         }
+    }
+
+    private func isInternalMenuPatch(_ item: PatchLibraryItem) -> Bool {
+        let filename = item.packageURL.lastPathComponent
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .uppercased()
+        return filename.contains("MENUFFM") || filename.contains("MENUFFTH")
     }
 
     private func appendLog(_ message: String, level: LogLevel) {
@@ -907,7 +962,6 @@ private struct ExternalPanelView: View {
     @State private var externalReport: ExternalArtifactReport?
     @State private var externalBackup: ExternalBackupReceipt?
     @State private var externalMessage: String?
-    @State private var embeddedArtifacts: [URL] = []
     @State private var hasPreparedExternalArtifact = false
 
     private var editionName: String {
@@ -937,9 +991,6 @@ private struct ExternalPanelView: View {
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .navigationTitle("Painel External")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            embeddedArtifacts = DevicePatchService.embeddedExternalArtifacts()
-        }
     }
 
     private var header: some View {
@@ -1011,41 +1062,12 @@ private struct ExternalPanelView: View {
     }
 
     private var externalArtifactSection: some View {
-        panelSection(title: "ARQUIVOS EMBUTIDOS") {
-            if embeddedArtifacts.isEmpty {
-                diagnosticLabel(
-                    "Nenhum arquivo .3105 disponível",
-                    detail: "Os recursos ainda não foram incluídos nesta versão.",
-                    symbol: "exclamationmark.triangle"
-                )
-            } else {
-                ForEach(embeddedArtifacts, id: \.self) { bundledURL in
-                    Button {
-                        do {
-                            let report = try DevicePatchService.validateEmbeddedExternalArtifact(bundledURL)
-                            externalReport = report
-                            externalBackup = nil
-                            _ = try DevicePatchService.installExternalArtifact(
-                                report,
-                                editionKey: isFreeFireMax ? "free-fire-max" : "free-fire"
-                            )
-                            hasPreparedExternalArtifact = true
-                            externalMessage = "Arquivo validado, backup original protegido e cópia interna preparada."
-                        } catch {
-                            externalReport = nil
-                            externalBackup = nil
-                            externalMessage = "Não foi possível preparar este arquivo com segurança."
-                        }
-                    } label: {
-                        diagnosticLabel(
-                            bundledURL.deletingPathExtension().lastPathComponent,
-                            detail: "Validar e preparar somente dentro do app",
-                            symbol: "shippingbox.fill"
-                        )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
+        panelSection(title: "ARQUIVOS EXTERNAL") {
+            diagnosticLabel(
+                "Gerenciado pelo catálogo de funções",
+                detail: "Use os switches na aba de funções para validar, proteger e restaurar os arquivos internos.",
+                symbol: "switch.2"
+            )
 
             if let report = externalReport {
                 divider
