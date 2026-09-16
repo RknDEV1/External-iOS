@@ -27,6 +27,7 @@ final class PatchProjectStore: ObservableObject {
     @Published var passwordRequest: PatchPasswordRequest?
     @Published var alert: PatchStoreAlert?
     @Published var unlockErrorKey: String?
+    @Published private(set) var unlockedPackageID: UUID?
 
     private struct PendingUnlock {
         let data: Data
@@ -199,6 +200,7 @@ final class PatchProjectStore: ObservableObject {
                     try? PatchKeyStore.delete(for: pending.summary)
                     throw error
                 }
+                await self?.markUnlockSucceeded(packageID: pending.summary.packageID)
                 await self?.clearPendingUnlock()
                 await self?.finishOperation(successMessageKey: "patch.unlocked_message")
             } catch let error as PatchPackageError {
@@ -309,6 +311,10 @@ final class PatchProjectStore: ObservableObject {
             existingURL: existingURL
         )
         return nil
+    }
+
+    private func markUnlockSucceeded(packageID: UUID) {
+        unlockedPackageID = packageID
     }
 
     private func clearPendingUnlock() {

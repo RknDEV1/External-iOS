@@ -413,6 +413,10 @@ private struct CHZPrivHomeView: View {
         .onReceive(patchStore.$items) { _ in
             continuePendingExternalActivationIfReady()
         }
+        .onReceive(patchStore.$unlockedPackageID.compactMap { $0 }) { packageID in
+            guard packageID == pendingExternalUnlockID else { return }
+            pendingExternalPasswordItem = nil
+        }
         .sheet(item: $pendingExternalPasswordItem, onDismiss: {
             if patchStore.passwordRequest != nil {
                 patchStore.cancelUnlock()
