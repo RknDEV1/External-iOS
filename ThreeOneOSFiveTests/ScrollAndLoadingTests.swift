@@ -209,6 +209,23 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertFalse(manifest.contains("\"category\": \"Avatar\",\n      \"filename\": \"FFM -"))
     }
 
+    func testApprovedDescriptionsAreCompactAndSelectionTitleIsUpdated() throws {
+        let contentSource = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        let appSource = try loadProjectFile("ThreeOneOSFive/App.swift")
+
+        XCTAssertTrue(contentSource.contains(".lineLimit(1)"))
+        XCTAssertTrue(contentSource.contains(".minimumScaleFactor(0.78)"))
+        XCTAssertTrue(contentSource.contains("ESP sem assistência adicional de mira."))
+        XCTAssertTrue(contentSource.contains("ESP com assistência de mira."))
+        XCTAssertTrue(contentSource.contains("Hs no peito e no pescoço."))
+        XCTAssertTrue(contentSource.contains("Hs no pescoço e acima da cabeça."))
+        XCTAssertTrue(contentSource.contains("Hs 100% acima da cabeça."))
+        XCTAssertTrue(contentSource.contains("Hs 100% no pescoço."))
+        XCTAssertTrue(contentSource.contains("ESP e assistência de mira indisponíveis no MAX."))
+        XCTAssertTrue(appSource.contains("Text(\"Selecione o seu Free Fire\")"))
+        XCTAssertFalse(appSource.contains("Text(\"Escolha seu ambiente\")"))
+    }
+
     private func loadProjectFile(_ relativePath: String) throws -> String {
         let testFile = URL(fileURLWithPath: #filePath)
         let repositoryRoot = testFile

@@ -592,9 +592,12 @@ private struct CHZPrivHomeView: View {
                 }
                 if !description.isEmpty {
                     Text(description)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(unavailable ? Color.orange.opacity(0.82) : AppTheme.tertiaryText)
-                        .lineLimit(2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+                        .allowsTightening(true)
+                        .truncationMode(.tail)
                 }
             }
             Spacer(minLength: 6)
@@ -647,10 +650,52 @@ private struct CHZPrivHomeView: View {
 
     private func patchDescription(for item: PatchLibraryItem) -> String {
         if isUnavailablePatch(item) {
-            return "Indisponível no Free Fire MAX nesta versão."
+            return "ESP e assistência de mira indisponíveis no MAX."
         }
-        // As descrições definitivas serão inseridas quando o novo texto for fornecido.
-        return ""
+
+        let filename = item.packageURL.deletingPathExtension().lastPathComponent
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .uppercased()
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: "+", with: "")
+
+        if item.category == .external {
+            if filename.contains("ESPONLY") {
+                return "ESP sem assistência adicional de mira."
+            }
+            if filename.contains("ESPAIMBOT") {
+                return "ESP com assistência de mira."
+            }
+        }
+        if filename.contains("100") && filename.contains("BAYPSS") {
+            return "Hs no pescoço com perfil Baypss."
+        }
+        if filename.contains("PEITO") && filename.contains("PESCO") {
+            return "Hs no peito e no pescoço."
+        }
+        if filename.contains("PESCO") && filename.contains("ALTO") {
+            return "Hs no pescoço e acima da cabeça."
+        }
+        if filename.contains("PESCO") && filename.contains("ANTENA") {
+            return "Hs no pescoço com indicação de antena."
+        }
+        if filename.contains("ALTO") && filename.contains("ANTENA") {
+            return "Hs alto com indicação de antena."
+        }
+        if filename.contains("ALTO") && filename.contains("BAYPSS") {
+            return "Hs alto com perfil Baypss."
+        }
+        if filename.contains("PESCO") && filename.contains("BAYPSS") {
+            return "Hs no pescoço com perfil Baypss."
+        }
+        if filename.contains("ALTO") && filename.contains("100") {
+            return "Hs 100% acima da cabeça."
+        }
+        if filename.contains("PESCO") && filename.contains("100") {
+            return "Hs 100% no pescoço."
+        }
+        return "Função do catálogo 3105."
     }
 
     private func isUnavailablePatch(_ item: PatchLibraryItem) -> Bool {

@@ -214,7 +214,7 @@ private struct FreeFireSelectionView: View {
                                 .font(.system(size: 11, weight: .bold, design: .monospaced))
                                 .tracking(1.2)
                                 .foregroundStyle(AppTheme.accentBright)
-                            Text("Escolha seu ambiente")
+                            Text("Selecione o seu Free Fire")
                                 .font(.system(size: 27, weight: .black, design: .rounded))
                                 .foregroundStyle(.white)
                             Text("Selecione uma edição para continuar")
