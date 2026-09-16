@@ -122,25 +122,9 @@
   {
     "id": 16,
     "category": "External",
-    "file": "FF - Menu FFTH.3105",
-    "path": "External/FF - Menu FFTH.3105",
-    "sha256": "72eb453f17e9c074fae21b4961687679bb837db7d5a24677480c603993cbe948",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 17,
-    "category": "External",
     "file": "FFM - Esp+Aim.3105",
     "path": "External/FFM - Esp+Aim.3105",
     "sha256": "32881ab751680acc2beaf575e99bae9cd337ce9b2dcc86710e94add733f05489",
-    "edition": "Free Fire MAX"
-  },
-  {
-    "id": 18,
-    "category": "External",
-    "file": "FFM - Menu FFM.3105",
-    "path": "External/FFM - Menu FFM.3105",
-    "sha256": "654b86d617247c4218a55e62b1d2928871165f5368f1c394f684372338462329",
     "edition": "Free Fire MAX"
   }
 ]

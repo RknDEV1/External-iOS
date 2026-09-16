@@ -97,17 +97,17 @@ final class ScrollAndLoadingTests: XCTestCase {
         let manifest = try loadProjectFile("ThreeOneOSFive/FreeFirePatches/manifest.json")
         XCTAssertEqual(manifest.components(separatedBy: "\"category\": \"Avatar\"").count - 1, 5)
         XCTAssertEqual(manifest.components(separatedBy: "\"category\": \"Cache\"").count - 1, 8)
-        XCTAssertEqual(manifest.components(separatedBy: "\"category\": \"External\"").count - 1, 5)
-        XCTAssertTrue(manifest.contains("FF - Menu FFTH.3105"))
-        XCTAssertTrue(manifest.contains("FFM - Menu FFM.3105"))
+        XCTAssertEqual(manifest.components(separatedBy: "\"category\": \"External\"").count - 1, 3)
+        XCTAssertFalse(manifest.contains("FF - Menu FFTH.3105"))
+        XCTAssertFalse(manifest.contains("FFM - Menu FFM.3105"))
         XCTAssertFalse(manifest.contains("MenuFFM(1)_Chz_Priv.3105"))
         XCTAssertFalse(manifest.contains("MenuFFTH_Chz_Priv(1).3105"))
     }
 
     func testUpdatedPatchResourcesAreRegisteredInXcode() throws {
         let project = try loadProjectFile("ThreeOneOSFive.xcodeproj/project.pbxproj")
-        XCTAssertTrue(project.contains("ThreeOneOSFive/FreeFirePatches/External/FF - Menu FFTH.3105"))
-        XCTAssertTrue(project.contains("ThreeOneOSFive/FreeFirePatches/External/FFM - Menu FFM.3105"))
+        XCTAssertFalse(project.contains("ThreeOneOSFive/FreeFirePatches/External/FF - Menu FFTH.3105"))
+        XCTAssertFalse(project.contains("ThreeOneOSFive/FreeFirePatches/External/FFM - Menu FFM.3105"))
         XCTAssertFalse(project.contains("MenuFFM(1)_Chz_Priv.3105"))
         XCTAssertFalse(project.contains("MenuFFTH_Chz_Priv(1).3105"))
     }

@@ -615,22 +615,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func displayTitle(for item: PatchLibraryItem) -> String {
-        let rawTitle = item.project?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
-        let normalized = rawTitle
-            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-            .uppercased()
-            .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: "-", with: "")
-        if normalized.contains("100") && normalized.contains("BAYPSS") {
-            return "Hs Pescoço Baixo"
-        }
-        if normalized.contains("MENUFFM") {
-            return "Menu RKN MAX"
-        }
-        if normalized.contains("MENUFFTH") {
-            return "Menu RKN"
-        }
-        return rawTitle
+        item.project?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
     }
 
     private func patchDescription(for item: PatchLibraryItem) -> String {
@@ -643,9 +628,6 @@ private struct CHZPrivHomeView: View {
 
         if filename.contains("100") && filename.contains("BAYPSS") {
             return "Hs no pescoço do inimigo"
-        }
-        if filename.contains("MENUFFM") || filename.contains("MENUFFTH") {
-            return "Arquivo interno validado, protegido e restaurável"
         }
         if filename.contains("PEITO") && filename.contains("PESCO") {
             return "Hs no pescoço e peito do inimigo"
@@ -1051,24 +1033,15 @@ private struct ExternalPanelView: View {
         return urls
             .filter { url in
                 let name = url.lastPathComponent
-                return name.hasPrefix(prefix) && (name.localizedCaseInsensitiveContains("Esp") || name.localizedCaseInsensitiveContains("Menu"))
+                return name.hasPrefix(prefix) && name.localizedCaseInsensitiveContains("Esp")
             }
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
             .map { url in
                 let filename = url.lastPathComponent
                 let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
                 let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                let title: String
-                if normalized.localizedCaseInsensitiveContains("menu") {
-                    title = isFreeFireMax ? "Menu RKN MAX" : "Menu RKN"
-                } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
-                    title = "ESP + AIM"
-                } else {
-                    title = "ESP"
-                }
-                let detail = normalized.localizedCaseInsensitiveContains("menu")
-                    ? "Função External interna com validação e restauração do arquivo original"
-                    : "Função External interna com processamento e restauração do arquivo original"
+                let title = normalized.localizedCaseInsensitiveContains("esp+aim") ? "ESP + AIM" : "ESP"
+                let detail = "Função External interna com processamento e restauração do arquivo original"
                 return ExternalPatchFunction(
                     id: filename,
                     filename: filename,

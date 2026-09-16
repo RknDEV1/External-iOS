@@ -88,13 +88,11 @@
 		3105P209 /* FF - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P109; };
 		3105P210 /* FF - Esp only.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P110; };
 		3105P211 /* FF - Esp+Aim.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P111; };
-		3105P212 /* FF - Menu FFTH.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P112; };
 		3105P213 /* FFM - Hs 100- Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P113; };
 		3105P214 /* FFM - Hs Alto Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P114; };
 		3105P215 /* FFM - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P115; };
 		3105P216 /* FFM - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P116; };
 		3105P217 /* FFM - Esp+Aim.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P117; };
-		3105P218 /* FFM - Menu FFM.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P118; };
 
 /* End PBXBuildFile section */
 
@@ -112,13 +110,11 @@
 		3105P109 /* FF - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
 		3105P110 /* FF - Esp only.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Esp only.3105"; sourceTree = "<group>"; };
 		3105P111 /* FF - Esp+Aim.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Esp+Aim.3105"; sourceTree = "<group>"; };
-		3105P112 /* FF - Menu FFTH.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Menu FFTH.3105"; sourceTree = "<group>"; };
 		3105P113 /* FFM - Hs 100- Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs 100- Baypss.3105"; sourceTree = "<group>"; };
 		3105P114 /* FFM - Hs Alto Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Alto Baypss.3105"; sourceTree = "<group>"; };
 		3105P115 /* FFM - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
 		3105P116 /* FFM - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
 		3105P117 /* FFM - Esp+Aim.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - Esp+Aim.3105"; sourceTree = "<group>"; };
-		3105P118 /* FFM - Menu FFM.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - Menu FFM.3105"; sourceTree = "<group>"; };
 
 		3105A010 /* 3105.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3105.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3105A020 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -457,13 +453,11 @@
 				3105P209,
 				3105P210,
 				3105P211,
-				3105P212,
 				3105P213,
 				3105P214,
 				3105P215,
 				3105P216,
 				3105P217,
-				3105P218,
 
 	                );
 			runOnlyForDeploymentPostprocessing = 0;
