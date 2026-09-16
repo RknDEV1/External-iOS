@@ -400,14 +400,19 @@ private struct CHZPrivHomeView: View {
         }
         .tint(AppTheme.accent)
         .onAppear {
-            licenseViewModel.refresh()
             loadPatchesIfNeeded()
+            // Give the selected-edition view a stable host before presenting UIKit login.
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 120_000_000)
+                licenseViewModel.refresh()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CHZLoginDidAuthenticateNotification"))) { _ in
             licenseViewModel.markAuthenticatedInCurrentProcess()
         }
         .fullScreenCover(isPresented: $licenseViewModel.requiresLogin) {
             CHZLoginViewControllerRepresentable()
+                .id("chz-login-\(isFreeFireMax ? "max" : "free")")
                 .ignoresSafeArea()
                 .interactiveDismissDisabled(true)
         }
@@ -1190,7 +1195,7 @@ private struct ExternalPanelView: View {
             do {
                 let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
                 if enabled {
-                    let report = try DevicePatchService.validateExternalArtifact(at: sourceURL)
+                    let report = try DevicePatchService.validateEmbeddedExternalArtifact(sourceURL)
                     _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
                 } else {
                     _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)

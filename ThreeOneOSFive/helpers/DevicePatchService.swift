@@ -68,13 +68,26 @@ enum DevicePatchService {
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
     }
 
-    /// Validates a bundled artifact and copies it into the app-private quarantine.
+    /// Validates a bundled artifact against the catalog digest and copies it into
+    /// the app-private quarantine. No external container is accessed.
     static func validateEmbeddedExternalArtifact(_ bundledURL: URL) throws -> ExternalArtifactReport {
         guard bundledURL.isFileURL, bundledURL.pathExtension.lowercased() == "3105" else {
             throw PatchPackageError.unsupportedFormat
         }
-        return try validateExternalArtifact(at: bundledURL)
+        let report = try validateExternalArtifact(at: bundledURL)
+        guard let expected = expectedEmbeddedSHA256[report.filename],
+              report.sha256.caseInsensitiveCompare(expected) == .orderedSame else {
+            log("external: rejected catalog digest for \(report.filename)")
+            throw PatchPackageError.unsupportedFormat
+        }
+        log("external: catalog digest confirmed for \(report.filename)")
+        return report
     }
+
+    private static let expectedEmbeddedSHA256: [String: String] = [
+        "MenuFFM(1)_Chz_Priv.3105": "f7a1b2266c0ca347148a1daa80a94c4140a56df5d8d86b0934e0692d3b049815",
+        "MenuFFTH_Chz_Priv(1).3105": "441d056702cbdcede319daaa2e710e47f13dcfadd7e1b3a16976a67aae98a01c"
+    ]
 
     /// Installs only into the app-private working area. The operation is
     /// transactional: write temporary data, verify its digest, then replace.
