@@ -5,6 +5,7 @@ import CryptoKit
 enum PatchCategory: String, CaseIterable, Identifiable {
     case avatar = "Avatar"
     case cache = "Cache"
+    case external = "External"
 
     var id: String { rawValue }
 
@@ -12,6 +13,7 @@ enum PatchCategory: String, CaseIterable, Identifiable {
         switch self {
         case .avatar: return "scope"
         case .cache: return "antenna.radiowaves.left.and.right"
+        case .external: return "rectangle.3.group.fill"
         }
     }
 

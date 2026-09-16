@@ -678,13 +678,13 @@ private struct CHZPrivHomeView: View {
                         .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
                         .uppercased()
                     if isFreeFireMax {
-                        return filename.contains("MENUFFM")
+                        return filename.hasPrefix("FFM -")
                     }
-                    return !filename.contains("MENUFFM")
+                    return filename.hasPrefix("FF -")
                 }
                 let enabled = Set(scopedItems.compactMap { item in
                     if isInternalMenuPatch(item) {
-                        let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                        let editionKey = externalEditionKey(for: item)
                         return DevicePatchService.hasExternalWorkingFile(editionKey: editionKey) ? item.id : nil
                     }
                     return DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
@@ -734,7 +734,7 @@ private struct CHZPrivHomeView: View {
             do {
                 if isInternalMenuPatch(item) {
                     let report = try DevicePatchService.validateEmbeddedExternalArtifact(item.packageURL)
-                    let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                    let editionKey = externalEditionKey(for: item)
                     _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
                 } else {
                     let project = item.summary.schemaVersion >= 2
@@ -763,7 +763,7 @@ private struct CHZPrivHomeView: View {
         if isInternalMenuPatch(item) {
             Task.detached(priority: .userInitiated) {
                 do {
-                    let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                    let editionKey = externalEditionKey(for: item)
                     _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
                     await MainActor.run {
                         enabledPatchIDs.remove(item.id)
@@ -809,10 +809,12 @@ private struct CHZPrivHomeView: View {
     }
 
     private func isInternalMenuPatch(_ item: PatchLibraryItem) -> Bool {
+        item.category == .external
+    }
+
+    private func externalEditionKey(for item: PatchLibraryItem) -> String {
         let filename = item.packageURL.lastPathComponent
-            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-            .uppercased()
-        return filename.contains("MENUFFM") || filename.contains("MENUFFTH")
+        return filename.hasPrefix("FFM -") ? "free-fire-max-\(item.id.uuidString)" : "free-fire-\(item.id.uuidString)"
     }
 
     private func appendLog(_ message: String, level: LogLevel) {
@@ -1029,20 +1031,36 @@ private struct ExternalPanelView: View {
     }
 
     private var externalFunctions: [ExternalPatchFunction] {
-        if isFreeFireMax {
-            return [ExternalPatchFunction(
-                id: "menuffm",
-                filename: "MenuFFM(1)_Chz_Priv.3105",
-                title: "Menu RKN MAX",
-                detail: "Validação, preparação interna e restauração do arquivo original"
-            )]
-        }
-        return [ExternalPatchFunction(
-            id: "menuffth",
-            filename: "MenuFFTH_Chz_Priv(1).3105",
-            title: "Menu RKN",
-            detail: "Validação, preparação interna e restauração do arquivo original"
-        )]
+        let prefix = isFreeFireMax ? "FFM - " : "FF - "
+        let urls = Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil) ?? []
+        return urls
+            .filter { url in
+                let name = url.lastPathComponent
+                return name.hasPrefix(prefix) && (name.localizedCaseInsensitiveContains("Esp") || name.localizedCaseInsensitiveContains("Menu"))
+            }
+            .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
+            .map { url in
+                let filename = url.lastPathComponent
+                let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
+                let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                let title: String
+                if normalized.localizedCaseInsensitiveContains("menu") {
+                    title = isFreeFireMax ? "Menu RKN MAX" : "Menu RKN"
+                } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
+                    title = "ESP + AIM"
+                } else {
+                    title = "ESP"
+                }
+                let detail = normalized.localizedCaseInsensitiveContains("menu")
+                    ? "Função External interna com validação e restauração do arquivo original"
+                    : "Função External interna com processamento e restauração do arquivo original"
+                return ExternalPatchFunction(
+                    id: filename,
+                    filename: filename,
+                    title: title,
+                    detail: detail
+                )
+            }
     }
 
     private var editionName: String {
@@ -1078,6 +1096,7 @@ private struct ExternalPanelView: View {
         .chzPrivScrollBounceBehavior()
         .scrollIndicators(.hidden)
         .background(AppTheme.pageBackground.ignoresSafeArea())
+        .onAppear { refreshExternalState() }
     }
 
     private var compactExternalHeader: some View {
@@ -1323,17 +1342,33 @@ private struct ExternalPanelView: View {
         }
     }
 
+    private func externalEditionKey(for function: ExternalPatchFunction) -> String {
+        let prefix = isFreeFireMax ? "free-fire-max" : "free-fire"
+        let safe = function.id.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        return "\(prefix)-\(safe)"
+    }
+
+    private func refreshExternalState() {
+        let active = Set(externalFunctions.compactMap { function in
+            DevicePatchService.hasExternalWorkingFile(editionKey: externalEditionKey(for: function)) ? function.id : nil
+        })
+        activeExternalPatchIDs = active
+    }
+
     private func handleExternalPatch(_ function: ExternalPatchFunction, enabled: Bool) {
         guard workingExternalPatchID == nil else { return }
-        let resourceName = URL(fileURLWithPath: function.filename)
-            .deletingPathExtension()
-            .lastPathComponent
-        guard let sourceURL = Bundle.main.url(
-            forResource: resourceName,
-            withExtension: "3105"
-        ) else {
-            externalPatchMessage = "Recurso não encontrado no bundle."
-            return
+        let sourceURL: URL?
+        if enabled {
+            let resourceName = URL(fileURLWithPath: function.filename)
+                .deletingPathExtension()
+                .lastPathComponent
+            sourceURL = Bundle.main.url(forResource: resourceName, withExtension: "3105")
+            guard sourceURL != nil else {
+                externalPatchMessage = "Recurso não encontrado no bundle."
+                return
+            }
+        } else {
+            sourceURL = nil
         }
         workingExternalPatchID = function.id
         let action = enabled ? "ATIVAR" : "DESATIVAR"
@@ -1342,8 +1377,9 @@ private struct ExternalPanelView: View {
         externalPatchMessage = enabled ? "Processando ativação…" : "Processando restauração…"
         Task.detached(priority: .userInitiated) {
             do {
-                let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                let editionKey = externalEditionKey(for: function)
                 if enabled {
+                    guard let sourceURL else { throw PatchPackageError.invalidProject }
                     let report = try DevicePatchService.validateEmbeddedExternalArtifact(sourceURL)
                     _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
                 } else {

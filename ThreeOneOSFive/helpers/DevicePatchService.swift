@@ -75,7 +75,7 @@ enum DevicePatchService {
             throw PatchPackageError.unsupportedFormat
         }
         let report = try validateExternalArtifact(at: bundledURL)
-        guard let expected = expectedEmbeddedSHA256[report.filename],
+        guard let expected = expectedEmbeddedSHA256(for: report.filename),
               report.sha256.caseInsensitiveCompare(expected) == .orderedSame else {
             log("external: rejected catalog digest for \(report.filename)")
             throw PatchPackageError.unsupportedFormat
@@ -84,10 +84,19 @@ enum DevicePatchService {
         return report
     }
 
-    private static let expectedEmbeddedSHA256: [String: String] = [
-        "MenuFFM(1)_Chz_Priv.3105": "f7a1b2266c0ca347148a1daa80a94c4140a56df5d8d86b0934e0692d3b049815",
-        "MenuFFTH_Chz_Priv(1).3105": "441d056702cbdcede319daaa2e710e47f13dcfadd7e1b3a16976a67aae98a01c"
-    ]
+    private struct EmbeddedManifestEntry: Decodable {
+        let file: String
+        let sha256: String
+    }
+
+    private static func expectedEmbeddedSHA256(for filename: String, bundle: Bundle = .main) -> String? {
+        guard let manifestURL = bundle.url(forResource: "manifest", withExtension: "json"),
+              let data = try? Data(contentsOf: manifestURL),
+              let entries = try? JSONDecoder().decode([EmbeddedManifestEntry].self, from: data) else {
+            return nil
+        }
+        return entries.first(where: { $0.file == filename })?.sha256
+    }
 
     /// Installs only into the app-private working area. The operation is
     /// transactional: write temporary data, verify its digest, then replace.

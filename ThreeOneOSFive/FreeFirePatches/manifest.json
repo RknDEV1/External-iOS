@@ -2,71 +2,145 @@
   {
     "id": 1,
     "category": "Avatar",
-    "file": "HS ALTO - ANTENA.3105",
-    "path": "Avatar/HS ALTO - ANTENA.3105",
-    "sha256": "4487ec07d05fb33dc22ae7fc2f0c2c5f4b2e0914bdb8682511dc7b75d1cd4787"
+    "file": "FF - Hs Alto 100-.3105",
+    "path": "Avatar/FF - Hs Alto 100-.3105",
+    "sha256": "1c42a346d9ff7871ba712b6de65ff4b62c072922fe9e48c5bec0cf7470285d90",
+    "edition": "Free Fire"
   },
   {
     "id": 2,
     "category": "Avatar",
-    "file": "HS ALTO.3105",
-    "path": "Avatar/HS ALTO.3105",
-    "sha256": "ede656ab829eeace725f52041c18d3b656076e1b5d54519b46fee3309d5a17d4"
+    "file": "FF - Hs Alto-Antena.3105",
+    "path": "Avatar/FF - Hs Alto-Antena.3105",
+    "sha256": "a5f7f038547a18dd095da51c0dae809f408f1509c4c830459e40f076e7fd53cd",
+    "edition": "Free Fire"
   },
   {
     "id": 3,
     "category": "Avatar",
-    "file": "HS PESCO-ALTO.3105",
-    "path": "Avatar/HS PESCO-ALTO.3105",
-    "sha256": "9e3aac6366023d2d22848971f4959fcc484e16a70c9d33c300073f21a85b0d5e"
+    "file": "FF - Hs Pescoço 100-.3105",
+    "path": "Avatar/FF - Hs Pescoço 100-.3105",
+    "sha256": "a1264a359e63ed3ee4c5a613148ca90ad67be611e0cd3848818cd44fa8973137",
+    "edition": "Free Fire"
   },
   {
     "id": 4,
     "category": "Avatar",
-    "file": "HS PESCOÇO - ANTENA.3105",
-    "path": "Avatar/HS PESCOÇO - ANTENA.3105",
-    "sha256": "e8af16284d43348bf770a84c7d307cc9d615ebc2017896fe66f8d4bedb4ca222"
+    "file": "FF - Hs Pescoço-Alto.3105",
+    "path": "Avatar/FF - Hs Pescoço-Alto.3105",
+    "sha256": "d70b7c13793bc2362c00e5d1a396fcbda9b5b21686e59b125cd7c7228ed37d94",
+    "edition": "Free Fire"
   },
   {
     "id": 5,
     "category": "Avatar",
-    "file": "HS PESCOÇO.3105",
-    "path": "Avatar/HS PESCOÇO.3105",
-    "sha256": "8dda481f5022ffdba8eb49f30c91596f0ff7c619e1c327669fcfcc50c6cbc125"
+    "file": "FF - Hs Pescoço-Antena.3105",
+    "path": "Avatar/FF - Hs Pescoço-Antena.3105",
+    "sha256": "9a3a5fb621dffd78683346550b9f7996bd8bc0995c221db2bb3abf331b75ae81",
+    "edition": "Free Fire"
   },
   {
     "id": 6,
     "category": "Cache",
-    "file": "HS 100- BAYPSS.3105",
-    "path": "Cache/HS 100- BAYPSS.3105",
-    "sha256": "d8a14d94a21a00e381d0a7c981866b07e6b47c160b51e4054ff73a72f9318fea"
+    "file": "FF - Hs 100- Baypss.3105",
+    "path": "Cache/FF - Hs 100- Baypss.3105",
+    "sha256": "934405c1146e1b46044d2f934be7e8a9738d05701d1512494fec912032c1aa50",
+    "edition": "Free Fire"
   },
   {
     "id": 7,
     "category": "Cache",
-    "file": "HS PEITO-PESCOÇO.3105",
-    "path": "Cache/HS PEITO-PESCOÇO.3105",
-    "sha256": "6f23951ccc1d79e5c319f669fdec1e4cabe154adbc211099f6d30643b9a9e413"
+    "file": "FF - Hs Alto Baypss.3105",
+    "path": "Cache/FF - Hs Alto Baypss.3105",
+    "sha256": "d761c286565ee0c723ce7b97c3bbcfdd28e0905ccd2a76495a2871f47e3ec348",
+    "edition": "Free Fire"
   },
   {
     "id": 8,
     "category": "Cache",
-    "file": "PESCOÇO BAYPS.3105",
-    "path": "Cache/PESCOÇO BAYPS.3105",
-    "sha256": "6e86c459ddf63ebbd4d09baf3fa1f34ee8af88be99a7115176546d590e082d00"
+    "file": "FF - Hs Peito-Pescoço.3105",
+    "path": "Cache/FF - Hs Peito-Pescoço.3105",
+    "sha256": "a245443d8429b1d491d48da3b39ab67333edb84497572cb3afd9f9703e931446",
+    "edition": "Free Fire"
   },
   {
     "id": 9,
     "category": "Cache",
-    "file": "MenuFFM(1)_Chz_Priv.3105",
-    "path": "Cache/MenuFFM(1)_Chz_Priv.3105",
-    "sha256": "f7a1b2266c0ca347148a1daa80a94c4140a56df5d8d86b0934e0692d3b049815"
+    "file": "FF - Hs Pescoço Baypss.3105",
+    "path": "Cache/FF - Hs Pescoço Baypss.3105",
+    "sha256": "d3b50ee2ee1fa027b76b7a43039d6e7405a0a78b0e84a3d4dfe38b336b0405fa",
+    "edition": "Free Fire"
   },
   {
     "id": 10,
     "category": "Cache",
-    "file": "MenuFFTH_Chz_Priv(1).3105",
-    "path": "Cache/MenuFFTH_Chz_Priv(1).3105",
-    "sha256": "441d056702cbdcede319daaa2e710e47f13dcfadd7e1b3a16976a67aae98a01c"
+    "file": "FFM - Hs 100- Baypss.3105",
+    "path": "Cache/FFM - Hs 100- Baypss.3105",
+    "sha256": "934405c1146e1b46044d2f934be7e8a9738d05701d1512494fec912032c1aa50",
+    "edition": "Free Fire MAX"
+  },
+  {
+    "id": 11,
+    "category": "Cache",
+    "file": "FFM - Hs Alto Baypss.3105",
+    "path": "Cache/FFM - Hs Alto Baypss.3105",
+    "sha256": "d761c286565ee0c723ce7b97c3bbcfdd28e0905ccd2a76495a2871f47e3ec348",
+    "edition": "Free Fire MAX"
+  },
+  {
+    "id": 12,
+    "category": "Cache",
+    "file": "FFM - Hs Peito-Pescoço.3105",
+    "path": "Cache/FFM - Hs Peito-Pescoço.3105",
+    "sha256": "a245443d8429b1d491d48da3b39ab67333edb84497572cb3afd9f9703e931446",
+    "edition": "Free Fire MAX"
+  },
+  {
+    "id": 13,
+    "category": "Cache",
+    "file": "FFM - Hs Pescoço Baypss.3105",
+    "path": "Cache/FFM - Hs Pescoço Baypss.3105",
+    "sha256": "d3b50ee2ee1fa027b76b7a43039d6e7405a0a78b0e84a3d4dfe38b336b0405fa",
+    "edition": "Free Fire MAX"
+  },
+  {
+    "id": 14,
+    "category": "External",
+    "file": "FF - Esp only.3105",
+    "path": "External/FF - Esp only.3105",
+    "sha256": "38aad24affd91d87747029dad34d8a0c31ccfd12ad223f607c1557b45ab5ec29",
+    "edition": "Free Fire"
+  },
+  {
+    "id": 15,
+    "category": "External",
+    "file": "FF - Esp+Aim.3105",
+    "path": "External/FF - Esp+Aim.3105",
+    "sha256": "5497cd420ada6c71d6c2e7c30f5b87fe96729236d4819b4e5eb07697d04a079b",
+    "edition": "Free Fire"
+  },
+  {
+    "id": 16,
+    "category": "External",
+    "file": "FF - Menu FFTH.3105",
+    "path": "External/FF - Menu FFTH.3105",
+    "sha256": "8dd18cc1ef609f534f9ed082c3ee0f4403102a9e8d3a87b514fa7600da960f6f",
+    "edition": "Free Fire"
+  },
+  {
+    "id": 17,
+    "category": "External",
+    "file": "FFM - Esp+Aim.3105",
+    "path": "External/FFM - Esp+Aim.3105",
+    "sha256": "9753e1ce0d384a9ec1f0e732e79fe2b852147a1c87be0c7a6e3f627155c843b9",
+    "edition": "Free Fire MAX"
+  },
+  {
+    "id": 18,
+    "category": "External",
+    "file": "FFM - Menu FFM.3105",
+    "path": "External/FFM - Menu FFM.3105",
+    "sha256": "c4b442b8ec5038a80b45bfce089e191e8877da470aae8470bcb3fff981b8b29f",
+    "edition": "Free Fire MAX"
   }
 ]
