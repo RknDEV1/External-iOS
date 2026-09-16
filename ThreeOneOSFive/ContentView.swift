@@ -305,6 +305,7 @@ private struct CHZPrivHomeView: View {
     let onExitToGamePicker: () -> Void
     @EnvironmentObject private var appState: AppState
     @StateObject private var licenseViewModel = LicenseViewModel()
+    @StateObject private var patchStore = PatchProjectStore()
 
     private enum HomePage {
         case license
@@ -348,6 +349,7 @@ private struct CHZPrivHomeView: View {
     @State private var workingPatchID: UUID?
     @State private var didLoadPatches = false
     @State private var patchLoadingCoordinator = PatchLoadingCoordinator()
+    @State private var pendingExternalUnlockID: UUID?
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -409,6 +411,14 @@ private struct CHZPrivHomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("CHZLoginDidAuthenticateNotification"))) { _ in
             licenseViewModel.markAuthenticatedInCurrentProcess()
+        }
+        .onReceive(patchStore.$items) { _ in
+            continuePendingExternalActivationIfReady()
+        }
+        .sheet(item: $patchStore.passwordRequest, onDismiss: {
+            continuePendingExternalActivationIfReady()
+        }) { request in
+            ExternalPatchUnlockView(request: request, store: patchStore)
         }
         .fullScreenCover(isPresented: $licenseViewModel.requiresLogin) {
             CHZLoginViewControllerRepresentable()
@@ -577,7 +587,7 @@ private struct CHZPrivHomeView: View {
             ))
                 .labelsHidden()
                 .toggleStyle(CHZSwitchStyle())
-                .disabled(item.project == nil || isWorking)
+                .disabled(isWorking)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
@@ -692,7 +702,13 @@ private struct CHZPrivHomeView: View {
         }
 
         guard let baseProject = item.project else {
-            appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
+            guard isEnabled, item.category == .external, item.summary.isPasswordProtected else {
+                appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
+                return
+            }
+            pendingExternalUnlockID = item.id
+            appendLog("Senha necessária para desbloquear o patch External", level: .progress)
+            patchStore.requestUnlock(for: item)
             return
         }
         let patchName = baseProject.name
@@ -711,6 +727,22 @@ private struct CHZPrivHomeView: View {
             appendLog("Verificando journal e backup protegido", level: .progress)
             restorePatch(item: item, patchName: patchName)
         }
+    }
+
+    private func continuePendingExternalActivationIfReady() {
+        guard let pendingID = pendingExternalUnlockID,
+              let unlockedItem = patchStore.items.first(where: { $0.id == pendingID }),
+              unlockedItem.project != nil,
+              !isWorking else { return }
+        pendingExternalUnlockID = nil
+        let prefix = isFreeFireMax ? "FFM -" : "FF -"
+        freeFirePatches = patchStore.items.filter { item in
+            item.packageURL.lastPathComponent
+                .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                .uppercased()
+                .hasPrefix(prefix)
+        }
+        updatePatchState(item: unlockedItem, isEnabled: true)
     }
 
     private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject, patchName: String) {
@@ -919,6 +951,56 @@ private struct CHZLoginViewControllerRepresentable: UIViewControllerRepresentabl
     func updateUIViewController(_ viewController: CHZLoginViewController, context: Context) {}
 }
 
+
+private struct ExternalPatchUnlockView: View {
+    let request: PatchPasswordRequest
+    @ObservedObject var store: PatchProjectStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var password = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Patch protegido") {
+                    Text(request.summary.packageID.uuidString)
+                        .font(.headline.monospaced())
+                        .lineLimit(1)
+                    SecureField("Senha do patch", text: $password)
+                        .textContentType(.password)
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
+                    if let errorKey = store.unlockErrorKey {
+                        Text(errorKey == "patch.error.wrong_password" ? "Senha incorreta ou pacote inválido." : "Não foi possível desbloquear o patch.")
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
+                }
+                Section {
+                    Text("A senha é solicitada somente para desbloquear este pacote. A aplicação continua sendo feita pelo fluxo original do 3105.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("Senha necessária")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") {
+                        store.cancelUnlock()
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Continuar") {
+                        store.unlock(password: password)
+                    }
+                    .disabled(password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || store.isBusy)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
 
 private struct ExternalPanelView: View {
     let isFreeFireMax: Bool
