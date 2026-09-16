@@ -976,6 +976,33 @@ private struct ExternalPanelView: View {
     @State private var externalBackup: ExternalBackupReceipt?
     @State private var externalMessage: String?
     @State private var hasPreparedExternalArtifact = false
+    @State private var activeExternalPatchIDs = Set<String>()
+    @State private var workingExternalPatchID: String?
+    @State private var externalPatchMessage: String?
+
+    private struct ExternalPatchFunction: Identifiable {
+        let id: String
+        let filename: String
+        let title: String
+        let detail: String
+    }
+
+    private var externalFunctions: [ExternalPatchFunction] {
+        if isFreeFireMax {
+            return [ExternalPatchFunction(
+                id: "menuffm",
+                filename: "MenuFFM(1)_Chz_Priv.3105",
+                title: "Menu CHZ PRIV MAX",
+                detail: "Validação, preparação interna e restauração do arquivo original"
+            )]
+        }
+        return [ExternalPatchFunction(
+            id: "menuffth",
+            filename: "MenuFFTH_Chz_Priv(1).3105",
+            title: "Menu CHZ PRIV",
+            detail: "Validação, preparação interna e restauração do arquivo original"
+        )]
+    }
 
     private var editionName: String {
         isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE"
@@ -992,6 +1019,7 @@ private struct ExternalPanelView: View {
                 environmentSection
                 statusSection
                 diagnosticsSection
+                externalFunctionsSection
                 externalArtifactSection
                 settingsSection
                 safetyNote
@@ -1071,6 +1099,86 @@ private struct ExternalPanelView: View {
             diagnosticRow("Integridade do app", value: diagnosticsEnabled ? "VERIFICADA" : "AGUARDANDO", color: diagnosticsEnabled ? AppTheme.success : AppTheme.secondaryText, symbol: "checkmark.shield")
             divider
             diagnosticRow("Logs da sessão", value: showLocalLogs ? "VISÍVEIS" : "OCULTOS", color: AppTheme.secondaryText, symbol: "doc.text.magnifyingglass")
+        }
+    }
+
+    private var externalFunctionsSection: some View {
+        panelSection(title: "FUNÇÕES EXTERNAL") {
+            ForEach(externalFunctions) { function in
+                HStack(spacing: 12) {
+                    Image(systemName: "shippingbox.fill")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(AppTheme.accentBright)
+                        .frame(width: 28)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(function.title.uppercased())
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(AppTheme.primaryText)
+                        Text(function.detail)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(AppTheme.tertiaryText)
+                            .lineLimit(2)
+                    }
+                    Spacer(minLength: 6)
+                    if workingExternalPatchID == function.id {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(AppTheme.accentBright)
+                    }
+                    Toggle(function.title, isOn: Binding(
+                        get: { activeExternalPatchIDs.contains(function.id) },
+                        set: { handleExternalPatch(function, enabled: $0) }
+                    ))
+                    .labelsHidden()
+                    .toggleStyle(CHZSwitchStyle())
+                    .disabled(workingExternalPatchID != nil)
+                }
+                .padding(.vertical, 7)
+            }
+            if let externalPatchMessage {
+                divider
+                Text(externalPatchMessage)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+    }
+
+    private func handleExternalPatch(_ function: ExternalPatchFunction, enabled: Bool) {
+        guard workingExternalPatchID == nil else { return }
+        let resourceName = URL(fileURLWithPath: function.filename)
+            .deletingPathExtension()
+            .lastPathComponent
+        guard let sourceURL = Bundle.main.url(
+            forResource: resourceName,
+            withExtension: "3105"
+        ) else {
+            externalPatchMessage = "Recurso não encontrado no bundle."
+            return
+        }
+        workingExternalPatchID = function.id
+        externalPatchMessage = enabled ? "Validando e preparando \(function.title)…" : "Restaurando o original de \(function.title)…"
+        Task.detached(priority: .userInitiated) {
+            do {
+                let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
+                if enabled {
+                    let report = try DevicePatchService.validateExternalArtifact(at: sourceURL)
+                    _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+                } else {
+                    _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
+                }
+                await MainActor.run {
+                    if enabled { activeExternalPatchIDs.insert(function.id) }
+                    else { activeExternalPatchIDs.remove(function.id) }
+                    workingExternalPatchID = nil
+                    externalPatchMessage = enabled ? "Patch validado e preparado internamente." : "Arquivo original restaurado internamente."
+                }
+            } catch {
+                await MainActor.run {
+                    workingExternalPatchID = nil
+                    externalPatchMessage = "Operação interrompida com segurança: \(error.localizedDescription)"
+                }
+            }
         }
     }
 
