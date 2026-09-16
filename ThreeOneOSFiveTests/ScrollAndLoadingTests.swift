@@ -79,6 +79,20 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(project.contains("IPHONEOS_DEPLOYMENT_TARGET = 16.0;"))
     }
 
+    func testExternalRestoreHandlesAbsentOriginalBaseline() throws {
+        let service = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")
+        XCTAssertTrue(service.contains("originalAbsentMarker"))
+        XCTAssertTrue(service.contains("original-absent"))
+        XCTAssertTrue(service.contains("restored private working state (original file was absent)"))
+    }
+
+    func testExternalSwitchOnlyChangesStateAfterSuccessfulOperation() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        XCTAssertTrue(source.contains("if enabled { activeExternalPatchIDs.insert(function.id) }"))
+        XCTAssertTrue(source.contains("else { activeExternalPatchIDs.remove(function.id) }"))
+        XCTAssertTrue(source.contains("workingExternalPatchID = nil"))
+    }
+
     private func loadProjectFile(_ relativePath: String) throws -> String {
         let testFile = URL(fileURLWithPath: #filePath)
         let repositoryRoot = testFile

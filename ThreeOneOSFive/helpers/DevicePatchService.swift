@@ -101,10 +101,18 @@ enum DevicePatchService {
         let destination = working.appendingPathComponent("\(safeKey).3105")
         let temporary = working.appendingPathComponent(".\(safeKey).\(UUID().uuidString).tmp")
         let original = working.appendingPathComponent("\(safeKey).original.3105")
+        let originalAbsentMarker = working.appendingPathComponent("\(safeKey).original.absent")
 
-        if FileManager.default.fileExists(atPath: destination.path),
-           !FileManager.default.fileExists(atPath: original.path) {
-            try FileManager.default.copyItem(at: destination, to: original)
+        // Capture the baseline exactly once per activation cycle. If no working
+        // file existed yet, persist that fact so deactivation can remove the
+        // generated working copy instead of failing to restore.
+        if !FileManager.default.fileExists(atPath: original.path),
+           !FileManager.default.fileExists(atPath: originalAbsentMarker.path) {
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try FileManager.default.copyItem(at: destination, to: original)
+            } else {
+                try Data("original-absent".utf8).write(to: originalAbsentMarker, options: [.atomic, .completeFileProtection])
+            }
         }
         try FileManager.default.copyItem(at: source, to: temporary)
         let copiedData = try Data(contentsOf: temporary, options: [.mappedIfSafe])
@@ -131,6 +139,17 @@ enum DevicePatchService {
         let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
         let destination = working.appendingPathComponent("\(safeKey).3105")
         let original = working.appendingPathComponent("\(safeKey).original.3105")
+        let originalAbsentMarker = working.appendingPathComponent("\(safeKey).original.absent")
+
+        if FileManager.default.fileExists(atPath: originalAbsentMarker.path) {
+            // The baseline was an absent file; restore means removing the
+            // generated working copy and clearing the cycle marker.
+            try? FileManager.default.removeItem(at: destination)
+            try FileManager.default.removeItem(at: originalAbsentMarker)
+            log("external: restored private working state (original file was absent)")
+            return destination
+        }
+
         guard FileManager.default.fileExists(atPath: original.path) else {
             throw PatchPackageError.invalidProject
         }
@@ -143,6 +162,7 @@ enum DevicePatchService {
         }
         try? FileManager.default.removeItem(at: destination)
         try FileManager.default.moveItem(at: temporary, to: destination)
+        try FileManager.default.removeItem(at: original)
         log("external: restored private working file \(destination.lastPathComponent)")
         return destination
     }
