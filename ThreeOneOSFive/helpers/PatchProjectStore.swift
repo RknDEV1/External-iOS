@@ -36,6 +36,7 @@ final class PatchProjectStore: ObservableObject {
     }
 
     private var pendingUnlock: PendingUnlock?
+    private var activeUnlockAttemptID: UUID?
 
     init() {
         reload()
@@ -173,27 +174,39 @@ final class PatchProjectStore: ObservableObject {
         // External protegidos podem exigir a senha novamente em cada ativação.
         // Os demais patches preservam o comportamento persistente original.
         guard (force || item.isLocked), !isBusy else { return false }
+        unlockedPackageID = nil
+        activeUnlockAttemptID = UUID()
         do {
             let data = try PatchProjectLibrary.readPackage(at: item.packageURL)
             pendingUnlock = PendingUnlock(data: data, summary: item.summary, existingURL: item.packageURL)
             passwordRequest = PatchPasswordRequest(summary: item.summary)
             return true
         } catch let error as PatchPackageError {
+            activeUnlockAttemptID = nil
             present(error)
         } catch {
+            activeUnlockAttemptID = nil
             present(.unsupportedFormat)
         }
         return false
     }
 
     func unlock(password: String) {
-        guard let pending = pendingUnlock, !isBusy else { return }
+        guard let pending = pendingUnlock,
+              let attemptID = activeUnlockAttemptID,
+              !isBusy else { return }
         isBusy = true
         unlockErrorKey = nil
         Task.detached(priority: .userInitiated) { [weak self] in
             do {
                 let decoded = try PatchPackageCodec.decode(pending.data, password: password)
+                guard await self?.isUnlockAttemptActive(attemptID) == true else { return }
+
                 try PatchKeyStore.store(decoded.contentKey, for: pending.summary)
+                guard await self?.isUnlockAttemptActive(attemptID) == true else {
+                    try? PatchKeyStore.delete(for: pending.summary)
+                    return
+                }
                 do {
                     try PatchProjectLibrary.installImportedPackage(
                         data: pending.data,
@@ -205,18 +218,33 @@ final class PatchProjectStore: ObservableObject {
                     try? PatchKeyStore.delete(for: pending.summary)
                     throw error
                 }
-                await self?.markUnlockSucceeded(packageID: pending.summary.packageID)
+
+                guard await self?.isUnlockAttemptActive(attemptID) == true else {
+                    try? PatchKeyStore.delete(for: pending.summary)
+                    return
+                }
+                guard await self?.markUnlockSucceeded(
+                    packageID: pending.summary.packageID,
+                    attemptID: attemptID
+                ) == true else {
+                    try? PatchKeyStore.delete(for: pending.summary)
+                    return
+                }
                 await self?.clearPendingUnlock()
                 await self?.finishOperation(successMessageKey: "patch.unlocked_message")
             } catch let error as PatchPackageError {
+                guard await self?.isUnlockAttemptActive(attemptID) == true else { return }
                 await self?.failUnlock(error)
             } catch {
+                guard await self?.isUnlockAttemptActive(attemptID) == true else { return }
                 await self?.failUnlock(.invalidPasswordOrCorruptedPackage)
             }
         }
     }
 
     func cancelUnlock() {
+        activeUnlockAttemptID = nil
+        unlockedPackageID = nil
         clearPendingUnlock()
         isBusy = false
     }
@@ -318,11 +346,20 @@ final class PatchProjectStore: ObservableObject {
         return nil
     }
 
-    private func markUnlockSucceeded(packageID: UUID) {
+    private func isUnlockAttemptActive(_ attemptID: UUID) -> Bool {
+        activeUnlockAttemptID == attemptID && pendingUnlock != nil
+    }
+
+    @discardableResult
+    private func markUnlockSucceeded(packageID: UUID, attemptID: UUID) -> Bool {
+        guard activeUnlockAttemptID == attemptID,
+              pendingUnlock?.summary.packageID == packageID else { return false }
         unlockedPackageID = packageID
+        return true
     }
 
     private func clearPendingUnlock() {
+        activeUnlockAttemptID = nil
         pendingUnlock = nil
         passwordRequest = nil
         unlockErrorKey = nil

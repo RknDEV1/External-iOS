@@ -3,6 +3,7 @@ import UIKit
 
 struct CHZAccessOverlay: View {
     @Binding var isPresented: Bool
+    let isRestoringSession: Bool
     let onAuthenticated: () -> Void
 
     @State private var key = ""
@@ -35,7 +36,7 @@ struct CHZAccessOverlay: View {
                     .tracking(1.3)
                     .foregroundStyle(.white)
 
-                Text("Acesso protegido")
+                Text(isRestoringSession ? "Validando sessão neste dispositivo" : "Acesso protegido")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
 
@@ -50,7 +51,7 @@ struct CHZAccessOverlay: View {
                     .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(Color.red.opacity(0.56), lineWidth: 1))
                     .foregroundStyle(.white)
-                    .disabled(isSubmitting || secondsRemaining == 0)
+                    .disabled(isSubmitting || isRestoringSession || secondsRemaining == 0)
 
                 HStack {
                     Text("Tempo restante")
@@ -64,8 +65,8 @@ struct CHZAccessOverlay: View {
 
                 Button(action: submit) {
                     ZStack {
-                        Text("Continuar").opacity(isSubmitting ? 0 : 1)
-                        if isSubmitting {
+                        Text("Continuar").opacity(isSubmitting || isRestoringSession ? 0 : 1)
+                        if isSubmitting || isRestoringSession {
                             ProgressView().tint(.white)
                         }
                     }
@@ -76,7 +77,7 @@ struct CHZAccessOverlay: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(.white)
                 .background(Color.red.opacity(0.82), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .disabled(isSubmitting || normalizedKey.isEmpty || secondsRemaining == 0)
+                .disabled(isSubmitting || isRestoringSession || normalizedKey.isEmpty || secondsRemaining == 0)
 
                 Text(errorMessage ?? " ")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
@@ -102,7 +103,7 @@ struct CHZAccessOverlay: View {
     }
 
     private func tick() {
-        guard isPresented, !didCompleteAuthentication, secondsRemaining > 0 else { return }
+        guard isPresented, !isRestoringSession, !didCompleteAuthentication, secondsRemaining > 0 else { return }
         secondsRemaining -= 1
         if secondsRemaining == 0 {
             isKeyFieldFocused = false
@@ -111,7 +112,7 @@ struct CHZAccessOverlay: View {
     }
 
     private func submit() {
-        guard secondsRemaining > 0, !isSubmitting, !didCompleteAuthentication, !normalizedKey.isEmpty else { return }
+        guard secondsRemaining > 0, !isSubmitting, !isRestoringSession, !didCompleteAuthentication, !normalizedKey.isEmpty else { return }
         isKeyFieldFocused = false
         isSubmitting = true
         errorMessage = nil

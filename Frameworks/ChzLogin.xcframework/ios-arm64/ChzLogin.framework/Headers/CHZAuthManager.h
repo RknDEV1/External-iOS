@@ -9,6 +9,7 @@ typedef void (^CHZAuthFailure)(NSString *message);
 
 + (instancetype)sharedManager;
 - (BOOL)hasValidSavedSession;
+- (void)validateSavedSessionWithSuccess:(CHZAuthSuccess)success failure:(CHZAuthFailure)failure;
 - (void)clearSavedSession;
 - (void)loginWithKey:(NSString *)key success:(CHZAuthSuccess)success failure:(CHZAuthFailure)failure;
 

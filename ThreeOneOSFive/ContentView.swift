@@ -416,21 +416,20 @@ private struct CHZPrivHomeView: View {
         .onReceive(patchStore.$unlockedPackageID.compactMap { $0 }) { packageID in
             guard packageID == pendingExternalUnlockID else { return }
             pendingExternalPasswordItem = nil
+            continuePendingExternalActivationIfReady()
         }
         .sheet(item: $pendingExternalPasswordItem, onDismiss: {
-            // O ID pendente precisa sobreviver ao dismiss causado por desbloqueio
-            // bem-sucedido; caso contrário, a ativação nunca é retomada.
-            let wasCancelled = patchStore.passwordRequest != nil
-            if wasCancelled {
-                patchStore.cancelUnlock()
-                pendingExternalUnlockID = nil
-                pendingExternalPasswordItem = nil
+            guard pendingExternalUnlockID != nil else { return }
+            if patchStore.unlockedPackageID == pendingExternalUnlockID {
+                continuePendingExternalActivationIfReady()
+            } else {
+                cancelPendingExternalUnlock()
             }
-            continuePendingExternalActivationIfReady()
         }) { item in
             ExternalPatchUnlockView(
                 request: PatchPasswordRequest(summary: item.summary),
-                store: patchStore
+                store: patchStore,
+                onCancel: cancelPendingExternalUnlock
             )
         }
     }
@@ -570,6 +569,7 @@ private struct CHZPrivHomeView: View {
     private func functionRow(item: PatchLibraryItem) -> some View {
         let title = displayTitle(for: item)
         let description = patchDescription(for: item)
+        let unavailable = isUnavailablePatch(item)
         return HStack(spacing: 12) {
                 Image(systemName: item.category.symbol)
                 .font(.system(size: 20, weight: .semibold))
@@ -584,10 +584,16 @@ private struct CHZPrivHomeView: View {
                     .tracking(0.25)
                     .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(2)
+                if unavailable {
+                    Text("INDISPONÍVEL")
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .tracking(0.7)
+                        .foregroundStyle(Color.orange)
+                }
                 if !description.isEmpty {
                     Text(description)
                         .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(AppTheme.tertiaryText)
+                        .foregroundStyle(unavailable ? Color.orange.opacity(0.82) : AppTheme.tertiaryText)
                         .lineLimit(2)
                 }
             }
@@ -598,12 +604,15 @@ private struct CHZPrivHomeView: View {
                     .tint(AppTheme.accentBright)
             }
             Toggle("\(title)", isOn: Binding(
-                get: { enabledPatchIDs.contains(item.id) },
-                set: { updatePatchState(item: item, isEnabled: $0) }
+                get: { !unavailable && enabledPatchIDs.contains(item.id) },
+                set: { newValue in
+                    guard !unavailable else { return }
+                    updatePatchState(item: item, isEnabled: newValue)
+                }
             ))
                 .labelsHidden()
                 .toggleStyle(CHZSwitchStyle())
-                .disabled(isWorking)
+                .disabled(isWorking || unavailable)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
@@ -637,7 +646,29 @@ private struct CHZPrivHomeView: View {
     }
 
     private func patchDescription(for item: PatchLibraryItem) -> String {
-        ""
+        if isUnavailablePatch(item) {
+            return "Indisponível no Free Fire MAX nesta versão."
+        }
+        // As descrições definitivas serão inseridas quando o novo texto for fornecido.
+        return ""
+    }
+
+    private func isUnavailablePatch(_ item: PatchLibraryItem) -> Bool {
+        guard isFreeFireMax, item.category == .external else { return false }
+        let filename = item.packageURL.deletingPathExtension().lastPathComponent
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .uppercased()
+        return filename.contains("ESP+AIMBOT")
+    }
+
+    private func belongsToSelectedEdition(_ item: PatchLibraryItem) -> Bool {
+        let filename = item.packageURL.lastPathComponent
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .uppercased()
+        if isFreeFireMax {
+            return filename.hasPrefix("FFM -")
+        }
+        return filename.hasPrefix("FF -") && !filename.hasPrefix("FFM -")
     }
 
     private func loadPatchesIfNeeded() {
@@ -647,15 +678,7 @@ private struct CHZPrivHomeView: View {
             autoreleasepool {
                 PatchProjectLibrary.installBundledOriginalFreeFirePatches()
                 let items = PatchProjectLibrary.load()
-                let scopedItems = items.filter { item in
-                    let filename = item.packageURL.lastPathComponent
-                        .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                        .uppercased()
-                    if isFreeFireMax {
-                        return filename.hasPrefix("FFM -")
-                    }
-                    return filename.hasPrefix("FF -")
-                }
+                let scopedItems = items.filter(belongsToSelectedEdition)
                 let enabled = Set(scopedItems.compactMap { item in
                     return DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
                 })
@@ -668,6 +691,12 @@ private struct CHZPrivHomeView: View {
     }
 
     private func updatePatchState(item: PatchLibraryItem, isEnabled: Bool, afterUnlock: Bool = false) {
+        guard !isUnavailablePatch(item) else {
+            enabledPatchIDs.remove(item.id)
+            appendLog("Esp+aimbot está indisponível no Free Fire MAX", level: .warning)
+            return
+        }
+
         // Todo External protegido pede CHZ no início de cada ativação,
         // mesmo que o pacote tenha sido desbloqueado em uma sessão anterior.
         // A retomada após uma senha correta usa afterUnlock para não reabrir a folha.
@@ -705,20 +734,22 @@ private struct CHZPrivHomeView: View {
         }
     }
 
+    private func cancelPendingExternalUnlock() {
+        pendingExternalUnlockID = nil
+        pendingExternalPasswordItem = nil
+        patchStore.cancelUnlock()
+        appendLog("Ativação External cancelada", level: .warning)
+    }
+
     private func continuePendingExternalActivationIfReady() {
         guard let pendingID = pendingExternalUnlockID,
+              patchStore.unlockedPackageID == pendingID,
               let unlockedItem = patchStore.items.first(where: { $0.id == pendingID }),
               unlockedItem.project != nil,
               !isWorking else { return }
         pendingExternalUnlockID = nil
         pendingExternalPasswordItem = nil
-        let prefix = isFreeFireMax ? "FFM -" : "FF -"
-        freeFirePatches = patchStore.items.filter { item in
-            item.packageURL.lastPathComponent
-                .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                .uppercased()
-                .hasPrefix(prefix)
-        }
+        freeFirePatches = patchStore.items.filter(belongsToSelectedEdition)
         updatePatchState(item: unlockedItem, isEnabled: true, afterUnlock: true)
     }
 
@@ -924,6 +955,7 @@ private struct CHZSwitchStyle: ToggleStyle {
 private struct ExternalPatchUnlockView: View {
     let request: PatchPasswordRequest
     @ObservedObject var store: PatchProjectStore
+    let onCancel: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var password = ""
 
@@ -955,7 +987,7 @@ private struct ExternalPatchUnlockView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") {
-                        store.cancelUnlock()
+                        onCancel()
                         dismiss()
                     }
                 }

@@ -14,6 +14,7 @@ struct ThreeOneOSFiveApp: App {
     @State private var showAttribution = false
     @State private var showCHZAccessOverlay = true
     @State private var sessionAuthenticated = false
+    @State private var isRestoringSession = false
     @State private var didEvaluateInitialSession = false
     @State private var didStartPostLoginWork = false
     @State private var updateOffer: AppUpdateChecker.Offer?
@@ -46,13 +47,28 @@ struct ThreeOneOSFiveApp: App {
     }
 
     private func refreshAuthenticationState() {
-        guard !sessionAuthenticated else { return }
-        let hasSavedSession = CHZAuthManager.shared().hasValidSavedSession()
-        sessionAuthenticated = hasSavedSession
-        showCHZAccessOverlay = !hasSavedSession
-        if hasSavedSession {
-            startPostLoginWork()
+        guard !sessionAuthenticated, !isRestoringSession else { return }
+        let manager = CHZAuthManager.shared()
+        guard manager.hasValidSavedSession() else {
+            showCHZAccessOverlay = true
+            return
         }
+
+        isRestoringSession = true
+        showCHZAccessOverlay = true
+        manager.validateSavedSession(success: {
+            DispatchQueue.main.async {
+                isRestoringSession = false
+                didAuthenticate()
+            }
+        }, failure: { _ in
+            DispatchQueue.main.async {
+                manager.clearSavedSession()
+                isRestoringSession = false
+                sessionAuthenticated = false
+                showCHZAccessOverlay = true
+            }
+        })
     }
 
     private func didAuthenticate() {
@@ -64,7 +80,8 @@ struct ThreeOneOSFiveApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                                    ContentView(
+                if !showOnboarding && !showGamePicker {
+                    ContentView(
                         isFreeFireMax: selectedEdition == .freeFireMax,
                         onExitToGamePicker: {
                             withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
@@ -72,14 +89,14 @@ struct ThreeOneOSFiveApp: App {
                             }
                         }
                     )
-
+                    .id(selectedEdition == .freeFireMax ? "free-fire-max" : "free-fire")
                     .environmentObject(appState)
                     .environmentObject(patchDraftCoordinator)
                     .environmentObject(fileOperationCoordinator)
                     .environment(\.appLanguage, language)
                     .environment(\.locale, language.locale)
-                    .opacity(showOnboarding || showGamePicker ? 0 : 1)
-                    .allowsHitTesting(!showOnboarding && !showGamePicker)
+                    .transition(.opacity)
+                }
 
                 if showGamePicker && !showOnboarding {
                     FreeFireSelectionView { edition in
@@ -97,6 +114,7 @@ struct ThreeOneOSFiveApp: App {
                 if showCHZAccessOverlay {
                     CHZAccessOverlay(
                         isPresented: $showCHZAccessOverlay,
+                        isRestoringSession: isRestoringSession,
                         onAuthenticated: didAuthenticate
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))

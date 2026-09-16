@@ -60,10 +60,10 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertFalse(source.contains("scrollTransition"))
     }
 
-    func testPatchDisplayNameUsesSafeRenamedLabel() throws {
+    func testPatchDisplayNameUsesOriginalProjectName() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
-        XCTAssertTrue(source.contains("return \"Hs Pescoço Baixo\""))
-        XCTAssertTrue(source.contains("private func displayTitle(for item: PatchLibraryItem)"))
+        XCTAssertTrue(source.contains("item.project?.name ?? item.packageURL.deletingPathExtension().lastPathComponent"))
+        XCTAssertFalse(source.contains("return \"Hs Pescoço Baixo\""))
     }
 
     func testPatchLoadingSourceStaysOffMainThreadAndHasDuplicateGuard() throws {
@@ -88,9 +88,10 @@ final class ScrollAndLoadingTests: XCTestCase {
 
     func testExternalSwitchOnlyChangesStateAfterSuccessfulOperation() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
-        XCTAssertTrue(source.contains("if enabled { activeExternalPatchIDs.insert(function.id) }"))
-        XCTAssertTrue(source.contains("else { activeExternalPatchIDs.remove(function.id) }"))
-        XCTAssertTrue(source.contains("workingExternalPatchID = nil"))
+        XCTAssertTrue(source.contains("_ = try DevicePatchService.apply(project: project)"))
+        XCTAssertTrue(source.contains("enabledPatchIDs.insert(item.id)"))
+        XCTAssertTrue(source.contains("enabledPatchIDs.remove(item.id)"))
+        XCTAssertTrue(source.contains("workingPatchID = nil"))
     }
 
     func testUpdatedPatchCatalogContainsAllEditionCategories() throws {
@@ -119,10 +120,10 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(source.contains("digestFile(snapshot) == currentDigest"))
     }
 
-    func testExternalCardMatchesInjectorCardStructure() throws {
+    func testExternalCategoryUsesInjectorCardStructure() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
-        XCTAssertTrue(source.contains("private var externalFunctions: [ExternalPatchFunction]"))
-        XCTAssertTrue(source.contains("RKN // SYSTEM LOG"))
+        XCTAssertTrue(source.contains("categorySection(.external)"))
+        XCTAssertTrue(source.contains("CHZ PRIV // SYSTEM LOG"))
         XCTAssertTrue(source.contains("stroke(AppTheme.outline, lineWidth: 1.0)"))
         XCTAssertTrue(source.contains("stroke(AppTheme.outlineStrong, lineWidth: 1.15)"))
         XCTAssertTrue(source.contains("ProgressView()"))
@@ -135,9 +136,45 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(source.contains(".onReceive(patchStore.$unlockedPackageID.compactMap { $0 })"))
         XCTAssertTrue(source.contains("pendingExternalPasswordItem = nil"))
         XCTAssertTrue(source.contains("pendingExternalUnlockID = nil"))
-        XCTAssertTrue(source.contains("guard patchStore.requestUnlock(for: item) else"))
+        XCTAssertTrue(source.contains("guard patchStore.requestUnlock(for: item, force: true) else"))
         XCTAssertTrue(store.contains("@Published private(set) var unlockedPackageID: UUID?"))
-        XCTAssertTrue(store.contains("markUnlockSucceeded(packageID: pending.summary.packageID)"))
+        XCTAssertTrue(store.contains("private var activeUnlockAttemptID: UUID?"))
+        XCTAssertTrue(store.contains("markUnlockSucceeded("))
+        XCTAssertTrue(store.contains("attemptID: attemptID"))
+    }
+
+    func testExternalCancellationCannotPublishUnlockOrActivatePatch() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        let store = try loadProjectFile("ThreeOneOSFive/helpers/PatchProjectStore.swift")
+
+        XCTAssertTrue(source.contains("private func cancelPendingExternalUnlock()"))
+        XCTAssertTrue(source.contains("pendingExternalUnlockID = nil"))
+        XCTAssertTrue(source.contains("patchStore.cancelUnlock()"))
+        XCTAssertTrue(source.contains("if patchStore.unlockedPackageID == pendingExternalUnlockID"))
+        XCTAssertTrue(source.contains("patchStore.unlockedPackageID == pendingID"))
+        XCTAssertTrue(store.contains("activeUnlockAttemptID = nil"))
+        XCTAssertTrue(store.contains("unlockedPackageID = nil"))
+        XCTAssertTrue(store.contains("guard await self?.isUnlockAttemptActive(attemptID) == true else { return }"))
+        XCTAssertTrue(store.contains("pendingUnlock?.summary.packageID == packageID"))
+    }
+
+    func testFreeFireMaxAimbotIsUnavailableAndCannotReachActivationCallback() throws {
+        let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        XCTAssertTrue(source.contains("private func isUnavailablePatch"))
+        XCTAssertTrue(source.contains("filename.contains(\"ESP+AIMBOT\")"))
+        XCTAssertTrue(source.contains("Text(\"INDISPONÍVEL\")"))
+        XCTAssertTrue(source.contains(".disabled(isWorking || unavailable)"))
+        XCTAssertTrue(source.contains("guard !isUnavailablePatch(item) else"))
+    }
+
+    func testSavedSessionRequiresRemoteRevalidationBeforeOverlayCloses() throws {
+        let app = try loadProjectFile("ThreeOneOSFive/App.swift")
+        let overlay = try loadProjectFile("ThreeOneOSFive/CHZAccessOverlay.swift")
+        XCTAssertTrue(app.contains("manager.validateSavedSession(success:"))
+        XCTAssertTrue(app.contains("isRestoringSession = true"))
+        XCTAssertFalse(app.contains("sessionAuthenticated = hasSavedSession"))
+        XCTAssertTrue(overlay.contains("let isRestoringSession: Bool"))
+        XCTAssertTrue(overlay.contains("!isRestoringSession"))
     }
 
     func testExternalCategoryUsesOriginal3105PatchPath() throws {
@@ -157,6 +194,19 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertFalse(injectorPath.contains("restoreExternalWorkingFile"))
         XCTAssertTrue(serviceSource.contains("PatchPackageCodec.decode(data, password: \"CHZ\")"))
         XCTAssertFalse(serviceSource.contains("PatchPackageCodec.decode(data, password: \"OG\")"))
+    }
+
+    func testFreeFireMaxNeverReusesFreeFireAvatarState() throws {
+        let appSource = try loadProjectFile("ThreeOneOSFive/App.swift")
+        let contentSource = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
+        let manifest = try loadProjectFile("ThreeOneOSFive/FreeFirePatches/manifest.json")
+
+        XCTAssertTrue(appSource.contains(".id(selectedEdition == .freeFireMax ? \"free-fire-max\" : \"free-fire\")"))
+        XCTAssertTrue(contentSource.contains("private func belongsToSelectedEdition"))
+        XCTAssertTrue(contentSource.contains("return filename.hasPrefix(\"FFM -\")"))
+        XCTAssertTrue(contentSource.contains("return filename.hasPrefix(\"FF -\") && !filename.hasPrefix(\"FFM -\")"))
+        XCTAssertTrue(contentSource.contains("ForEach(visibleCategories, id: \\.rawValue)"))
+        XCTAssertFalse(manifest.contains("\"category\": \"Avatar\",\n      \"filename\": \"FFM -"))
     }
 
     private func loadProjectFile(_ relativePath: String) throws -> String {
