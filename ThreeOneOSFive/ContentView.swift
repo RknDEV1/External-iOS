@@ -418,10 +418,14 @@ private struct CHZPrivHomeView: View {
             pendingExternalPasswordItem = nil
         }
         .sheet(item: $pendingExternalPasswordItem, onDismiss: {
-            if patchStore.passwordRequest != nil {
+            // O ID pendente precisa sobreviver ao dismiss causado por desbloqueio
+            // bem-sucedido; caso contrário, a ativação nunca é retomada.
+            let wasCancelled = patchStore.passwordRequest != nil
+            if wasCancelled {
                 patchStore.cancelUnlock()
+                pendingExternalUnlockID = nil
+                pendingExternalPasswordItem = nil
             }
-            pendingExternalUnlockID = nil
             continuePendingExternalActivationIfReady()
         }) { item in
             ExternalPatchUnlockView(
