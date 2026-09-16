@@ -129,14 +129,20 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(source.contains("toggleStyle(CHZSwitchStyle())"))
     }
 
-    func testExternalActivationRequiresEnvelopePasswordAndVerifiedReceipt() throws {
-        let service = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")
+    func testExternalCategoryUsesOriginal3105PatchPath() throws {
         let source = try loadProjectFile("ThreeOneOSFive/ContentView.swift")
-        XCTAssertTrue(service.contains("PatchPackageCodec.decode(data, password: \"OG\")"))
-        XCTAssertTrue(service.contains("ExternalInstallReceipt"))
-        XCTAssertTrue(service.contains("verifyExternalWorkingFile"))
-        XCTAssertTrue(source.contains("try DevicePatchService.verifyExternalWorkingFile"))
-        XCTAssertTrue(source.contains("licença ausente ou inválida"))
+        XCTAssertTrue(source.contains("categorySection(.external)"))
+        XCTAssertTrue(source.contains("guard let baseProject = item.project"))
+        guard let applyStart = source.range(of: "private func applyPatch"),
+              let logStart = source.range(of: "private func appendLog", range: applyStart.upperBound..<source.endIndex) else {
+            XCTFail("Original Injetor patch callback not found")
+            return
+        }
+        let injectorPath = String(source[applyStart.lowerBound..<logStart.lowerBound])
+        XCTAssertTrue(injectorPath.contains("_ = try DevicePatchService.apply(project: project)"))
+        XCTAssertTrue(injectorPath.contains("try DevicePatchService.restore(receipt: receipt)"))
+        XCTAssertFalse(injectorPath.contains("installExternalArtifact"))
+        XCTAssertFalse(injectorPath.contains("restoreExternalWorkingFile"))
     }
 
     private func loadProjectFile(_ relativePath: String) throws -> String {

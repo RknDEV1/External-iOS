@@ -422,7 +422,6 @@ private struct CHZPrivHomeView: View {
         HStack(spacing: 4) {
             bottomNavigationItem(.license, title: "Início", symbol: "house.fill")
             bottomNavigationItem(.injector, title: "Injetor", symbol: "gamecontroller.fill")
-            bottomNavigationItem(.external, title: "External", symbol: "rectangle.3.group.fill")
         }
         .padding(5)
         .background(.ultraThinMaterial, in: Capsule(style: .continuous))
@@ -478,6 +477,7 @@ private struct CHZPrivHomeView: View {
             LazyHStack(spacing: 10) {
                 categoryOverviewCard(.avatar)
                 categoryOverviewCard(.cache)
+                categoryOverviewCard(.external)
             }
             .padding(.horizontal, 1)
         }
@@ -509,21 +509,9 @@ private struct CHZPrivHomeView: View {
 
     private var functions: some View {
         VStack(alignment: .leading, spacing: 15) {
-            if isFreeFireMax {
-                Text("Suporte em breve…")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AppTheme.secondaryText)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 34)
-                    .background(.ultraThinMaterial.opacity(0.55), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(AppTheme.outline, lineWidth: 1.0)
-                    }
-            } else {
-                categorySection(.avatar)
-                categorySection(.cache)
-            }
+            categorySection(.avatar)
+            categorySection(.cache)
+            categorySection(.external)
         }
     }
 
@@ -683,10 +671,6 @@ private struct CHZPrivHomeView: View {
                     return filename.hasPrefix("FF -")
                 }
                 let enabled = Set(scopedItems.compactMap { item in
-                    if isInternalMenuPatch(item) {
-                        let editionKey = externalEditionKey(for: item)
-                        return DevicePatchService.hasExternalWorkingFile(editionKey: editionKey) ? item.id : nil
-                    }
                     return DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
                 })
                 DispatchQueue.main.async {
@@ -707,12 +691,11 @@ private struct CHZPrivHomeView: View {
             return
         }
 
-        let baseProject = item.project
-        guard baseProject != nil || isInternalMenuPatch(item) else {
+        guard let baseProject = item.project else {
             appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
             return
         }
-        let patchName = baseProject?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
+        let patchName = baseProject.name
         isWorking = true
         workingPatchID = item.id
 
@@ -730,21 +713,13 @@ private struct CHZPrivHomeView: View {
         }
     }
 
-    private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject?, patchName: String) {
+    private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject, patchName: String) {
         Task.detached(priority: .userInitiated) {
             do {
-                if isInternalMenuPatch(item) {
-                    let report = try DevicePatchService.validateEmbeddedExternalArtifact(item.packageURL)
-                    let editionKey = externalEditionKey(for: item)
-                    _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
-                    try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
-                } else {
-                    guard let baseProject else { throw PatchPackageError.invalidProject }
-                    let project = item.summary.schemaVersion >= 2
-                        ? try PatchProjectLibrary.synchronizeWorkspace(item: item)
-                        : baseProject
-                    _ = try DevicePatchService.apply(project: project)
-                }
+                let project = item.summary.schemaVersion >= 2
+                    ? try PatchProjectLibrary.synchronizeWorkspace(item: item)
+                    : baseProject
+                _ = try DevicePatchService.apply(project: project)
                 await MainActor.run {
                     enabledPatchIDs.insert(item.id)
                     workingPatchID = nil
@@ -763,28 +738,6 @@ private struct CHZPrivHomeView: View {
     }
 
     private func restorePatch(item: PatchLibraryItem, patchName: String) {
-        if isInternalMenuPatch(item) {
-            Task.detached(priority: .userInitiated) {
-                do {
-                    let editionKey = externalEditionKey(for: item)
-                    _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
-                    await MainActor.run {
-                        enabledPatchIDs.remove(item.id)
-                        workingPatchID = nil
-                        isWorking = false
-                        SoundEffectManager.shared.play(.confirmation)
-                        appendLog("Arquivo original interno restaurado", level: .success)
-                    }
-                } catch {
-                    await MainActor.run {
-                        workingPatchID = nil
-                        isWorking = false
-                        appendLog("Falha ao restaurar o arquivo interno: \(error.localizedDescription)", level: .warning)
-                    }
-                }
-            }
-            return
-        }
         guard let receipt = DevicePatchService.latestReceipt(projectID: item.id) else {
             enabledPatchIDs.remove(item.id)
             isWorking = false
@@ -809,15 +762,6 @@ private struct CHZPrivHomeView: View {
                 }
             }
         }
-    }
-
-    private func isInternalMenuPatch(_ item: PatchLibraryItem) -> Bool {
-        item.category == .external
-    }
-
-    private func externalEditionKey(for item: PatchLibraryItem) -> String {
-        let filename = item.packageURL.lastPathComponent
-        return filename.hasPrefix("FFM -") ? "free-fire-max-\(item.id.uuidString)" : "free-fire-\(item.id.uuidString)"
     }
 
     private func appendLog(_ message: String, level: LogLevel) {
