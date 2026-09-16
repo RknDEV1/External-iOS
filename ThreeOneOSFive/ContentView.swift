@@ -733,7 +733,7 @@ private struct CHZPrivHomeView: View {
         Task.detached(priority: .userInitiated) {
             do {
                 if isInternalMenuPatch(item) {
-                    let report = try DevicePatchService.validateExternalArtifact(at: item.packageURL)
+                    let report = try DevicePatchService.validateEmbeddedExternalArtifact(item.packageURL)
                     let editionKey = isFreeFireMax ? "free-fire-max" : "free-fire"
                     _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
                 } else {
@@ -1050,7 +1050,7 @@ private struct ExternalPanelView: View {
     private var externalLogSection: some View {
         panelSection(title: "LOG") {
             if externalLog.isEmpty {
-                Text("Aguardando ativação de função…")
+                Text("Aguardando ativação…")
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText)
             } else {
@@ -1133,44 +1133,85 @@ private struct ExternalPanelView: View {
     }
 
     private var externalFunctionsSection: some View {
-        panelSection(title: "FUNÇÕES EXTERNAL") {
-            ForEach(externalFunctions) { function in
-                HStack(spacing: 12) {
-                    Image(systemName: "shippingbox.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(AppTheme.accentBright)
-                        .frame(width: 28)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(function.title.uppercased())
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundStyle(AppTheme.primaryText)
-                        Text(function.detail)
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                            .foregroundStyle(AppTheme.tertiaryText)
-                            .lineLimit(2)
-                    }
-                    Spacer(minLength: 6)
-                    if workingExternalPatchID == function.id {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(AppTheme.accentBright)
-                    }
-                    Toggle(function.title, isOn: Binding(
-                        get: { activeExternalPatchIDs.contains(function.id) },
-                        set: { handleExternalPatch(function, enabled: $0) }
-                    ))
-                    .labelsHidden()
-                    .toggleStyle(CHZSwitchStyle())
-                    .disabled(workingExternalPatchID != nil)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("FUNÇÕES")
+                    .font(.system(size: 20, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundStyle(AppTheme.primaryText)
+                Spacer()
+                Text("\(externalFunctions.count)")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+            LazyVStack(alignment: .leading, spacing: 8) {
+                ForEach(externalFunctions) { function in
+                    externalFunctionRow(function)
                 }
-                .padding(.vertical, 7)
             }
             if let externalPatchMessage {
-                divider
                 Text(externalPatchMessage)
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText)
+                    .padding(.top, 4)
             }
+        }
+    }
+
+    private func externalFunctionRow(_ function: ExternalPatchFunction) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "shippingbox.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(AppTheme.accentBright)
+                .shadow(color: AppTheme.accent.opacity(0.55), radius: 7)
+                .frame(width: 28)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(function.title.uppercased())
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .tracking(0.25)
+                    .foregroundStyle(AppTheme.primaryText)
+                    .lineLimit(2)
+                Text(function.detail)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.tertiaryText)
+                    .lineLimit(2)
+            }
+            Spacer(minLength: 6)
+            if workingExternalPatchID == function.id {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(AppTheme.accentBright)
+            }
+            Toggle(function.title, isOn: Binding(
+                get: { activeExternalPatchIDs.contains(function.id) },
+                set: { handleExternalPatch(function, enabled: $0) }
+            ))
+            .labelsHidden()
+            .toggleStyle(CHZSwitchStyle())
+            .disabled(workingExternalPatchID != nil)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 5)
+        .frame(minHeight: 78)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
+                .stroke(AppTheme.outlineStrong, lineWidth: 1.15)
+        }
+        .shadow(color: AppTheme.accent.opacity(0.12), radius: 5, y: 3)
+        .overlay(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(LinearGradient(
+                    colors: [.white.opacity(0.13), .clear],
+                    startPoint: .topLeading,
+                    endPoint: .center
+                ))
+                .frame(height: 28)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .allowsHitTesting(false)
         }
     }
 
