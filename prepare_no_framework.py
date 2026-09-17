@@ -9,7 +9,14 @@ text = '\n'.join(line for line in text.splitlines() if 'ChzLogin' not in line) +
 project.write_text(text, encoding='utf-8')
 
 header = root / 'ThreeOneOSFive/ThreeOneOSFive-Bridging-Header.h'
-header.write_text('// Test build without external authentication framework.\n', encoding='utf-8')
+header.write_text('''#import "exploit/bad_query.h"
+#import "exploit/mcm_bridge.h"
+#import "kexploit/kexploit_opa334.h"
+#import "kexploit/sandbox_escape.h"
+#import "kexploit/kutils.h"
+#import "helpers/AppIconHelper.h"
+#import "helpers/DisplayIdentity.h"
+''', encoding='utf-8')
 
 app = root / 'ThreeOneOSFive/App.swift'
 source = app.read_text(encoding='utf-8')
