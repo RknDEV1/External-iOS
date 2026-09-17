@@ -79,6 +79,17 @@ final class ScrollAndLoadingTests: XCTestCase {
         XCTAssertTrue(project.contains("IPHONEOS_DEPLOYMENT_TARGET = 16.0;"))
     }
 
+    func testTargetResolutionRetriesExactBundleWithoutGuessing() throws {
+        let service = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")
+        XCTAssertTrue(service.contains("resolveContainerWithRetry(bundleID: bundleID)"))
+        XCTAssertTrue(service.contains("let attempts = 3"))
+        XCTAssertTrue(service.contains("Thread.sleep(forTimeInterval: 0.35)"))
+        XCTAssertTrue(service.contains("ContainerStore.isApplicationContainerPath(path)"))
+        XCTAssertTrue(service.contains("target unavailable after retry window"))
+        XCTAssertTrue(service.contains("case \"com.dts.freefireth\": return \"Free Fire\""))
+        XCTAssertTrue(service.contains("case \"com.dts.freefiremax\": return \"Free Fire MAX\""))
+    }
+
     func testExternalRestoreHandlesAbsentOriginalBaseline() throws {
         let service = try loadProjectFile("ThreeOneOSFive/helpers/DevicePatchService.swift")
         XCTAssertTrue(service.contains("originalAbsentMarker"))

@@ -183,7 +183,11 @@ extension PatchPackageError: LocalizedError {
 
     var localizationArgument: String? {
         if case .targetAppUnavailable(let bundleID) = self {
-            return bundleID
+            switch bundleID {
+            case "com.dts.freefireth": return "Free Fire (com.dts.freefireth)"
+            case "com.dts.freefiremax": return "Free Fire MAX (com.dts.freefiremax)"
+            default: return bundleID
+            }
         }
         return nil
     }

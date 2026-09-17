@@ -389,12 +389,39 @@ enum DevicePatchService {
     ) throws -> T {
         var roots: [String: URL] = [:]
         for bundleID in bundleIDs {
-            guard let path = ContainerStore.resolveAppContainerPath(bundleID: bundleID),
-                  ContainerStore.isApplicationContainerPath(path) else {
+            guard let path = resolveContainerWithRetry(bundleID: bundleID) else {
+                log("patch: target unavailable after retry window bundle=\(bundleID) name=\(displayName(for: bundleID))")
                 throw PatchPackageError.targetAppUnavailable(bundleID)
             }
             roots[bundleID] = PatchPathValidator.canonicalFileURL(URL(fileURLWithPath: path, isDirectory: true))
         }
         return try operation(roots)
+    }
+
+    /// iOS can briefly return no container while LaunchServices/MCM is waking
+    /// up or after the target app has just been closed. Retry only the exact
+    /// bundle identifier declared by the package; never select a similar app.
+    private static func resolveContainerWithRetry(bundleID: String) -> String? {
+        let attempts = 3
+        for attempt in 1...attempts {
+            if let path = ContainerStore.resolveAppContainerPath(bundleID: bundleID),
+               ContainerStore.isApplicationContainerPath(path) {
+                log("patch: target resolved bundle=\(bundleID) attempt=\(attempt)")
+                return path
+            }
+            log("patch: target lookup pending bundle=\(bundleID) attempt=\(attempt)/\(attempts)")
+            if attempt < attempts {
+                Thread.sleep(forTimeInterval: 0.35)
+            }
+        }
+        return nil
+    }
+
+    private static func displayName(for bundleID: String) -> String {
+        switch bundleID {
+        case "com.dts.freefireth": return "Free Fire"
+        case "com.dts.freefiremax": return "Free Fire MAX"
+        default: return bundleID
+        }
     }
 }

@@ -193,7 +193,7 @@
 "patch.error.invalid_project" = "Check the project name, target bundle, and workspace contents.";
 "patch.error.replacement_required" = "Choose a replacement file for every target path before saving.";
 "patch.error.keychain" = "The remembered unlock key could not be saved or read securely.";
-"patch.error.app_unavailable" = "The app bundle %@ is not installed or cannot be opened. No patch files were changed.";
+"patch.error.app_unavailable" = "%@ was not found or its container could not be opened. Open the selected game once, close it completely, and try again. No patch files were changed.";
 "patch.error.symlink" = "Patch targets cannot pass through symbolic links.";
 "patch.error.apply" = "The patch could not be applied. Any earlier writes were rolled back.";
 "patch.error.restore" = "The originals could not be restored safely. No unverified target was overwritten.";
