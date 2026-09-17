@@ -1,0 +1,109 @@
+name: Build unsigned IPA without ChzLogin (test)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Remove ChzLogin and install test authentication shim
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path.cwd()
+          project = root / "ThreeOneOSFive.xcodeproj/project.pbxproj"
+          text = project.read_text(encoding="utf-8")
+          text = "\n".join(line for line in text.splitlines() if "ChzLogin" not in line) + "\n"
+          project.write_text(text, encoding="utf-8")
+
+          (root / "ThreeOneOSFive/ThreeOneOSFive-Bridging-Header.h").write_text(
+              "// External authentication framework intentionally omitted from this test build.\n",
+              encoding="utf-8",
+          )
+
+          app = root / "ThreeOneOSFive/App.swift"
+          source = app.read_text(encoding="utf-8")
+          pattern = r"    private func refreshAuthenticationState\(\) \{.*?\n    \}\n\n    private func didAuthenticate\(\)"
+          replacement = """    private func refreshAuthenticationState() {
+          // Test-only build: no external authentication framework is embedded.
+          didAuthenticate()
+      }
+
+      private func didAuthenticate()"""
+          source, count = re.subn(pattern, replacement, source, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit("could not replace authentication entry point")
+          app.write_text(source, encoding="utf-8")
+          
+          overlay = root / "ThreeOneOSFive/CHZAccessOverlay.swift"
+          overlay.write_text('''import SwiftUI\nimport UIKit\n\nstruct CHZAccessOverlay: View {\n    @Binding var isPresented: Bool\n    let isRestoringSession: Bool\n    let onAuthenticated: () -> Void\n    @State private var key = ""\n    @State private var secondsRemaining = 30\n    @FocusState private var focused: Bool\n    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()\n\n    var body: some View {\n        ZStack {\n            Color.black.opacity(0.62).ignoresSafeArea()\n            VStack(spacing: 14) {\n                Image(systemName: "lock.fill").font(.system(size: 24, weight: .semibold)).foregroundStyle(.red)\n                Text("TESTE SEM FRAMEWORK").font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white)\n                Text("Modo local de validação").font(.caption).foregroundStyle(.white.opacity(0.65))\n                SecureField("Insira uma key de teste", text: $key)\n                    .focused($focused).textInputAutocapitalization(.characters).autocorrectionDisabled(true)\n                    .padding(12).background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))\n                    .foregroundStyle(.white)\n                Button("Continuar") {\n                    guard !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }\n                    onAuthenticated()\n                }\n                .frame(maxWidth: .infinity).frame(height: 42).foregroundStyle(.white)\n                .background(Color.red.opacity(0.82), in: RoundedRectangle(cornerRadius: 12))\n                Text("Tempo restante: 00:\\(String(format: "%02d", secondsRemaining))")\n                    .font(.caption.monospaced()).foregroundStyle(.white.opacity(0.65))\n            }\n            .padding(22).frame(width: min(UIScreen.main.bounds.width - 42, 330))\n            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))\n            .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.red.opacity(0.7), lineWidth: 1.2))\n        }\n        .onReceive(timer) { _ in if secondsRemaining > 0 { secondsRemaining -= 1 } }\n    }\n}\n''', encoding="utf-8")
+          PY
+          ! grep -R "ChzLogin" ThreeOneOSFive.xcodeproj/project.pbxproj ThreeOneOSFive/ThreeOneOSFive-Bridging-Header.h
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.4.app
+          xcodebuild -version
+
+      - name: Build unsigned archive without framework
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project ThreeOneOSFive.xcodeproj \
+            -scheme 3105 \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$RUNNER_TEMP/3105-no-framework.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO archive
+
+      - name: Verify no framework was embedded
+        run: |
+          set -euo pipefail
+          APP_PATH=$(find "$RUNNER_TEMP/3105-no-framework.xcarchive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)
+          test -n "$APP_PATH"
+          test ! -e "$APP_PATH/Frameworks/ChzLogin.framework"
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/Payload"
+          mkdir -p "$RUNNER_TEMP/Payload"
+          cp -R "$APP_PATH" "$RUNNER_TEMP/Payload/"
+          cd "$RUNNER_TEMP"
+          zip -qry "External-Chz-no-framework-${GITHUB_SHA::7}.ipa" Payload
+          unzip -t "External-Chz-no-framework-${GITHUB_SHA::7}.ipa"
+          mv "External-Chz-no-framework-${GITHUB_SHA::7}.ipa" "$GITHUB_WORKSPACE/"
+
+      - name: Upload test IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-chz-no-framework-ipa
+          path: External-Chz-no-framework-*.ipa
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+      - name: Publish test IPA release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="no-framework-build-${GITHUB_RUN_ID}"
+          gh release create "$TAG" External-Chz-no-framework-*.ipa \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "External Chz no-framework test ${GITHUB_RUN_NUMBER}" \
+            --notes "Unsigned test IPA without ChzLogin.framework. Authentication is a local test shim only; do not use this build for production or licensed distribution."
