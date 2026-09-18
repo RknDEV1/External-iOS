@@ -1111,20 +1111,37 @@ private struct ExternalPanelView: View {
         return urls
             .filter { url in
                 let name = url.lastPathComponent
-                return name.hasPrefix(prefix) && name.localizedCaseInsensitiveContains("Esp")
+                return name.hasPrefix(prefix) && (
+                    name.localizedCaseInsensitiveContains("Esp") ||
+                    name.localizedCaseInsensitiveContains("Painel") ||
+                    name.localizedCaseInsensitiveContains("BoxBlue")
+                )
             }
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
             .map { url in
                 let filename = url.lastPathComponent
                 let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
                 let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                let isPanelArtifact = normalized.localizedCaseInsensitiveContains("esp only")
-                let title = isPanelArtifact
-                    ? "Painel"
-                    : (normalized.localizedCaseInsensitiveContains("esp+aim") ? "ESP + AIM" : "ESP")
-                let detail = isPanelArtifact
-                    ? "Painel interno com validação, backup e restauração no sandbox do app"
-                    : "Função interna com validação, backup e restauração no sandbox do app"
+                let isPanelArtifact = normalized.localizedCaseInsensitiveContains("painel")
+                let isBoxBlueArtifact = normalized.localizedCaseInsensitiveContains("boxblue")
+                let title: String
+                let detail: String
+                if isPanelArtifact {
+                    title = "Painel"
+                    detail = "Painel interno com validação, backup e restauração no sandbox do app"
+                } else if isBoxBlueArtifact {
+                    title = "BoxBlue"
+                    detail = "Função interna BoxBlue com validação e estado protegido no sandbox do app"
+                } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
+                    title = "ESP + AIM"
+                    detail = "Função interna ESP + AIM com validação e restauração no sandbox do app"
+                } else if normalized.localizedCaseInsensitiveContains("esp only") {
+                    title = "ESP ONLY"
+                    detail = "Função interna ESP ONLY com validação e restauração no sandbox do app"
+                } else {
+                    title = "ESP"
+                    detail = "Função interna com validação e restauração no sandbox do app"
+                }
                 return ExternalPatchFunction(
                     id: filename,
                     filename: filename,
