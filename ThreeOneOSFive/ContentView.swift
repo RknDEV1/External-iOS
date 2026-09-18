@@ -645,7 +645,16 @@ private struct CHZPrivHomeView: View {
     }
 
     private func displayTitle(for item: PatchLibraryItem) -> String {
-        item.project?.name ?? item.packageURL.deletingPathExtension().lastPathComponent
+        let filename = item.packageURL.deletingPathExtension().lastPathComponent
+        let normalized = filename
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .uppercased()
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: "-", with: "")
+            .replacingOccurrences(of: "+", with: "")
+        if normalized.contains("BOXBLUE") { return "BoxBlue" }
+        if normalized.contains("PAINEL") { return "Painel" }
+        return item.project?.name ?? filename
     }
 
     private func patchDescription(for item: PatchLibraryItem) -> String {
@@ -722,6 +731,7 @@ private struct CHZPrivHomeView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             autoreleasepool {
                 PatchProjectLibrary.installBundledOriginalFreeFirePatches()
+                PatchProjectLibrary.removeObsoleteExternalPackages()
                 let items = PatchProjectLibrary.load()
                 let scopedItems = items.filter(belongsToSelectedEdition)
                 let enabled = Set(scopedItems.compactMap { item in

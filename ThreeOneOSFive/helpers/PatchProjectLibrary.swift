@@ -238,6 +238,35 @@ enum PatchProjectLibrary {
         }
     }
 
+    /// Removes only legacy External entries whose names were never part of the
+    /// current bundled catalog. This is intentionally scoped to this app's
+    /// Application Support directory; it never touches another app/container.
+    static func removeObsoleteExternalPackages(fileManager: FileManager = .default) {
+        guard let root = try? packageRootURL(fileManager: fileManager) else { return }
+        let externalRoot = root.appendingPathComponent(PatchCategory.external.rawValue, isDirectory: true)
+        guard let urls = fileManager.enumerator(
+            at: externalRoot,
+            includingPropertiesForKeys: [.isRegularFileKey, .isSymbolicLinkKey],
+            options: [.skipsHiddenFiles]
+        )?.compactMap({ $0 as? URL }) else { return }
+
+        for url in urls where url.pathExtension.lowercased() == "3105" {
+            let normalized = url.deletingPathExtension().lastPathComponent
+                .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                .uppercased()
+                .replacingOccurrences(of: " ", with: "")
+                .replacingOccurrences(of: "-", with: "")
+                .replacingOccurrences(of: "+", with: "")
+            guard normalized.contains("HIHI") || normalized.contains("SILENTAIM") else { continue }
+            do {
+                try fileManager.removeItem(at: url)
+                log("patch: removed obsolete External package — \(url.lastPathComponent)")
+            } catch {
+                log("patch: could not remove obsolete External package — \(url.lastPathComponent)")
+            }
+        }
+    }
+
     static func readPackage(at url: URL) throws -> Data {
         let values = try url.resourceValues(forKeys: [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey])
         guard values.isDirectory != true,
