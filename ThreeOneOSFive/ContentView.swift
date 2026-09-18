@@ -679,6 +679,9 @@ private struct CHZPrivHomeView: View {
             if filename.contains("BOXBLUE") {
                 return "ESP com assistência de mira e recursos adicionais."
             }
+            if filename.contains("PAINEL") {
+                return "ESP com painel interno de funções e configurações."
+            }
         }
         if filename.contains("100") && filename.contains("BAYPSS") {
             return "Hs no pescoço com perfil Baypss."
