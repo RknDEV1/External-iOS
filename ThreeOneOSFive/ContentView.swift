@@ -653,7 +653,7 @@ private struct CHZPrivHomeView: View {
             .replacingOccurrences(of: "-", with: "")
             .replacingOccurrences(of: "+", with: "")
         if normalized.contains("BOXBLUE") { return "BoxBlue" }
-        if normalized.contains("PAINEL") { return "Painel" }
+        if normalized.contains("PAINEL") { return "Esp+Painel" }
         return item.project?.name ?? filename
     }
 
@@ -733,7 +733,9 @@ private struct CHZPrivHomeView: View {
                 PatchProjectLibrary.installBundledOriginalFreeFirePatches()
                 PatchProjectLibrary.removeObsoleteExternalPackages()
                 let items = PatchProjectLibrary.load()
-                let scopedItems = items.filter(belongsToSelectedEdition)
+                let scopedItems = items.filter { item in
+                    belongsToSelectedEdition(item) && !isUnavailablePatch(item)
+                }
                 let enabled = Set(scopedItems.compactMap { item in
                     return DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
                 })
@@ -1137,7 +1139,7 @@ private struct ExternalPanelView: View {
                 let title: String
                 let detail: String
                 if isPanelArtifact {
-                    title = "Painel"
+                    title = "Esp+Painel"
                     detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if isBoxBlueArtifact {
                     title = "BoxBlue"
