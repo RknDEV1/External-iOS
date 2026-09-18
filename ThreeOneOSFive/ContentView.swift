@@ -652,7 +652,7 @@ private struct CHZPrivHomeView: View {
             .replacingOccurrences(of: " ", with: "")
             .replacingOccurrences(of: "-", with: "")
             .replacingOccurrences(of: "+", with: "")
-        if normalized.contains("BOXBLUE") { return "BoxBlue" }
+        if normalized.contains("BOXBLUE") { return isFreeFireMax ? "Esp+Aimbot" : "BoxBlue" }
         if normalized.contains("PAINEL") { return "Esp+Painel" }
         return item.project?.name ?? filename
     }
@@ -675,6 +675,9 @@ private struct CHZPrivHomeView: View {
             }
             if filename.contains("ESPAIMBOT") {
                 return "ESP com assistência de mira."
+            }
+            if filename.contains("BOXBLUE") {
+                return "ESP com assistência de mira e recursos adicionais."
             }
         }
         if filename.contains("100") && filename.contains("BAYPSS") {
@@ -1127,7 +1130,7 @@ private struct ExternalPanelView: View {
                     name.localizedCaseInsensitiveContains("Esp") ||
                     name.localizedCaseInsensitiveContains("Painel") ||
                     name.localizedCaseInsensitiveContains("BoxBlue")
-                )
+                ) && !(isFreeFireMax && name.localizedCaseInsensitiveContains("Esp+aimbot"))
             }
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
             .map { url in
@@ -1142,8 +1145,10 @@ private struct ExternalPanelView: View {
                     title = "Esp+Painel"
                     detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if isBoxBlueArtifact {
-                    title = "BoxBlue"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
+                    title = isFreeFireMax ? "Esp+Aimbot" : "BoxBlue"
+                    detail = isFreeFireMax
+                        ? "ESP com assistência de mira e recursos adicionais."
+                        : "Função External interna com processamento e restauração do arquivo original"
                 } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
                     title = "ESP + AIM"
                     detail = "Função External interna com processamento e restauração do arquivo original"
