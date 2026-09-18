@@ -1128,19 +1128,19 @@ private struct ExternalPanelView: View {
                 let detail: String
                 if isPanelArtifact {
                     title = "Painel"
-                    detail = "Painel interno com validação, backup e restauração no sandbox do app"
+                    detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if isBoxBlueArtifact {
                     title = "BoxBlue"
-                    detail = "Função interna BoxBlue com validação e estado protegido no sandbox do app"
+                    detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
                     title = "ESP + AIM"
-                    detail = "Função interna ESP + AIM com validação e restauração no sandbox do app"
+                    detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if normalized.localizedCaseInsensitiveContains("esp only") {
                     title = "ESP ONLY"
-                    detail = "Função interna ESP ONLY com validação e restauração no sandbox do app"
+                    detail = "Função External interna com processamento e restauração do arquivo original"
                 } else {
                     title = "ESP"
-                    detail = "Função interna com validação e restauração no sandbox do app"
+                    detail = "Função External interna com processamento e restauração do arquivo original"
                 }
                 return ExternalPatchFunction(
                     id: filename,
