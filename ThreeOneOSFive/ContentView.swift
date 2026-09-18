@@ -1118,8 +1118,13 @@ private struct ExternalPanelView: View {
                 let filename = url.lastPathComponent
                 let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
                 let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                let title = normalized.localizedCaseInsensitiveContains("esp+aim") ? "ESP + AIM" : "ESP"
-                let detail = "Função External interna com processamento e restauração do arquivo original"
+                let isPanelArtifact = normalized.localizedCaseInsensitiveContains("esp only")
+                let title = isPanelArtifact
+                    ? "Painel"
+                    : (normalized.localizedCaseInsensitiveContains("esp+aim") ? "ESP + AIM" : "ESP")
+                let detail = isPanelArtifact
+                    ? "Painel interno com validação, backup e restauração no sandbox do app"
+                    : "Função interna com validação, backup e restauração no sandbox do app"
                 return ExternalPatchFunction(
                     id: filename,
                     filename: filename,

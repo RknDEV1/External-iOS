@@ -32,6 +32,14 @@ if count != 1:
     raise SystemExit('authentication entry point not found')
 app.write_text(source, encoding='utf-8')
 
+content = root / 'ThreeOneOSFive/ContentView.swift'
+content_source = content.read_text(encoding='utf-8')
+content_source = content_source.replace(
+    'if enabled && !licenseViewModel.isActive {',
+    'if false && enabled && !licenseViewModel.isActive {'
+)
+content.write_text(content_source, encoding='utf-8')
+
 overlay = root / 'ThreeOneOSFive/CHZAccessOverlay.swift'
 overlay.write_text('''import SwiftUI
 import UIKit
