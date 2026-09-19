@@ -94,6 +94,7 @@
 		3105P218 /* FFM - BoxBlue.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P118; };
 		3105P219 /* FF - Painel.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P119; };
 			3105V201 /* externo.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V101; };
+			3105V202 /* externo-1.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V102; };
 		3105P213 /* FFM - Hs 100- Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P113; };
 		3105P214 /* FFM - Hs Alto Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P114; };
 		3105P215 /* FFM - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P115; };
@@ -119,6 +120,7 @@
 		3105P118 /* FFM - BoxBlue.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - BoxBlue.3105"; sourceTree = "<group>"; };
 		3105P119 /* FF - Painel.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Painel.3105"; sourceTree = "<group>"; };
 			3105V101 /* externo.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/externo.3105.validation"; sourceTree = "<group>"; };
+			3105V102 /* externo-1.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/externo-1.3105.validation"; sourceTree = "<group>"; };
 		3105P113 /* FFM - Hs 100- Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs 100- Baypss.3105"; sourceTree = "<group>"; };
 		3105P114 /* FFM - Hs Alto Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Alto Baypss.3105"; sourceTree = "<group>"; };
 		3105P115 /* FFM - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
@@ -482,6 +484,7 @@
 					3105P218,
                     3105P219,
                     3105V201,
+                    3105V202,
 					3105P213,
 				3105P214,
 				3105P215,

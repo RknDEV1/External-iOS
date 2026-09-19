@@ -269,14 +269,20 @@ enum DevicePatchService {
     }
 
     static func validateExternalArtifact(at sourceURL: URL) throws -> ExternalArtifactReport {
-        try validateExternalArtifact(at: sourceURL, packageSummary: nil)
+        let data = try Data(contentsOf: sourceURL, options: [.mappedIfSafe])
+        let summary = try PatchPackageCodec.inspect(data)
+        if summary.isPasswordProtected {
+            _ = try PatchPackageCodec.decode(data, password: "CHZ")
+        }
+        return try validateExternalArtifact(at: sourceURL, packageSummary: summary)
     }
 
     private static func validateExternalArtifact(
         at sourceURL: URL,
         packageSummary: PatchPackageSummary?
     ) throws -> ExternalArtifactReport {
-        guard sourceURL.pathExtension.lowercased() == "3105" else {
+        let lowerName = sourceURL.lastPathComponent.lowercased()
+        guard sourceURL.pathExtension.lowercased() == "3105" || lowerName.hasSuffix(".3105.validation") else {
             throw PatchPackageError.unsupportedFormat
         }
 
@@ -338,6 +344,12 @@ enum DevicePatchService {
         }
         log("external: backup restored \(receipt.sourceFilename)")
         return restoredURL
+    }
+
+    static func deleteExternalBackup(_ receipt: ExternalBackupReceipt) throws {
+        let backup = try privateOwnedFile(receipt.backupURL)
+        try FileManager.default.removeItem(at: backup)
+        log("external: backup deleted \(receipt.sourceFilename)")
     }
 
     private static func externalRoot() throws -> URL {

@@ -439,33 +439,27 @@ private struct CHZPrivHomeView: View {
             ExternalDemoUnlockSheet(
                 onCancel: { showCatalogDemoUnlock = false },
                 onSuccess: {
-                    catalogDemoActive = validateBundledDemoArtifact()
+                    catalogDemoActive = validateCatalogDemoArtifact()
                     showCatalogDemoUnlock = false
                 }
             )
         }
     }
 
-    private func validateBundledDemoArtifact() -> Bool {
-        guard let url = Bundle.main.url(forResource: "externo", withExtension: "3105.validation"),
-              let data = try? Data(contentsOf: url),
-              data.starts(with: Data("3105PATCH".utf8)) else {
-            activityLog.append(LogEntry(
-                timestamp: Date().formatted(date: .omitted, time: .shortened),
-                message: "Painel External: arquivo de validação ausente ou cabeçalho inválido",
-                level: .warning
-            ))
+    private func validateCatalogDemoArtifact() -> Bool {
+        guard let url = Bundle.main.url(forResource: "externo-1", withExtension: "3105.validation") else {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: arquivo ausente", level: .warning))
             return false
         }
-        let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-        let expected = "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0"
-        let valid = digest == expected
-        activityLog.append(LogEntry(
-            timestamp: Date().formatted(date: .omitted, time: .shortened),
-            message: valid ? "Painel External: arquivo validado no bundle (SHA-256 confirmado)" : "Painel External: falha de integridade",
-            level: valid ? .success : .warning
-        ))
-        return valid
+        do {
+            let report = try DevicePatchService.validateExternalArtifact(at: url)
+            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else { return false }
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: externo(1).3105 validado e enviado à quarentena interna", level: .success))
+            return true
+        } catch {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: validação interna falhou", level: .warning))
+            return false
+        }
     }
 
     private var bottomNavigation: some View {
@@ -1295,7 +1289,8 @@ private struct ExternalPanelView: View {
                     showDemoUnlock = false
                 },
                 onSuccess: {
-                    if let id = demoUnlockFunctionID {
+                    if let report = prepareBundledDemoArtifact(), let id = demoUnlockFunctionID {
+                        externalReport = report
                         activeExternalPatchIDs.insert(id)
                     }
                     demoUnlockFunctionID = nil
@@ -1304,6 +1299,28 @@ private struct ExternalPanelView: View {
                     appendExternalLog("[OK] Autorização local confirmada; nenhum payload executado")
                 }
             )
+        }
+    }
+
+    private func prepareBundledDemoArtifact() -> ExternalArtifactReport? {
+        guard let url = Bundle.main.url(forResource: "externo-1", withExtension: "3105.validation") else {
+            externalMessage = "Arquivo externo(1).3105 ausente no bundle."
+            appendExternalLog("[ERRO] externo(1).3105 ausente no bundle")
+            return nil
+        }
+        do {
+            let report = try DevicePatchService.validateExternalArtifact(at: url)
+            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else {
+                throw PatchPackageError.unsupportedFormat
+            }
+            externalMessage = "externo(1).3105 validado e copiado para a quarentena interna."
+            appendExternalLog("[OK] externo(1).3105 validado; SHA-256 confirmado")
+            appendExternalLog("[INFO] Quarentena: Application Support/ExternalMenu/Quarantine")
+            return report
+        } catch {
+            externalMessage = "Falha na validação estrutural do externo(1).3105."
+            appendExternalLog("[ERRO] Validação interna interrompida: \(error.localizedDescription)")
+            return nil
         }
     }
 
@@ -1676,6 +1693,13 @@ private struct ExternalPanelView: View {
                     symbol: "number"
                 )
                 divider
+                diagnosticRow(
+                    "Origem",
+                    value: "externo(1).3105",
+                    color: AppTheme.secondaryText,
+                    symbol: "doc.badge.checkmark"
+                )
+                divider
                 HStack(spacing: 10) {
                     Button("Criar backup") {
                         do {
@@ -1690,17 +1714,35 @@ private struct ExternalPanelView: View {
                     .disabled(externalBackup != nil)
 
                     Button("Restaurar original") {
+                        guard let externalBackup else {
+                            externalMessage = "Crie o backup interno antes de restaurar."
+                            return
+                        }
                         do {
-                            _ = try DevicePatchService.restoreExternalWorkingFile(
-                                editionKey: isFreeFireMax ? "free-fire-max" : "free-fire"
-                            )
-                            externalMessage = "Arquivo original interno restaurado e verificado."
+                            _ = try DevicePatchService.restoreExternalBackup(externalBackup)
+                            externalMessage = "Backup interno restaurado e verificado."
+                            appendExternalLog("[OK] Backup de externo(1).3105 restaurado na quarentena")
                         } catch {
-                            externalMessage = "Não existe backup original interno para restaurar."
+                            externalMessage = "Falha ao restaurar o backup interno."
+                            appendExternalLog("[ERRO] Restauração interna interrompida")
                         }
                     }
                     .buttonStyle(.bordered)
-                    .disabled(!hasPreparedExternalArtifact)
+                    .disabled(externalBackup == nil)
+
+                    Button("Excluir backup") {
+                        guard let externalBackup else { return }
+                        do {
+                            try DevicePatchService.deleteExternalBackup(externalBackup)
+                            self.externalBackup = nil
+                            externalMessage = "Backup interno excluído."
+                            appendExternalLog("[OK] Backup interno excluído")
+                        } catch {
+                            externalMessage = "Falha ao excluir o backup interno."
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(externalBackup == nil)
                 }
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .padding(.vertical, 8)
