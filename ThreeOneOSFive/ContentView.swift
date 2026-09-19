@@ -614,7 +614,7 @@ private struct CHZPrivHomeView: View {
                 Text("PAINEL EXTERNAL")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
-                Text("ESP com painel interno de funções e configurações.")
+                Text("externo.3105 · ESP com painel interno de funções e configurações.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
