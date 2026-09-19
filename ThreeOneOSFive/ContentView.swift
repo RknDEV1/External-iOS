@@ -352,6 +352,8 @@ private struct CHZPrivHomeView: View {
     @State private var patchLoadingCoordinator = PatchLoadingCoordinator()
     @State private var pendingExternalUnlockID: UUID?
     @State private var pendingExternalPasswordItem: PatchLibraryItem?
+    @State private var catalogDemoActive = false
+    @State private var showCatalogDemoUnlock = false
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -433,6 +435,15 @@ private struct CHZPrivHomeView: View {
                 onCancel: cancelPendingExternalUnlock
             )
         }
+        .sheet(isPresented: $showCatalogDemoUnlock) {
+            ExternalDemoUnlockSheet(
+                onCancel: { showCatalogDemoUnlock = false },
+                onSuccess: {
+                    catalogDemoActive = true
+                    showCatalogDemoUnlock = false
+                }
+            )
+        }
     }
 
     private var bottomNavigation: some View {
@@ -507,7 +518,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func categoryOverviewCard(_ category: PatchCategory) -> some View {
-        let count = freeFirePatches.filter { $0.category == category }.count
+        let count = freeFirePatches.filter { $0.category == category }.count + ((category == .external && !isFreeFireMax) ? 1 : 0)
         return HStack(spacing: 9) {
             Image(systemName: category.symbol)
                 .font(.system(size: 16, weight: .bold))
@@ -541,6 +552,7 @@ private struct CHZPrivHomeView: View {
     @ViewBuilder
     private func categorySection(_ category: PatchCategory) -> some View {
         let items = freeFirePatches.filter { $0.category == category }
+        let displayedCount = items.count + ((category == .external && !isFreeFireMax) ? 1 : 0)
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(category.rawValue.uppercased())
@@ -548,7 +560,7 @@ private struct CHZPrivHomeView: View {
                     .tracking(0.6)
                     .foregroundStyle(AppTheme.primaryText)
                 Spacer()
-                Text("\(items.count)")
+                Text("\(displayedCount)")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(AppTheme.secondaryText)
             }
@@ -562,9 +574,46 @@ private struct CHZPrivHomeView: View {
                     ForEach(items) { item in
                         functionRow(item: item)
                     }
+                    if category == .external && !isFreeFireMax {
+                        catalogDemoFunctionRow
+                    }
                 }
             }
         }
+    }
+
+    private var catalogDemoFunctionRow: some View {
+        HStack(spacing: 12) {
+            Image(systemName: PatchCategory.external.symbol)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(AppTheme.accentBright)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: 5) {
+                Text("PAINEL EXTERNAL")
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(AppTheme.primaryText)
+                Text("ESP com painel interno de funções e configurações.")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.tertiaryText)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 6)
+            Toggle("Painel External", isOn: Binding(
+                get: { catalogDemoActive },
+                set: { enabled in
+                    if enabled { showCatalogDemoUnlock = true }
+                    else { catalogDemoActive = false }
+                }
+            ))
+            .labelsHidden()
+            .toggleStyle(CHZSwitchStyle())
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 5)
+        .frame(minHeight: 78)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
     }
 
     private func functionRow(item: PatchLibraryItem) -> some View {
