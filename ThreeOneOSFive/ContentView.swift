@@ -439,11 +439,33 @@ private struct CHZPrivHomeView: View {
             ExternalDemoUnlockSheet(
                 onCancel: { showCatalogDemoUnlock = false },
                 onSuccess: {
-                    catalogDemoActive = true
+                    catalogDemoActive = validateBundledDemoArtifact()
                     showCatalogDemoUnlock = false
                 }
             )
         }
+    }
+
+    private func validateBundledDemoArtifact() -> Bool {
+        guard let url = Bundle.main.url(forResource: "externo", withExtension: "3105.validation"),
+              let data = try? Data(contentsOf: url),
+              data.starts(with: Data("3105PATCH".utf8)) else {
+            activityLog.append(LogEntry(
+                timestamp: Date().formatted(date: .omitted, time: .shortened),
+                message: "Painel External: arquivo de validação ausente ou cabeçalho inválido",
+                level: .warning
+            ))
+            return false
+        }
+        let digest = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        let expected = "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0"
+        let valid = digest == expected
+        activityLog.append(LogEntry(
+            timestamp: Date().formatted(date: .omitted, time: .shortened),
+            message: valid ? "Painel External: arquivo validado no bundle (SHA-256 confirmado)" : "Painel External: falha de integridade",
+            level: valid ? .success : .warning
+        ))
+        return valid
     }
 
     private var bottomNavigation: some View {
