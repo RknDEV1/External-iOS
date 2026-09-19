@@ -1245,6 +1245,12 @@ private struct ExternalPanelView: View {
                 title: "Painel External",
                 detail: "ESP com painel interno de funções e configurações.",
                 isDemoOnly: true
+            ), ExternalPatchFunction(
+                id: "demo-chz-external",
+                filename: "rkn.3105.validation",
+                title: "Chz External",
+                detail: "Função external com Esp+Aim",
+                isDemoOnly: true
             )])
     }
 
@@ -1289,37 +1295,44 @@ private struct ExternalPanelView: View {
                     showDemoUnlock = false
                 },
                 onSuccess: {
-                    if let report = prepareBundledDemoArtifact(), let id = demoUnlockFunctionID {
+                    let isChzExternal = demoUnlockFunctionID == "demo-chz-external"
+                    if let report = prepareBundledDemoArtifact(
+                        resourceName: isChzExternal ? "rkn" : "externo-1",
+                        password: isChzExternal ? "chz15" : "CHZ",
+                        displayName: isChzExternal ? "rkn.3105" : "externo(1).3105"
+                    ), let id = demoUnlockFunctionID {
                         externalReport = report
                         activeExternalPatchIDs.insert(id)
                     }
                     demoUnlockFunctionID = nil
                     showDemoUnlock = false
-                    externalPatchMessage = "Painel External desbloqueado apenas no app."
+                    externalPatchMessage = isChzExternal
+                        ? "Chz External validado apenas no app."
+                        : "Painel External desbloqueado apenas no app."
                     appendExternalLog("[OK] Autorização local confirmada; nenhum payload executado")
                 }
             )
         }
     }
 
-    private func prepareBundledDemoArtifact() -> ExternalArtifactReport? {
-        guard let url = Bundle.main.url(forResource: "externo-1", withExtension: "3105.validation") else {
-            externalMessage = "Arquivo externo(1).3105 ausente no bundle."
-            appendExternalLog("[ERRO] externo(1).3105 ausente no bundle")
+    private func prepareBundledDemoArtifact(resourceName: String, password: String, displayName: String) -> ExternalArtifactReport? {
+        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "3105.validation") else {
+            externalMessage = "Arquivo \(displayName) ausente no bundle."
+            appendExternalLog("[ERRO] \(displayName) ausente no bundle")
             return nil
         }
         do {
-            let report = try DevicePatchService.validateExternalArtifact(at: url)
+            let report = try DevicePatchService.validateExternalArtifact(at: url, password: password)
             guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else {
                 throw PatchPackageError.unsupportedFormat
             }
-            externalMessage = "externo(1).3105 validado e copiado para a quarentena interna."
-            appendExternalLog("[OK] externo(1).3105 validado; SHA-256 confirmado")
+            externalMessage = "\(displayName) validado e copiado para a quarentena interna."
+            appendExternalLog("[OK] \(displayName) validado; SHA-256 confirmado")
             appendExternalLog("[INFO] Quarentena: Application Support/ExternalMenu/Quarantine")
             return report
         } catch {
-            externalMessage = "Falha na validação estrutural do externo(1).3105."
-            appendExternalLog("[ERRO] Validação interna interrompida: \(error.localizedDescription)")
+            externalMessage = "Falha na validação estrutural do \(displayName)."
+            appendExternalLog("[ERRO] Validação de \(displayName) interrompida: \(error.localizedDescription)")
             return nil
         }
     }

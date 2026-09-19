@@ -268,11 +268,11 @@ enum DevicePatchService {
         try PropertyListDecoder().decode(ExternalInstallReceipt.self, from: Data(contentsOf: url))
     }
 
-    static func validateExternalArtifact(at sourceURL: URL) throws -> ExternalArtifactReport {
+    static func validateExternalArtifact(at sourceURL: URL, password: String? = "CHZ") throws -> ExternalArtifactReport {
         let data = try Data(contentsOf: sourceURL, options: [.mappedIfSafe])
         let summary = try PatchPackageCodec.inspect(data)
         if summary.isPasswordProtected {
-            _ = try PatchPackageCodec.decode(data, password: "CHZ")
+            _ = try PatchPackageCodec.decode(data, password: password)
         }
         return try validateExternalArtifact(at: sourceURL, packageSummary: summary)
     }
