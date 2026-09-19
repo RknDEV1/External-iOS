@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
+import CryptoKit
 
 struct ContentView: View {
     var isFreeFireMax: Bool = false
@@ -1079,6 +1080,8 @@ private struct ExternalPanelView: View {
     @State private var activeExternalPatchIDs = Set<String>()
     @State private var workingExternalPatchID: String?
     @State private var externalPatchMessage: String?
+    @State private var showDemoUnlock = false
+    @State private var demoUnlockFunctionID: String?
     private enum ExternalLogLevel: Equatable {
         case info, progress, success, warning
 
@@ -1121,6 +1124,7 @@ private struct ExternalPanelView: View {
         let filename: String
         let title: String
         let detail: String
+        let isDemoOnly: Bool
     }
 
     private var externalFunctions: [ExternalPatchFunction] {
@@ -1166,9 +1170,17 @@ private struct ExternalPanelView: View {
                     id: filename,
                     filename: filename,
                     title: title,
-                    detail: detail
+                    detail: detail,
+                    isDemoOnly: false
                 )
             }
+            + (isFreeFireMax ? [] : [ExternalPatchFunction(
+                id: "demo-painel-external",
+                filename: "",
+                title: "Painel External",
+                detail: "ESP com painel interno de funções e configurações.",
+                isDemoOnly: true
+            )])
     }
 
     private var editionName: String {
@@ -1205,6 +1217,23 @@ private struct ExternalPanelView: View {
         .scrollIndicators(.hidden)
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .onAppear { refreshExternalState() }
+        .sheet(isPresented: $showDemoUnlock) {
+            ExternalDemoUnlockSheet(
+                onCancel: {
+                    demoUnlockFunctionID = nil
+                    showDemoUnlock = false
+                },
+                onSuccess: {
+                    if let id = demoUnlockFunctionID {
+                        activeExternalPatchIDs.insert(id)
+                    }
+                    demoUnlockFunctionID = nil
+                    showDemoUnlock = false
+                    externalPatchMessage = "Painel External desbloqueado apenas no app."
+                    appendExternalLog("[OK] Autorização local confirmada; nenhum payload executado")
+                }
+            )
+        }
     }
 
     private var compactExternalHeader: some View {
@@ -1469,6 +1498,18 @@ private struct ExternalPanelView: View {
 
     private func handleExternalPatch(_ function: ExternalPatchFunction, enabled: Bool) {
         guard workingExternalPatchID == nil else { return }
+        if function.isDemoOnly {
+            guard enabled else {
+                activeExternalPatchIDs.remove(function.id)
+                externalPatchMessage = "Painel External desativado."
+                appendExternalLog("[INFO] Painel External desativado; estado apenas local")
+                return
+            }
+            demoUnlockFunctionID = function.id
+            showDemoUnlock = true
+            appendExternalLog("[PROCESSO] Solicitação de autorização local do Painel External")
+            return
+        }
         let sourceURL: URL?
         if enabled {
             let resourceName = URL(fileURLWithPath: function.filename)
@@ -1687,6 +1728,71 @@ private struct ExternalPanelView: View {
         Rectangle()
             .fill(Color.white.opacity(0.10))
             .frame(height: 0.7)
+    }
+}
+
+private struct ExternalDemoUnlockSheet: View {
+    let onCancel: () -> Void
+    let onSuccess: () -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var password = ""
+    @State private var attempts = 0
+    @State private var errorMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Autorização local") {
+                    SecureField("Senha", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                    if let errorMessage {
+                        Text(errorMessage)
+                            .foregroundStyle(.red)
+                            .font(.footnote)
+                    }
+                }
+                Section {
+                    Text("Esta autorização altera somente o estado visual interno do app. Nenhum payload é executado.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("Painel External")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") {
+                        onCancel()
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Validar") {
+                        validate()
+                    }
+                    .disabled(password.isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+
+    private func validate() {
+        let digest = SHA256.hash(data: Data(password.utf8))
+        let expected = SHA256.hash(data: Data("CHZ".utf8))
+        guard digest == expected else {
+            attempts += 1
+            password = ""
+            errorMessage = attempts >= 3 ? "Limite de tentativas atingido." : "Senha incorreta."
+            if attempts >= 3 {
+                onCancel()
+                dismiss()
+            }
+            return
+        }
+        onSuccess()
+        dismiss()
     }
 }
 
