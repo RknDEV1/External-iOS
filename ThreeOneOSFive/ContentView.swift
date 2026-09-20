@@ -1003,6 +1003,12 @@ private struct CHZPrivHomeView: View {
                 pendingExternalPasswordItem = nil
                 return
             }
+            if isEspOnly(item) {
+                pendingExternalPasswordItem = nil
+                appendLog("ESP ONLY autorizado automaticamente; validando pacote protegido", level: .progress)
+                patchStore.unlock(password: "CHZ")
+                return
+            }
             pendingExternalPasswordItem = item
             appendLog("Senha necessária para ativar o patch External", level: .progress)
             return
@@ -1035,6 +1041,12 @@ private struct CHZPrivHomeView: View {
         pendingExternalPasswordItem = nil
         patchStore.cancelUnlock()
         appendLog("Ativação External cancelada", level: .warning)
+    }
+
+    private func isEspOnly(_ item: PatchLibraryItem) -> Bool {
+        let name = item.packageURL.deletingPathExtension().lastPathComponent
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+        return name.contains("esp only")
     }
 
     private func continuePendingExternalActivationIfReady() {
