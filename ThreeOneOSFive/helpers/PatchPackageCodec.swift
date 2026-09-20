@@ -5,7 +5,9 @@ import Security
 
 enum PatchPackageCodec {
     private static let magic = Data("3105PATCH\0".utf8)
-    static let latestSchemaVersion = 2
+    // Schema 3 is used by the newly supplied ChPainel and Modnew packages.
+    // The envelope and authenticated payload remain compatible with the existing decoder.
+    static let latestSchemaVersion = 3
     private static let minimumSchemaVersion = 1
 
     private struct Envelope: Codable {
