@@ -737,7 +737,7 @@ private struct CHZPrivHomeView: View {
                 Text("CHPAINEL")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
-                Text("Função external com painel interno.")
+                Text("Painel interno com funções e configurações.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
@@ -773,7 +773,7 @@ private struct CHZPrivHomeView: View {
                 Text("EXTERNAL CHZ")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
-                Text("Função external do catálogo 3105.")
+                Text("ESP com assistência de mira e painel externo.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
@@ -1393,7 +1393,7 @@ private struct ExternalPanelView: View {
                     detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if normalized.localizedCaseInsensitiveContains("esp only") {
                     title = "ESP ONLY"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
+                    detail = "ESP sem assistência adicional de mira."
                 } else {
                     title = "ESP"
                     detail = "Função External interna com processamento e restauração do arquivo original"
@@ -1410,13 +1410,13 @@ private struct ExternalPanelView: View {
                 id: "demo-modnew-external",
                 filename: "modnew.3105.validation",
                 title: "External Chz",
-                detail: "Função external do catálogo 3105.",
+                detail: "ESP com assistência de mira e painel externo.",
                 isDemoOnly: true
             )] : [ExternalPatchFunction(
                 id: "demo-chpainel",
                 filename: "chpainel.3105.validation",
                 title: "ChPainel",
-                detail: "Função external com painel interno.",
+                detail: "Painel interno com funções e configurações.",
                 isDemoOnly: true
             )])
     }
