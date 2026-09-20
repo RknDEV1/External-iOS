@@ -747,7 +747,7 @@ private struct CHZPrivHomeView: View {
             Toggle("ChPainel", isOn: Binding(
                 get: { catalogChPainelActive },
                 set: { enabled in
-                    if enabled { showCatalogChPainelUnlock = true }
+                    if enabled { catalogChPainelActive = validateCatalogChPainelArtifact() }
                     else {
                         catalogChPainelActive = restoreCatalogInternalArtifact(editionKey: "catalog-free-fire-chpainel")
                     }
@@ -783,7 +783,7 @@ private struct CHZPrivHomeView: View {
             Toggle("External Chz", isOn: Binding(
                 get: { catalogModnewActive },
                 set: { enabled in
-                    if enabled { showCatalogModnewUnlock = true }
+                    if enabled { catalogModnewActive = validateCatalogModnewArtifact() }
                     else {
                         catalogModnewActive = restoreCatalogInternalArtifact(editionKey: "catalog-free-fire-max-modnew")
                     }
@@ -1800,6 +1800,10 @@ private struct ExternalPanelView: View {
                 }
                 return
             }
+            if function.id == "demo-chpainel" || function.id == "demo-modnew-external" {
+                activateBundledDemoWithoutUnlock(function)
+                return
+            }
             demoUnlockFunctionID = function.id
             showDemoUnlock = true
             appendExternalLog("[PROCESSO] Solicitação de autorização local do Painel External")
@@ -1857,6 +1861,25 @@ private struct ExternalPanelView: View {
                     appendExternalLog("[ERRO] Operação interrompida: \(error.localizedDescription)")
                 }
             }
+        }
+    }
+
+    private func activateBundledDemoWithoutUnlock(_ function: ExternalPatchFunction) {
+        let isChPainel = function.id == "demo-chpainel"
+        let resourceName = isChPainel ? "chpainel" : "modnew"
+        let displayName = isChPainel ? "ChPainel.3105" : "Modnew.3105"
+        let expectedHash = isChPainel
+            ? "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387"
+            : "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b"
+        guard let report = prepareBundledDemoArtifact(resourceName: resourceName, password: nil, displayName: displayName, expectedHash: expectedHash) else { return }
+        do {
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: externalEditionKey(for: function))
+            activeExternalPatchIDs.insert(function.id)
+            externalPatchMessage = "\(function.title) ativado sem senha na área privada do app."
+            appendExternalLog("[OK] \(function.title) validado, com backup criado e instalado internamente")
+        } catch {
+            externalPatchMessage = "Falha ao instalar \(function.title) na área privada."
+            appendExternalLog("[ERRO] Instalação interna interrompida: \(error.localizedDescription)")
         }
     }
 
