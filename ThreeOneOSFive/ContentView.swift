@@ -515,11 +515,22 @@ private struct CHZPrivHomeView: View {
         }
     }
 
+    private func restoreCatalogInternalArtifact(editionKey: String) -> Bool {
+        do {
+            _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Backup interno restaurado", level: .success))
+        } catch {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Nenhum backup interno pôde ser restaurado", level: .warning))
+        }
+        return false
+    }
+
     private func validateCatalogChPainelArtifact() -> Bool {
         guard let url = Bundle.main.url(forResource: "chpainel", withExtension: "3105.validation") else { return false }
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
             guard report.sha256 == "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387" else { return false }
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-chpainel")
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "ChPainel: arquivo validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -533,6 +544,7 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
             guard report.sha256 == "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" else { return false }
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-max-modnew")
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "External Chz: Modnew.3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -736,7 +748,9 @@ private struct CHZPrivHomeView: View {
                 get: { catalogChPainelActive },
                 set: { enabled in
                     if enabled { showCatalogChPainelUnlock = true }
-                    else { catalogChPainelActive = false }
+                    else {
+                        catalogChPainelActive = restoreCatalogInternalArtifact(editionKey: "catalog-free-fire-chpainel")
+                    }
                 }
             ))
             .labelsHidden()
@@ -770,7 +784,9 @@ private struct CHZPrivHomeView: View {
                 get: { catalogModnewActive },
                 set: { enabled in
                     if enabled { showCatalogModnewUnlock = true }
-                    else { catalogModnewActive = false }
+                    else {
+                        catalogModnewActive = restoreCatalogInternalArtifact(editionKey: "catalog-free-fire-max-modnew")
+                    }
                 }
             ))
             .labelsHidden()
@@ -1461,15 +1477,27 @@ private struct ExternalPanelView: View {
                         displayName: isChPainel ? "ChPainel.3105" : (isModnew ? "Modnew.3105" : "externo(1).3105"),
                         expectedHash: isChPainel ? "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387" : (isModnew ? "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" : "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0")
                     ), let id = demoUnlockFunctionID {
-                        externalReport = report
-                        activeExternalPatchIDs.insert(id)
+                        let function = ExternalPatchFunction(
+                            id: id,
+                            filename: report.filename,
+                            title: isChPainel ? "ChPainel" : (isModnew ? "External Chz" : "Painel External"),
+                            detail: "Função interna do External Chz.",
+                            isDemoOnly: true
+                        )
+                        do {
+                            _ = try DevicePatchService.installExternalArtifact(report, editionKey: externalEditionKey(for: function))
+                            externalReport = report
+                            activeExternalPatchIDs.insert(id)
+                            externalPatchMessage = "\(function.title) validado e substituído na área privada do app."
+                            appendExternalLog("[OK] Backup original criado; arquivo instalado em Application Support/ExternalMenu/Working")
+                        } catch {
+                            externalPatchMessage = "Falha ao instalar na área privada do app."
+                            appendExternalLog("[ERRO] Instalação interna interrompida: \(error.localizedDescription)")
+                        }
                     }
                     demoUnlockFunctionID = nil
                     showDemoUnlock = false
-                    externalPatchMessage = isChPainel
-                        ? "ChPainel validado apenas no app."
-                        : (isModnew ? "External Chz validado apenas no app." : "Painel External desbloqueado apenas no app.")
-                    appendExternalLog("[OK] Autorização local confirmada; nenhum payload executado")
+                    appendExternalLog("[OK] Autorização local confirmada; nenhum container externo acessado")
                 }
             )
         }
@@ -1762,8 +1790,14 @@ private struct ExternalPanelView: View {
         if function.isDemoOnly {
             guard enabled else {
                 activeExternalPatchIDs.remove(function.id)
-                externalPatchMessage = "Painel External desativado."
-                appendExternalLog("[INFO] Painel External desativado; estado apenas local")
+                do {
+                    _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: externalEditionKey(for: function))
+                    externalPatchMessage = "\(function.title) desativado e backup original restaurado na área privada."
+                    appendExternalLog("[OK] Backup original restaurado; nenhuma área externa acessada")
+                } catch {
+                    externalPatchMessage = "Falha ao restaurar o backup interno."
+                    appendExternalLog("[ERRO] Restauração interna interrompida: \(error.localizedDescription)")
+                }
                 return
             }
             demoUnlockFunctionID = function.id
