@@ -140,7 +140,16 @@ def patch_project(project_file: Path) -> None:
 
     text = project_file.read_text()
 
-    if FILE_REF_ID in text and EMBED_PHASE_ID in text:
+    # Older project revisions use different object IDs. Detect the semantic
+    # framework/embed objects too, so CI cannot add a second embed phase.
+    if (
+        (FILE_REF_ID in text and EMBED_PHASE_ID in text)
+        or (
+            'path = "Frameworks/ChzLogin.xcframework"' in text
+            and 'name = "Embed Frameworks";' in text
+            and 'PBXCopyFilesBuildPhase' in text
+        )
+    ):
 
         return
 
@@ -250,4 +259,3 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
-
