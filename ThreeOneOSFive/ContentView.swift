@@ -356,6 +356,10 @@ private struct CHZPrivHomeView: View {
     @State private var showCatalogDemoUnlock = false
     @State private var catalogChzExternalActive = false
     @State private var showCatalogChzExternalUnlock = false
+    @State private var catalogChPainelActive = false
+    @State private var showCatalogChPainelUnlock = false
+    @State private var catalogModnewActive = false
+    @State private var showCatalogModnewUnlock = false
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -457,6 +461,26 @@ private struct CHZPrivHomeView: View {
                 }
             )
         }
+        .sheet(isPresented: $showCatalogChPainelUnlock) {
+            ExternalDemoUnlockSheet(
+                title: "ChPainel",
+                onCancel: { showCatalogChPainelUnlock = false },
+                onSuccess: {
+                    catalogChPainelActive = validateCatalogChPainelArtifact()
+                    showCatalogChPainelUnlock = false
+                }
+            )
+        }
+        .sheet(isPresented: $showCatalogModnewUnlock) {
+            ExternalDemoUnlockSheet(
+                title: "External Chz",
+                onCancel: { showCatalogModnewUnlock = false },
+                onSuccess: {
+                    catalogModnewActive = validateCatalogModnewArtifact()
+                    showCatalogModnewUnlock = false
+                }
+            )
+        }
     }
 
     private func validateCatalogDemoArtifact() -> Bool {
@@ -487,6 +511,32 @@ private struct CHZPrivHomeView: View {
             return true
         } catch {
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: validação interna falhou", level: .warning))
+            return false
+        }
+    }
+
+    private func validateCatalogChPainelArtifact() -> Bool {
+        guard let url = Bundle.main.url(forResource: "chpainel", withExtension: "3105.validation") else { return false }
+        do {
+            let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
+            guard report.sha256 == "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387" else { return false }
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "ChPainel: arquivo validado e enviado à quarentena interna", level: .success))
+            return true
+        } catch {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "ChPainel: validação interna falhou", level: .warning))
+            return false
+        }
+    }
+
+    private func validateCatalogModnewArtifact() -> Bool {
+        guard let url = Bundle.main.url(forResource: "modnew", withExtension: "3105.validation") else { return false }
+        do {
+            let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
+            guard report.sha256 == "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" else { return false }
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "External Chz: Modnew.3105 validado e enviado à quarentena interna", level: .success))
+            return true
+        } catch {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "External Chz: validação interna falhou", level: .warning))
             return false
         }
     }
@@ -563,7 +613,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func categoryOverviewCard(_ category: PatchCategory) -> some View {
-        let count = freeFirePatches.filter { $0.category == category }.count + ((category == .external && !isFreeFireMax) ? 2 : 0)
+        let count = freeFirePatches.filter { $0.category == category }.count + (category == .external ? (isFreeFireMax ? 1 : 2) : 0)
         return HStack(spacing: 9) {
             Image(systemName: category.symbol)
                 .font(.system(size: 16, weight: .bold))
@@ -597,7 +647,7 @@ private struct CHZPrivHomeView: View {
     @ViewBuilder
     private func categorySection(_ category: PatchCategory) -> some View {
         let items = freeFirePatches.filter { $0.category == category }
-        let displayedCount = items.count + ((category == .external && !isFreeFireMax) ? 2 : 0)
+        let displayedCount = items.count + (category == .external ? (isFreeFireMax ? 1 : 2) : 0)
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(category.rawValue.uppercased())
@@ -619,9 +669,13 @@ private struct CHZPrivHomeView: View {
                     ForEach(items) { item in
                         functionRow(item: item)
                     }
-                    if category == .external && !isFreeFireMax {
-                        catalogDemoFunctionRow
-                        catalogChzExternalFunctionRow
+                    if category == .external {
+                        if isFreeFireMax {
+                            catalogModnewFunctionRow
+                        } else {
+                            catalogDemoFunctionRow
+                            catalogChPainelFunctionRow
+                        }
                     }
                 }
             }
@@ -662,27 +716,61 @@ private struct CHZPrivHomeView: View {
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
     }
 
-    private var catalogChzExternalFunctionRow: some View {
+    private var catalogChPainelFunctionRow: some View {
         HStack(spacing: 12) {
             Image(systemName: PatchCategory.external.symbol)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(AppTheme.accentBright)
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
-                Text("CHZ EXTERNAL")
+                Text("CHPAINEL")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
-                Text("Função external com Esp+Aim")
+                Text("Função external com painel interno.")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
             Spacer(minLength: 6)
-            Toggle("Chz External", isOn: Binding(
-                get: { catalogChzExternalActive },
+            Toggle("ChPainel", isOn: Binding(
+                get: { catalogChPainelActive },
                 set: { enabled in
-                    if enabled { showCatalogChzExternalUnlock = true }
-                    else { catalogChzExternalActive = false }
+                    if enabled { showCatalogChPainelUnlock = true }
+                    else { catalogChPainelActive = false }
+                }
+            ))
+            .labelsHidden()
+            .toggleStyle(CHZSwitchStyle())
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 5)
+        .frame(minHeight: 78)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
+    }
+
+    private var catalogModnewFunctionRow: some View {
+        HStack(spacing: 12) {
+            Image(systemName: PatchCategory.external.symbol)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(AppTheme.accentBright)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: 5) {
+                Text("EXTERNAL CHZ")
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(AppTheme.primaryText)
+                Text("Função external do catálogo 3105.")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.tertiaryText)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 6)
+            Toggle("External Chz", isOn: Binding(
+                get: { catalogModnewActive },
+                set: { enabled in
+                    if enabled { showCatalogModnewUnlock = true }
+                    else { catalogModnewActive = false }
                 }
             ))
             .labelsHidden()
@@ -1303,17 +1391,23 @@ private struct ExternalPanelView: View {
                     isDemoOnly: false
                 )
             }
-            + (isFreeFireMax ? [] : [ExternalPatchFunction(
+            + (isFreeFireMax ? [ExternalPatchFunction(
+                id: "demo-modnew-external",
+                filename: "modnew.3105.validation",
+                title: "External Chz",
+                detail: "Função external do catálogo 3105.",
+                isDemoOnly: true
+            )] : [ExternalPatchFunction(
                 id: "demo-painel-external",
                 filename: "",
                 title: "Painel External",
                 detail: "ESP com painel interno de funções e configurações.",
                 isDemoOnly: true
             ), ExternalPatchFunction(
-                id: "demo-chz-external",
-                filename: "rkn.3105.validation",
-                title: "Chz External",
-                detail: "Função external com Esp+Aim",
+                id: "demo-chpainel",
+                filename: "chpainel.3105.validation",
+                title: "ChPainel",
+                detail: "Função external com painel interno.",
                 isDemoOnly: true
             )])
     }
@@ -1359,27 +1453,29 @@ private struct ExternalPanelView: View {
                     showDemoUnlock = false
                 },
                 onSuccess: {
-                    let isChzExternal = demoUnlockFunctionID == "demo-chz-external"
+                    let isChPainel = demoUnlockFunctionID == "demo-chpainel"
+                    let isModnew = demoUnlockFunctionID == "demo-modnew-external"
                     if let report = prepareBundledDemoArtifact(
-                        resourceName: isChzExternal ? "rkn" : "externo-1",
-                        password: isChzExternal ? "chz15" : "CHZ",
-                        displayName: isChzExternal ? "rkn.3105" : "externo(1).3105"
+                        resourceName: isChPainel ? "chpainel" : (isModnew ? "modnew" : "externo-1"),
+                        password: (isChPainel || isModnew) ? nil : "CHZ",
+                        displayName: isChPainel ? "ChPainel.3105" : (isModnew ? "Modnew.3105" : "externo(1).3105"),
+                        expectedHash: isChPainel ? "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387" : (isModnew ? "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" : "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0")
                     ), let id = demoUnlockFunctionID {
                         externalReport = report
                         activeExternalPatchIDs.insert(id)
                     }
                     demoUnlockFunctionID = nil
                     showDemoUnlock = false
-                    externalPatchMessage = isChzExternal
-                        ? "Chz External validado apenas no app."
-                        : "Painel External desbloqueado apenas no app."
+                    externalPatchMessage = isChPainel
+                        ? "ChPainel validado apenas no app."
+                        : (isModnew ? "External Chz validado apenas no app." : "Painel External desbloqueado apenas no app.")
                     appendExternalLog("[OK] Autorização local confirmada; nenhum payload executado")
                 }
             )
         }
     }
 
-    private func prepareBundledDemoArtifact(resourceName: String, password: String, displayName: String) -> ExternalArtifactReport? {
+    private func prepareBundledDemoArtifact(resourceName: String, password: String?, displayName: String, expectedHash: String) -> ExternalArtifactReport? {
         guard let url = Bundle.main.url(forResource: resourceName, withExtension: "3105.validation") else {
             externalMessage = "Arquivo \(displayName) ausente no bundle."
             appendExternalLog("[ERRO] \(displayName) ausente no bundle")
@@ -1387,7 +1483,7 @@ private struct ExternalPanelView: View {
         }
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: password)
-            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else {
+            guard report.sha256 == expectedHash else {
                 throw PatchPackageError.unsupportedFormat
             }
             externalMessage = "\(displayName) validado e copiado para a quarentena interna."
