@@ -354,6 +354,8 @@ private struct CHZPrivHomeView: View {
     @State private var pendingExternalPasswordItem: PatchLibraryItem?
     @State private var catalogDemoActive = false
     @State private var showCatalogDemoUnlock = false
+    @State private var catalogChzExternalActive = false
+    @State private var showCatalogChzExternalUnlock = false
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -444,6 +446,17 @@ private struct CHZPrivHomeView: View {
                 }
             )
         }
+        .sheet(isPresented: $showCatalogChzExternalUnlock) {
+            ExternalDemoUnlockSheet(
+                expectedPassword: "chz15",
+                title: "Chz External",
+                onCancel: { showCatalogChzExternalUnlock = false },
+                onSuccess: {
+                    catalogChzExternalActive = validateCatalogChzExternalArtifact()
+                    showCatalogChzExternalUnlock = false
+                }
+            )
+        }
     }
 
     private func validateCatalogDemoArtifact() -> Bool {
@@ -458,6 +471,22 @@ private struct CHZPrivHomeView: View {
             return true
         } catch {
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: validação interna falhou", level: .warning))
+            return false
+        }
+    }
+
+    private func validateCatalogChzExternalArtifact() -> Bool {
+        guard let url = Bundle.main.url(forResource: "rkn", withExtension: "3105.validation") else {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: arquivo rkn.3105 ausente", level: .warning))
+            return false
+        }
+        do {
+            let report = try DevicePatchService.validateExternalArtifact(at: url, password: "chz15")
+            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else { return false }
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: rkn.3105 validado e enviado à quarentena interna", level: .success))
+            return true
+        } catch {
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: validação interna falhou", level: .warning))
             return false
         }
     }
@@ -534,7 +563,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func categoryOverviewCard(_ category: PatchCategory) -> some View {
-        let count = freeFirePatches.filter { $0.category == category }.count + ((category == .external && !isFreeFireMax) ? 1 : 0)
+        let count = freeFirePatches.filter { $0.category == category }.count + ((category == .external && !isFreeFireMax) ? 2 : 0)
         return HStack(spacing: 9) {
             Image(systemName: category.symbol)
                 .font(.system(size: 16, weight: .bold))
@@ -568,7 +597,7 @@ private struct CHZPrivHomeView: View {
     @ViewBuilder
     private func categorySection(_ category: PatchCategory) -> some View {
         let items = freeFirePatches.filter { $0.category == category }
-        let displayedCount = items.count + ((category == .external && !isFreeFireMax) ? 1 : 0)
+        let displayedCount = items.count + ((category == .external && !isFreeFireMax) ? 2 : 0)
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(category.rawValue.uppercased())
@@ -592,6 +621,7 @@ private struct CHZPrivHomeView: View {
                     }
                     if category == .external && !isFreeFireMax {
                         catalogDemoFunctionRow
+                        catalogChzExternalFunctionRow
                     }
                 }
             }
@@ -619,6 +649,40 @@ private struct CHZPrivHomeView: View {
                 set: { enabled in
                     if enabled { showCatalogDemoUnlock = true }
                     else { catalogDemoActive = false }
+                }
+            ))
+            .labelsHidden()
+            .toggleStyle(CHZSwitchStyle())
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 5)
+        .frame(minHeight: 78)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
+    }
+
+    private var catalogChzExternalFunctionRow: some View {
+        HStack(spacing: 12) {
+            Image(systemName: PatchCategory.external.symbol)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(AppTheme.accentBright)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: 5) {
+                Text("CHZ EXTERNAL")
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(AppTheme.primaryText)
+                Text("Função external com Esp+Aim")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(AppTheme.tertiaryText)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 6)
+            Toggle("Chz External", isOn: Binding(
+                get: { catalogChzExternalActive },
+                set: { enabled in
+                    if enabled { showCatalogChzExternalUnlock = true }
+                    else { catalogChzExternalActive = false }
                 }
             ))
             .labelsHidden()
@@ -1858,12 +1922,21 @@ private struct ExternalPanelView: View {
 }
 
 private struct ExternalDemoUnlockSheet: View {
+    let expectedPassword: String
+    let title: String
     let onCancel: () -> Void
     let onSuccess: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var password = ""
     @State private var attempts = 0
     @State private var errorMessage: String?
+
+    init(expectedPassword: String = "CHZ", title: String = "Painel External", onCancel: @escaping () -> Void, onSuccess: @escaping () -> Void) {
+        self.expectedPassword = expectedPassword
+        self.title = title
+        self.onCancel = onCancel
+        self.onSuccess = onSuccess
+    }
 
     var body: some View {
         NavigationStack {
@@ -1884,7 +1957,7 @@ private struct ExternalDemoUnlockSheet: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("Painel External")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -1906,7 +1979,7 @@ private struct ExternalDemoUnlockSheet: View {
 
     private func validate() {
         let digest = SHA256.hash(data: Data(password.utf8))
-        let expected = SHA256.hash(data: Data("CHZ".utf8))
+        let expected = SHA256.hash(data: Data(expectedPassword.utf8))
         guard digest == expected else {
             attempts += 1
             password = ""
