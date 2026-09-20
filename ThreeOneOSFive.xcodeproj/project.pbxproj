@@ -90,9 +90,6 @@
 		3105P208 /* FF - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P108; };
 		3105P209 /* FF - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P109; };
 		3105P210 /* FF - Esp only.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P110; };
-		3105P211 /* FF - Esp+aimbot.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P111; };
-		3105P218 /* FFM - BoxBlue.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P118; };
-		3105P219 /* FF - Painel.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P119; };
 			3105V201 /* externo.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V101; };
 			3105V202 /* externo-1.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V102; };
 			3105V203 /* rkn.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V103; };
@@ -102,7 +99,6 @@
 		3105P214 /* FFM - Hs Alto Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P114; };
 		3105P215 /* FFM - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P115; };
 		3105P216 /* FFM - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P116; };
-		3105P217 /* FFM - Esp+aimbot.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P117; };
 
 /* End PBXBuildFile section */
 
@@ -119,9 +115,6 @@
 		3105P108 /* FF - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
 		3105P109 /* FF - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
 		3105P110 /* FF - Esp only.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Esp only.3105"; sourceTree = "<group>"; };
-		3105P111 /* FF - Esp+aimbot.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Esp+aimbot.3105"; sourceTree = "<group>"; };
-		3105P118 /* FFM - BoxBlue.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - BoxBlue.3105"; sourceTree = "<group>"; };
-		3105P119 /* FF - Painel.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Painel.3105"; sourceTree = "<group>"; };
 			3105V101 /* externo.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/externo.3105.validation"; sourceTree = "<group>"; };
 			3105V102 /* externo-1.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/externo-1.3105.validation"; sourceTree = "<group>"; };
 			3105V103 /* rkn.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/rkn.3105.validation"; sourceTree = "<group>"; };
@@ -131,7 +124,6 @@
 		3105P114 /* FFM - Hs Alto Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Alto Baypss.3105"; sourceTree = "<group>"; };
 		3105P115 /* FFM - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
 		3105P116 /* FFM - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
-		3105P117 /* FFM - Esp+aimbot.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - Esp+aimbot.3105"; sourceTree = "<group>"; };
 
 		3105A010 /* 3105.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3105.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3105A020 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };

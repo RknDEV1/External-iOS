@@ -609,7 +609,7 @@ private struct CHZPrivHomeView: View {
 
     private var visibleCategories: [PatchCategory] {
         [PatchCategory.avatar, .cache, .external].filter { category in
-            freeFirePatches.contains { $0.category == category }
+            category == .external || freeFirePatches.contains { $0.category == category }
         }
     }
 
@@ -625,7 +625,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func categoryOverviewCard(_ category: PatchCategory) -> some View {
-        let count = freeFirePatches.filter { $0.category == category }.count + (category == .external ? (isFreeFireMax ? 1 : 2) : 0)
+        let count = freeFirePatches.filter { $0.category == category }.count + (category == .external ? 1 : 0)
         return HStack(spacing: 9) {
             Image(systemName: category.symbol)
                 .font(.system(size: 16, weight: .bold))
@@ -659,7 +659,7 @@ private struct CHZPrivHomeView: View {
     @ViewBuilder
     private func categorySection(_ category: PatchCategory) -> some View {
         let items = freeFirePatches.filter { $0.category == category }
-        let displayedCount = items.count + (category == .external ? (isFreeFireMax ? 1 : 2) : 0)
+        let displayedCount = items.count + (category == .external ? 1 : 0)
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(category.rawValue.uppercased())
@@ -685,7 +685,6 @@ private struct CHZPrivHomeView: View {
                         if isFreeFireMax {
                             catalogModnewFunctionRow
                         } else {
-                            catalogDemoFunctionRow
                             catalogChPainelFunctionRow
                         }
                     }
@@ -1414,12 +1413,6 @@ private struct ExternalPanelView: View {
                 detail: "Função external do catálogo 3105.",
                 isDemoOnly: true
             )] : [ExternalPatchFunction(
-                id: "demo-painel-external",
-                filename: "",
-                title: "Painel External",
-                detail: "ESP com painel interno de funções e configurações.",
-                isDemoOnly: true
-            ), ExternalPatchFunction(
                 id: "demo-chpainel",
                 filename: "chpainel.3105.validation",
                 title: "ChPainel",
