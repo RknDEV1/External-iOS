@@ -2,20 +2,20 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    // Identidade CHZ PRIV: fundo preto, vermelho vivo, branco e cinza.
-    static let accent = Color(red: 1.00, green: 0.015, blue: 0.055)
-    static let accentBright = Color(red: 1.00, green: 0.16, blue: 0.19)
-    static let accentSoft = Color(red: 1.00, green: 0.015, blue: 0.055).opacity(0.16)
-    static let outline = accent.opacity(0.58)
-    static let outlineStrong = accentBright.opacity(0.86)
+    // Neutral dark interface with the soft peach accent used by the reference design.
+    static let accent = Color(red: 0.96, green: 0.62, blue: 0.40)
+    static let accentBright = Color(red: 1.00, green: 0.68, blue: 0.46)
+    static let accentSoft = Color(red: 0.96, green: 0.62, blue: 0.40).opacity(0.16)
+    static let outline = Color.white.opacity(0.08)
+    static let outlineStrong = Color.white.opacity(0.14)
     static let pageBackground = Color.black
-    static let consoleBackground = Color(red: 0.045, green: 0.018, blue: 0.022)
-    static let cardBackground = Color(red: 0.065, green: 0.020, blue: 0.026)
-    static let fieldBackground = Color(red: 0.10, green: 0.035, blue: 0.042)
+    static let consoleBackground = Color(red: 0.075, green: 0.075, blue: 0.085)
+    static let cardBackground = Color(red: 0.11, green: 0.11, blue: 0.12)
+    static let fieldBackground = Color(red: 0.14, green: 0.14, blue: 0.15)
     static let primaryText = Color.white
-    static let secondaryText = Color(red: 0.56, green: 0.56, blue: 0.58)
-    static let tertiaryText = Color(red: 0.38, green: 0.38, blue: 0.40)
-    static let success = Color(red: 0.19, green: 0.82, blue: 0.42)
+    static let secondaryText = Color(red: 0.62, green: 0.62, blue: 0.65)
+    static let tertiaryText = Color(red: 0.48, green: 0.48, blue: 0.51)
+    static let success = Color(red: 0.38, green: 0.84, blue: 0.45)
     static let pageInset: CGFloat = 16
     static let rowIconSize: CGFloat = 17
     static let rowIconFrame: CGFloat = 28
@@ -25,7 +25,7 @@ enum AppTheme {
     static let appIconSize: CGFloat = 32
     static let emptyIconSize: CGFloat = 30
     static let selectionIconSize: CGFloat = 18
-    static let contentCardCornerRadius: CGFloat = 18
+    static let contentCardCornerRadius: CGFloat = 20
     static let contentCardInset: CGFloat = 16
     static let contentCardPadding: CGFloat = 16
     static let brandFontName = "BurbankBigCondensed-Black"
@@ -35,19 +35,17 @@ struct CHZPrivWordmark: View {
     var size: CGFloat = 34
 
     var body: some View {
-        Image("CHZPrivLogoFinal")
-            .resizable()
-            .scaledToFit()
-            .frame(width: max(size * 2.9, 88), height: max(size * 1.25, 38))
-            .shadow(color: AppTheme.accent.opacity(0.28), radius: 8, y: 3)
-            .accessibilityLabel("CHZ PRIV")
+        Text("External Chz")
+            .font(.system(size: size, weight: .bold, design: .rounded))
+            .foregroundStyle(AppTheme.accentBright)
+            .accessibilityLabel("External Chz")
     }
 }
 
 struct AppCardBorder: View {
     var body: some View {
         RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
-            .strokeBorder(AppTheme.accent.opacity(0.52), lineWidth: 0.7)
+            .strokeBorder(AppTheme.outlineStrong, lineWidth: 0.7)
             .accessibilityHidden(true)
     }
 }
@@ -64,7 +62,7 @@ struct AppRowIcon: View {
                 .fill(tint.opacity(0.16))
                 .overlay {
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .stroke(AppTheme.accent.opacity(0.42), lineWidth: 0.6)
+                        .stroke(AppTheme.outlineStrong, lineWidth: 0.6)
                 }
             Image(systemName: systemName)
                 .font(.system(size: symbolSize, weight: .semibold))
@@ -113,7 +111,7 @@ struct AppSearchField: View {
         )
         .overlay {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(AppTheme.accent.opacity(0.38), lineWidth: 0.7)
+                .stroke(AppTheme.outlineStrong, lineWidth: 0.7)
         }
         .padding(.horizontal, AppTheme.pageInset)
         .padding(.vertical, 8)
@@ -125,18 +123,16 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Image("CHZPrivLogoFinal")
-            .resizable()
-            .scaledToFit()
-            .padding(size * 0.08)
+        Image(systemName: "shippingbox.fill")
+            .font(.system(size: size * 0.48, weight: .semibold))
+            .foregroundStyle(AppTheme.accentBright)
             .frame(width: size, height: size)
-            .background(Color.black.opacity(0.88))
+            .background(AppTheme.fieldBackground)
             .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
-                    .stroke(AppTheme.outlineStrong, lineWidth: 1.35)
+                    .stroke(AppTheme.outlineStrong, lineWidth: 1.0)
             }
-            .shadow(color: AppTheme.accent.opacity(0.35), radius: 8)
             .accessibilityHidden(true)
     }
 }
