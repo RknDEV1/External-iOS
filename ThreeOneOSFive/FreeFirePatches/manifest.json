@@ -18,24 +18,24 @@
   {
     "id": 3,
     "category": "Avatar",
-    "file": "FF - Hs Pescoço 100-.3105",
-    "path": "Avatar/FF - Hs Pescoço 100-.3105",
+    "file": "FF - Hs Pescoço 100-.3105",
+    "path": "Avatar/FF - Hs Pescoço 100-.3105",
     "sha256": "351326ac0335927b7b084f619803af9441afc07737d4a66b4691357da2455fb2",
     "edition": "Free Fire"
   },
   {
     "id": 4,
     "category": "Avatar",
-    "file": "FF - Hs Pescoço-Alto.3105",
-    "path": "Avatar/FF - Hs Pescoço-Alto.3105",
+    "file": "FF - Hs Pescoço-Alto.3105",
+    "path": "Avatar/FF - Hs Pescoço-Alto.3105",
     "sha256": "205efc20e12a5db1f1166834ad4ff892250490471fdebcc82368280570abf8e4",
     "edition": "Free Fire"
   },
   {
     "id": 5,
     "category": "Avatar",
-    "file": "FF - Hs Pescoço-Antena.3105",
-    "path": "Avatar/FF - Hs Pescoço-Antena.3105",
+    "file": "FF - Hs Pescoço-Antena.3105",
+    "path": "Avatar/FF - Hs Pescoço-Antena.3105",
     "sha256": "55eeb6f2ad7e9eb7397a0ce1a65d20c71d941680bb396e4afdd6af42c6101a9f",
     "edition": "Free Fire"
   },
@@ -58,16 +58,16 @@
   {
     "id": 8,
     "category": "Cache",
-    "file": "FF - Hs Peito-Pescoço.3105",
-    "path": "Cache/FF - Hs Peito-Pescoço.3105",
+    "file": "FF - Hs Peito-Pescoço.3105",
+    "path": "Cache/FF - Hs Peito-Pescoço.3105",
     "sha256": "a48ec3c9a4de295f0856ce5302e48a74593a1a8812aa2c462e558ac45c6fe174",
     "edition": "Free Fire"
   },
   {
     "id": 9,
     "category": "Cache",
-    "file": "FF - Hs Pescoço Baypss.3105",
-    "path": "Cache/FF - Hs Pescoço Baypss.3105",
+    "file": "FF - Hs Pescoço Baypss.3105",
+    "path": "Cache/FF - Hs Pescoço Baypss.3105",
     "sha256": "090876b44810ed84a26475a4c7502151467903b625c49a6411031ce86a9ed864",
     "edition": "Free Fire"
   },
@@ -90,16 +90,16 @@
   {
     "id": 12,
     "category": "Cache",
-    "file": "FFM - Hs Peito-Pescoço.3105",
-    "path": "Cache/FFM - Hs Peito-Pescoço.3105",
+    "file": "FFM - Hs Peito-Pescoço.3105",
+    "path": "Cache/FFM - Hs Peito-Pescoço.3105",
     "sha256": "7df8edbaa0b6fc0291f6bdfae041667a7ca3ee6fc966c01be336cf37f3e276cc",
     "edition": "Free Fire MAX"
   },
   {
     "id": 13,
     "category": "Cache",
-    "file": "FFM - Hs Pescoço Baypss.3105",
-    "path": "Cache/FFM - Hs Pescoço Baypss.3105",
+    "file": "FFM - Hs Pescoço Baypss.3105",
+    "path": "Cache/FFM - Hs Pescoço Baypss.3105",
     "sha256": "96dcffd1413ed3eeec29e5c75ac5116f1d84051877516953e3ee61515ad5a0af",
     "edition": "Free Fire MAX"
   },
@@ -114,17 +114,9 @@
   {
     "id": 15,
     "category": "External",
-    "file": "FF - Esp+aimbot.3105",
-    "path": "External/FF - Esp+aimbot.3105",
-    "sha256": "e01758777347f773b45f0d37bc40799c4495466ae1c1703fe8da3cdfaafed2a8",
+    "file": "FF - ChPainel.3105",
+    "path": "External/FF - ChPainel.3105",
+    "sha256": "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387",
     "edition": "Free Fire"
-  },
-  {
-    "id": 16,
-    "category": "External",
-    "file": "FFM - Esp+aimbot.3105",
-    "path": "External/FFM - Esp+aimbot.3105",
-    "sha256": "48807d2f3079bb95831129ae2de3759c1621f4120bfa5193e913e9cde2a296e5",
-    "edition": "Free Fire MAX"
   }
 ]
