@@ -31,13 +31,13 @@ struct CHZAccessOverlay: View {
                         .foregroundStyle(Color.red.opacity(0.95))
                 }
 
-                Text("CHZ PRIV")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                Text("Raki")
+                    .font(.system(size: 18, weight: .bold, design: .default))
                     .tracking(1.3)
                     .foregroundStyle(.white)
 
                 Text(isRestoringSession ? "Validando sessão neste dispositivo" : "Acesso protegido")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(size: 12, weight: .medium, design: .default))
                     .foregroundStyle(.white.opacity(0.62))
 
                 SecureField("Insira sua key", text: $key)
@@ -55,7 +55,7 @@ struct CHZAccessOverlay: View {
 
                 HStack {
                     Text("Tempo restante")
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .font(.system(size: 11, weight: .medium, design: .default))
                         .foregroundStyle(.white.opacity(0.55))
                     Spacer()
                     Text("00:\(String(format: "%02d", secondsRemaining))")
@@ -70,7 +70,7 @@ struct CHZAccessOverlay: View {
                             ProgressView().tint(.white)
                         }
                     }
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.system(size: 14, weight: .bold, design: .default))
                     .frame(maxWidth: .infinity)
                     .frame(height: 42)
                 }
@@ -80,7 +80,7 @@ struct CHZAccessOverlay: View {
                 .disabled(isSubmitting || isRestoringSession || normalizedKey.isEmpty || secondsRemaining == 0)
 
                 Text(errorMessage ?? " ")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.system(size: 11, weight: .medium, design: .default))
                     .foregroundStyle(.red.opacity(0.95))
                     .multilineTextAlignment(.center)
                     .frame(minHeight: 28, alignment: .top)

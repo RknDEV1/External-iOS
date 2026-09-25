@@ -12,7 +12,7 @@ struct LicenseSnapshot: Equatable {
     }
 
     var status: Status = .loading
-    var product = "CHZ PRIV"
+    var product = "Raki"
     var expiration: Date?
     var deviceID = "Indisponível"
 }
@@ -29,7 +29,7 @@ struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
         let snapshot = LicenseSnapshot(
             status: .unavailable,
-            product: "CHZ PRIV",
+            product: "Raki",
             expiration: nil,
             deviceID: currentDeviceID
         )

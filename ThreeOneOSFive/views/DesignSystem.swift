@@ -2,10 +2,10 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    // Neutral dark interface with the soft peach accent used by the reference design.
-    static let accent = Color(red: 0.96, green: 0.62, blue: 0.40)
-    static let accentBright = Color(red: 1.00, green: 0.68, blue: 0.46)
-    static let accentSoft = Color(red: 0.96, green: 0.62, blue: 0.40).opacity(0.16)
+    // Raki monochrome interface using the native iOS system typeface.
+    static let accent = Color.white
+    static let accentBright = Color.white
+    static let accentSoft = Color.white.opacity(0.12)
     static let outline = Color.white.opacity(0.08)
     static let outlineStrong = Color.white.opacity(0.14)
     static let pageBackground = Color.black
@@ -15,7 +15,7 @@ enum AppTheme {
     static let primaryText = Color.white
     static let secondaryText = Color(red: 0.62, green: 0.62, blue: 0.65)
     static let tertiaryText = Color(red: 0.48, green: 0.48, blue: 0.51)
-    static let success = Color(red: 0.38, green: 0.84, blue: 0.45)
+    static let success = Color.white
     static let pageInset: CGFloat = 16
     static let rowIconSize: CGFloat = 17
     static let rowIconFrame: CGFloat = 28
@@ -28,7 +28,7 @@ enum AppTheme {
     static let contentCardCornerRadius: CGFloat = 20
     static let contentCardInset: CGFloat = 16
     static let contentCardPadding: CGFloat = 16
-    static let brandFontName = "BurbankBigCondensed-Black"
+    static let brandFontName = "SF Pro"
 }
 
 struct CHZPrivWordmark: View {
@@ -36,7 +36,7 @@ struct CHZPrivWordmark: View {
 
     var body: some View {
         Text("Raki")
-            .font(.system(size: size, weight: .bold, design: .rounded))
+            .font(.system(size: size, weight: .bold, design: .default))
             .foregroundStyle(AppTheme.accentBright)
             .accessibilityLabel("Raki")
     }
@@ -81,7 +81,7 @@ struct AppSearchField: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.system(size: 14, weight: .semibold, design: .default))
                 .foregroundStyle(AppTheme.accent)
                 .accessibilityHidden(true)
 
@@ -142,7 +142,7 @@ struct AppThemeModifier: ViewModifier {
         content
             .preferredColorScheme(.dark)
             .tint(AppTheme.accent)
-            .environment(\.font, .system(.body, design: .rounded))
+            .environment(\.font, .system(.body, design: .default))
             .foregroundStyle(AppTheme.primaryText)
             .scrollContentBackground(.hidden)
             .background(AppTheme.pageBackground.ignoresSafeArea())
