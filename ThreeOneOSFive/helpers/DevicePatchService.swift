@@ -354,8 +354,10 @@ enum DevicePatchService {
     }
 
     private static func privateOwnedFile(_ url: URL) throws -> URL {
-        let root = try externalRoot().standardizedFileURL
-        let candidate = url.standardizedFileURL
+        // iOS may expose the same app container as /var or /private/var.
+        // Canonicalize both sides before enforcing containment.
+        let root = PatchPathValidator.canonicalFileURL(try externalRoot())
+        let candidate = PatchPathValidator.canonicalFileURL(url)
         guard candidate.path.hasPrefix(root.path + "/") else {
             throw PatchPackageError.unsafeTargetPath
         }

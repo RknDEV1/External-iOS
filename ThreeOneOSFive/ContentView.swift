@@ -355,6 +355,8 @@ private struct CHZPrivHomeView: View {
     @State private var showCatalogChPainelUnlock = false
     @State private var catalogModnewActive = false
     @State private var showCatalogModnewUnlock = false
+    @State private var showPathValidationConfirmation = false
+    @State private var pathValidationConfirmationMessage = ""
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -369,14 +371,14 @@ private struct CHZPrivHomeView: View {
                         LicenseInfoView(licenseViewModel: licenseViewModel)
                     } else if selectedPage == .external {
                         ExternalPanelView(
-                            isFreeFireMax: isFreeFireMax,
+                            isFreeFireMax: $isFreeFireMax,
                             licenseViewModel: licenseViewModel
                         )
                     } else {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
+                                editionSelector
                                 logo
-                                activityLogView
                                 categoryOverview
                                 functions
                                 backupStatus
@@ -465,6 +467,11 @@ private struct CHZPrivHomeView: View {
                 }
             )
         }
+        .alert("Arquivo validado", isPresented: $showPathValidationConfirmation) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(pathValidationConfirmationMessage)
+        }
     }
 
     private func validateCatalogDemoArtifact() -> Bool {
@@ -474,7 +481,9 @@ private struct CHZPrivHomeView: View {
         }
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url)
-            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else { return false }
+            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
+            pathValidationConfirmationMessage = "Painel External validado com SHA-256 e caminho interno confirmado no container do Raki."
+            showPathValidationConfirmation = true
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: externo(1).3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -490,7 +499,9 @@ private struct CHZPrivHomeView: View {
         }
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: "chz15")
-            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b0" else { return false }
+            guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
+            pathValidationConfirmationMessage = "Raki External validado com SHA-256 e caminho interno confirmado no container do Raki."
+            showPathValidationConfirmation = true
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: rkn.3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -528,6 +539,8 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
             guard report.sha256 == "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" else { return false }
+            pathValidationConfirmationMessage = "Raki validado com SHA-256 e caminho interno confirmado no container do Raki."
+            showPathValidationConfirmation = true
             _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-max-modnew")
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki: Modnew.3105 validado e enviado à quarentena interna", level: .success))
             return true
@@ -1311,7 +1324,7 @@ private struct ExternalPatchUnlockView: View {
 }
 
 private struct ExternalPanelView: View {
-    let isFreeFireMax: Bool
+    @Binding var isFreeFireMax: Bool
     @ObservedObject var licenseViewModel: LicenseViewModel
     @EnvironmentObject private var appState: AppState
     @State private var diagnosticsEnabled = false
@@ -1323,6 +1336,8 @@ private struct ExternalPanelView: View {
     @State private var activeExternalPatchIDs = Set<String>()
     @State private var workingExternalPatchID: String?
     @State private var externalPatchMessage: String?
+    @State private var showPathValidationConfirmation = false
+    @State private var pathValidationConfirmationMessage = ""
     @State private var showDemoUnlock = false
     @State private var demoUnlockFunctionID: String?
     private enum ExternalLogLevel: Equatable {
@@ -1434,6 +1449,21 @@ private struct ExternalPanelView: View {
         isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE"
     }
 
+    private var editionSelector: some View {
+        Picker("Edição", selection: $isFreeFireMax) {
+            Text("Free Fire").tag(false)
+            Text("Free Fire MAX").tag(true)
+        }
+        .pickerStyle(.segmented)
+        .tint(AppTheme.accent)
+        .padding(4)
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppTheme.outlineStrong, lineWidth: 0.8)
+        }
+    }
+
     private var editionStatus: String {
         isFreeFireMax ? "AMBIENTE SELECIONADO" : "AMBIENTE SELECIONADO"
     }
@@ -1444,7 +1474,7 @@ private struct ExternalPanelView: View {
                 CHZPrivWordmark(size: 40)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 6)
-                externalActivityLogView
+                editionSelector
                 externalFunctionsSection
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.shield")
@@ -1464,6 +1494,11 @@ private struct ExternalPanelView: View {
         .scrollIndicators(.hidden)
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .onAppear { refreshExternalState() }
+        .alert("Arquivo validado", isPresented: $showPathValidationConfirmation) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(pathValidationConfirmationMessage)
+        }
         .sheet(isPresented: $showDemoUnlock) {
             ExternalDemoUnlockSheet(
                 onCancel: {
@@ -1491,6 +1526,8 @@ private struct ExternalPanelView: View {
                             externalReport = report
                             activeExternalPatchIDs.insert(id)
                             externalPatchMessage = "\(function.title) validado e substituído na área privada do app."
+                            pathValidationConfirmationMessage = "\(function.title) foi validado com SHA-256 e o caminho interno foi confirmado no container do Raki."
+                            showPathValidationConfirmation = true
                             appendExternalLog("[OK] Backup original criado; arquivo instalado em Application Support/ExternalMenu/Working")
                         } catch {
                             externalPatchMessage = "Falha ao instalar na área privada do app."
@@ -2152,7 +2189,7 @@ private struct ExternalDemoUnlockSheet: View {
 
 #if DEBUG
 #Preview("Painel External") {
-    ExternalPanelView(isFreeFireMax: false, licenseViewModel: LicenseViewModel())
+    ExternalPanelView(isFreeFireMax: .constant(false), licenseViewModel: LicenseViewModel())
         .environmentObject(AppState())
 }
 #endif
