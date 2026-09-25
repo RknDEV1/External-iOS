@@ -89,8 +89,11 @@
 		3105P207 /* FF - Hs Alto Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P107; };
 		3105P208 /* FF - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P108; };
 		3105P209 /* FF - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P109; };
-		3105P210 /* FF - Esp only.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P110; };
-			3105V201 /* externo.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V101; };
+			3105P210 /* FF - Esp only.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P110; };
+			3105P211 /* FF - Esp+aimbot.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P111; };
+			3105P218 /* FFM - BoxBlue.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P118; };
+			3105P219 /* FF - Painel.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P119; };
+				3105V201 /* externo.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V101; };
 			3105V202 /* externo-1.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V102; };
 			3105V203 /* rkn.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V103; };
 			3105V204 /* chpainel.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V104; };
@@ -213,6 +216,9 @@
 		3105A121 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3105A122 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3105B123 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+				3105P111 /* FF - Esp+aimbot.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Esp+aimbot.3105"; sourceTree = "<group>"; };
+				3105P118 /* FFM - BoxBlue.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FFM - BoxBlue.3105"; sourceTree = "<group>"; };
+				3105P119 /* FF - Painel.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Painel.3105"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXCopyFilesBuildPhase section */
