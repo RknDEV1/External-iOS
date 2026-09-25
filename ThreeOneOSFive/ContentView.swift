@@ -482,8 +482,6 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url)
             guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
-            pathValidationConfirmationMessage = "Painel External validado com SHA-256 e caminho interno confirmado no container do Raki."
-            showPathValidationConfirmation = true
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: externo(1).3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -500,8 +498,6 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: "chz15")
             guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
-            pathValidationConfirmationMessage = "Raki External validado com SHA-256 e caminho interno confirmado no container do Raki."
-            showPathValidationConfirmation = true
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: rkn.3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -526,6 +522,8 @@ private struct CHZPrivHomeView: View {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
             guard report.sha256 == "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387" else { return false }
             _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-chpainel")
+            pathValidationConfirmationMessage = "ChPainel foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+            showPathValidationConfirmation = true
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "ChPainel: arquivo validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -539,9 +537,9 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
             guard report.sha256 == "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" else { return false }
-            pathValidationConfirmationMessage = "Raki validado com SHA-256 e caminho interno confirmado no container do Raki."
-            showPathValidationConfirmation = true
             _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-max-modnew")
+            pathValidationConfirmationMessage = "Raki foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+            showPathValidationConfirmation = true
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki: Modnew.3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -1861,11 +1859,6 @@ private struct ExternalPanelView: View {
         } else {
             sourceURL = nil
         }
-        if enabled && !licenseViewModel.isActive {
-            appendExternalLog("[ERRO] Ativação bloqueada: licença ausente ou inválida")
-            externalPatchMessage = "Ativação bloqueada pela licença."
-            return
-        }
         workingExternalPatchID = function.id
         let action = enabled ? "ATIVAR" : "DESATIVAR"
         appendExternalLog("[\(action)] \(function.title)")
@@ -1891,6 +1884,10 @@ private struct ExternalPanelView: View {
                     else { activeExternalPatchIDs.remove(function.id) }
                     workingExternalPatchID = nil
                     externalPatchMessage = enabled ? "Função ativada e verificada." : "Função desativada e original restaurado."
+                    if enabled {
+                        pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+                        showPathValidationConfirmation = true
+                    }
                     appendExternalLog(enabled ? "[OK] Recibo e hash confirmados; função ativada" : "[OK] Original restaurado e verificado")
                 }
             } catch {
@@ -1915,6 +1912,8 @@ private struct ExternalPanelView: View {
             _ = try DevicePatchService.installExternalArtifact(report, editionKey: externalEditionKey(for: function))
             activeExternalPatchIDs.insert(function.id)
             externalPatchMessage = "\(function.title) ativado sem senha na área privada do app."
+            pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+            showPathValidationConfirmation = true
             appendExternalLog("[OK] \(function.title) validado, com backup criado e instalado internamente")
         } catch {
             externalPatchMessage = "Falha ao instalar \(function.title) na área privada."
