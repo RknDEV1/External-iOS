@@ -565,7 +565,7 @@ private struct CHZPrivHomeView: View {
             Capsule(style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.15)
         }
-        .shadow(color: AppTheme.accent.opacity(0.22), radius: 18, y: 8)
+        .shadow(color: .clear, radius: 0)
         .padding(.horizontal, 44)
         .padding(.bottom, 10)
     }
@@ -770,7 +770,7 @@ private struct CHZPrivHomeView: View {
                 .foregroundStyle(AppTheme.accentBright)
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
-                Text("EXTERNAL CHZ")
+                Text("RAKI")
                     .font(.system(size: 17, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.primaryText)
                 Text("ESP com assistência de mira e painel externo.")
@@ -807,7 +807,7 @@ private struct CHZPrivHomeView: View {
                 Image(systemName: item.category.symbol)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(AppTheme.accentBright)
-                .shadow(color: AppTheme.accent.opacity(0.55), radius: 7)
+                .shadow(color: .clear, radius: 0)
                 .frame(width: 28)
                 .accessibilityHidden(true)
 
@@ -863,7 +863,7 @@ private struct CHZPrivHomeView: View {
             RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.15)
         }
-        .shadow(color: AppTheme.accent.opacity(0.12), radius: 5, y: 3)
+        .shadow(color: .clear, radius: 0)
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(LinearGradient(
@@ -1133,7 +1133,7 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 34, height: 34)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("CHZ PRIV // SYSTEM LOG")
+                    Text("RAKI // SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
                         .foregroundStyle(Color.green.opacity(0.96))
@@ -1145,7 +1145,7 @@ private struct CHZPrivHomeView: View {
                 Circle()
                     .fill(activityLog.last?.level.tint ?? AppTheme.secondaryText)
                     .frame(width: 8, height: 8)
-                    .shadow(color: (activityLog.last?.level.tint ?? AppTheme.secondaryText).opacity(0.65), radius: 5)
+                    .shadow(color: .clear, radius: 0)
             }
 
             ScrollViewReader { proxy in
@@ -1388,11 +1388,15 @@ private struct ExternalPanelView: View {
                 let filename = url.lastPathComponent
                 let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
                 let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                let isChPainelArtifact = normalized.localizedCaseInsensitiveContains("chpainel")
                 let isPanelArtifact = normalized.localizedCaseInsensitiveContains("painel")
                 let isBoxBlueArtifact = normalized.localizedCaseInsensitiveContains("boxblue")
                 let title: String
                 let detail: String
-                if isPanelArtifact {
+                if isChPainelArtifact {
+                    title = "ChPainel"
+                    detail = "Painel interno com funções e configurações."
+                } else if isPanelArtifact {
                     title = "Esp+Painel"
                     detail = "Função External interna com processamento e restauração do arquivo original"
                 } else if isBoxBlueArtifact {
@@ -1424,13 +1428,7 @@ private struct ExternalPanelView: View {
                 title: "External Chz",
                 detail: "ESP com assistência de mira e painel externo.",
                 isDemoOnly: true
-            )] : [ExternalPatchFunction(
-                id: "demo-chpainel",
-                filename: "chpainel.3105.validation",
-                title: "ChPainel",
-                detail: "Painel interno com funções e configurações.",
-                isDemoOnly: true
-            )])
+            )] : [])
     }
 
     private var editionName: String {
@@ -1557,7 +1555,7 @@ private struct ExternalPanelView: View {
                 }
                 .frame(width: 34, height: 34)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("CHZ PRIV // SYSTEM LOG")
+                    Text("RAKI // SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
                         .foregroundStyle(Color.green.opacity(0.96))
@@ -1569,7 +1567,7 @@ private struct ExternalPanelView: View {
                 Circle()
                     .fill(externalLog.last?.level.tint ?? AppTheme.secondaryText)
                     .frame(width: 8, height: 8)
-                    .shadow(color: (externalLog.last?.level.tint ?? AppTheme.secondaryText).opacity(0.65), radius: 5)
+                    .shadow(color: .clear, radius: 0)
             }
             ScrollViewReader { proxy in
                 ScrollView {
@@ -1626,7 +1624,7 @@ private struct ExternalPanelView: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("CHZ PRIV / EXTERNAL")
+                    Text("RAKI / MENU")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .tracking(1.1)
                         .foregroundStyle(AppTheme.accentBright)
@@ -1639,7 +1637,7 @@ private struct ExternalPanelView: View {
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(AppTheme.accentBright)
             }
-            Text("Central de status, diagnóstico e configurações do próprio CHZ PRIV.")
+            Text("Central de status, diagnóstico e configurações internas do aplicativo.")
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
         }
@@ -1680,7 +1678,7 @@ private struct ExternalPanelView: View {
     private var diagnosticsSection: some View {
         panelSection(title: "DIAGNÓSTICO") {
             Toggle(isOn: $diagnosticsEnabled) {
-                diagnosticLabel("Verificação local", detail: "Executar apenas diagnóstico do CHZ PRIV", symbol: "waveform.path.ecg")
+                diagnosticLabel("Verificação local", detail: "Executar apenas diagnóstico interno", symbol: "waveform.path.ecg")
             }
             .tint(AppTheme.accent)
             divider
@@ -1721,7 +1719,7 @@ private struct ExternalPanelView: View {
             Image(systemName: "shippingbox.fill")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(AppTheme.accentBright)
-                .shadow(color: AppTheme.accent.opacity(0.55), radius: 7)
+                .shadow(color: .clear, radius: 0)
                 .frame(width: 28)
                 .accessibilityHidden(true)
 
@@ -1763,7 +1761,7 @@ private struct ExternalPanelView: View {
             RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.15)
         }
-        .shadow(color: AppTheme.accent.opacity(0.12), radius: 5, y: 3)
+        .shadow(color: .clear, radius: 0)
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(LinearGradient(
@@ -2008,7 +2006,7 @@ private struct ExternalPanelView: View {
         HStack(alignment: .top, spacing: 9) {
             Image(systemName: "lock.shield.fill")
                 .foregroundStyle(AppTheme.accentBright)
-            Text("Este painel controla somente estados, diagnósticos e preferências do CHZ PRIV. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
+            Text("Este painel controla somente estados, diagnósticos e preferências internas. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)

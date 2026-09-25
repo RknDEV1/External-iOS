@@ -33,42 +33,20 @@ struct ExternalBackupReceipt: Codable, Equatable, Identifiable {
 }
 
 enum DevicePatchService {
-    // Legacy application entry point intentionally remains unavailable to
-    // external-menu imports. It is not used by the safe validation flow.
+    // Legacy application entry points are disabled. The Raki build only
+    // validates, backs up, and restores files in its own Application Support.
     static func apply(project: PatchProject) throws -> PatchTransactionReceipt {
-        let bundleIDs = orderedBundleIdentifiers(in: project)
-        return try withResolvedContainers(bundleIDs: bundleIDs) { roots in
-            try PatchTransaction.apply(
-                project: project,
-                backupRoot: try PatchProjectLibrary.backupRootURL(),
-                containerResolver: { bundleID in
-                    guard let root = roots[bundleID] else {
-                        throw PatchPackageError.targetAppUnavailable(bundleID)
-                    }
-                    return root
-                }
-            )
-        }
+        log("raki: external-container patch application is disabled")
+        throw PatchPackageError.unsafeTargetPath
     }
 
     static func restore(receipt: PatchTransactionReceipt) throws {
-        let bundleIDs = try PatchTransaction.requiredBundleIdentifiers(for: receipt)
-        try withResolvedContainers(bundleIDs: bundleIDs) { roots in
-            try PatchTransaction.restore(
-                receipt: receipt,
-                containerResolver: { bundleID in
-                    guard let root = roots[bundleID] else {
-                        throw PatchPackageError.targetAppUnavailable(bundleID)
-                    }
-                    return root
-                }
-            )
-        }
+        log("raki: external-container patch restoration is disabled")
+        throw PatchPackageError.unsafeTargetPath
     }
 
     static func latestReceipt(projectID: UUID) -> PatchTransactionReceipt? {
-        guard let backupRoot = try? PatchProjectLibrary.backupRootURL() else { return nil }
-        return PatchTransaction.latestReceipt(projectID: projectID, backupRoot: backupRoot)
+        return nil
     }
 
     // MARK: - RKN-only External Menu operations

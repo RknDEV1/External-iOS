@@ -90,6 +90,7 @@
 		3105P208 /* FF - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P108; };
 		3105P209 /* FF - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P109; };
 		3105P210 /* FF - Esp only.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P110; };
+		3105P220 /* FF - ChPainel.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P120; };
 			3105V201 /* externo.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V101; };
 			3105V202 /* externo-1.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V102; };
 			3105V203 /* rkn.3105.validation in Resources */ = {isa = PBXBuildFile; fileRef = 3105V103; };
@@ -115,6 +116,7 @@
 		3105P108 /* FF - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
 		3105P109 /* FF - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
 		3105P110 /* FF - Esp only.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Esp only.3105"; sourceTree = "<group>"; };
+		3105P120 /* FF - ChPainel.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - ChPainel.3105"; sourceTree = "<group>"; };
 			3105V101 /* externo.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/externo.3105.validation"; sourceTree = "<group>"; };
 			3105V102 /* externo-1.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/externo-1.3105.validation"; sourceTree = "<group>"; };
 			3105V103 /* rkn.3105.validation */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/Validation/rkn.3105.validation"; sourceTree = "<group>"; };
@@ -477,6 +479,7 @@
 				3105P208,
 					3105P209,
 					3105P210,
+							3105P220,
 					3105P211,
 					3105P218,
                     3105P219,

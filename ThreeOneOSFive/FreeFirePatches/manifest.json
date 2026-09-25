@@ -110,5 +110,13 @@
     "path": "External/FF - Esp only.3105",
     "sha256": "f6da5f94d4c1f1d2a7d6a70403490889319bd4d5344b40347a4f3097446dc39b",
     "edition": "Free Fire"
+  },
+  {
+    "id": 15,
+    "category": "External",
+    "file": "FF - ChPainel.3105",
+    "path": "External/FF - ChPainel.3105",
+    "sha256": "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387",
+    "edition": "Free Fire"
   }
 ]
