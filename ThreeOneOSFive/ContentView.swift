@@ -4,8 +4,7 @@ import UniformTypeIdentifiers
 import CryptoKit
 
 struct ContentView: View {
-    var isFreeFireMax: Bool = false
-    let onExitToGamePicker: () -> Void
+    @Binding var isFreeFireMax: Bool
     @Environment(\.appLanguage) private var language
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @EnvironmentObject private var patchDraftCoordinator: PatchDraftCoordinator
@@ -13,9 +12,8 @@ struct ContentView: View {
     @AppStorage(FeatureVisibility.cleanerStorageKey) private var cleanerEnabled = true
     @AppStorage(FeatureVisibility.wallpapersStorageKey) private var wallpapersEnabled = true
 
-    init(isFreeFireMax: Bool = false, onExitToGamePicker: @escaping () -> Void = {}) {
-        self.isFreeFireMax = isFreeFireMax
-        self.onExitToGamePicker = onExitToGamePicker
+    init(isFreeFireMax: Binding<Bool>) {
+        _isFreeFireMax = isFreeFireMax
 #if targetEnvironment(simulator)
         let arguments = ProcessInfo.processInfo.arguments
         let initialTab: Int
@@ -38,8 +36,7 @@ struct ContentView: View {
 
     var body: some View {
         CHZPrivHomeView(
-            isFreeFireMax: isFreeFireMax,
-            onExitToGamePicker: onExitToGamePicker
+            isFreeFireMax: $isFreeFireMax
         )
         .appTheme()
         .imageScale(.small)
@@ -101,8 +98,7 @@ struct ContentView: View {
         switch section {
         case .home:
             CHZPrivHomeView(
-                isFreeFireMax: isFreeFireMax,
-                onExitToGamePicker: onExitToGamePicker
+                isFreeFireMax: $isFreeFireMax
             )
         case .files:
             AppDataBrowserView(
@@ -302,8 +298,7 @@ private extension View {
 }
 
 private struct CHZPrivHomeView: View {
-    let isFreeFireMax: Bool
-    let onExitToGamePicker: () -> Void
+    @Binding var isFreeFireMax: Bool
     @EnvironmentObject private var appState: AppState
     @StateObject private var licenseViewModel = LicenseViewModel()
     @StateObject private var patchStore = PatchProjectStore()
@@ -398,17 +393,6 @@ private struct CHZPrivHomeView: View {
                 bottomNavigation
             }
             .background(AppTheme.pageBackground.ignoresSafeArea())
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        onExitToGamePicker()
-                    } label: {
-                        Label("Início", systemImage: "chevron.left")
-                            .font(.system(size: 14, weight: .semibold))
-                    }
-                    .accessibilityLabel("Voltar para a tela inicial")
-                }
-            }
         }
         .tint(AppTheme.accent)
         .onAppear {
@@ -550,6 +534,21 @@ private struct CHZPrivHomeView: View {
         } catch {
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "External Chz: validação interna falhou", level: .warning))
             return false
+        }
+    }
+
+    private var editionSelector: some View {
+        Picker("Edição", selection: $isFreeFireMax) {
+            Text("Free Fire").tag(false)
+            Text("Free Fire MAX").tag(true)
+        }
+        .pickerStyle(.segmented)
+        .tint(AppTheme.accent)
+        .padding(4)
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppTheme.outlineStrong, lineWidth: 0.8)
         }
     }
 

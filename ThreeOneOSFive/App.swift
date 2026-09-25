@@ -9,8 +9,7 @@ struct ThreeOneOSFiveApp: App {
     @AppStorage(AppLanguage.storageKey) private var languageCode = AppLanguage.english.rawValue
     // O app inicia diretamente no fluxo normal do 3105.
     @State private var showOnboarding = false
-    @State private var showGamePicker = true
-    @State private var selectedEdition: GameEdition = .freeFire
+    @State private var isFreeFireMax = false
     @State private var showAttribution = false
     @State private var showCHZAccessOverlay = true
     @State private var sessionAuthenticated = false
@@ -80,35 +79,16 @@ struct ThreeOneOSFiveApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                if !showOnboarding && !showGamePicker {
+                if !showOnboarding {
                     ContentView(
-                        isFreeFireMax: selectedEdition == .freeFireMax,
-                        onExitToGamePicker: {
-                            withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
-                                showGamePicker = true
-                            }
-                        }
+                        isFreeFireMax: $isFreeFireMax
                     )
-                    .id(selectedEdition == .freeFireMax ? "free-fire-max" : "free-fire")
                     .environmentObject(appState)
                     .environmentObject(patchDraftCoordinator)
                     .environmentObject(fileOperationCoordinator)
                     .environment(\.appLanguage, language)
                     .environment(\.locale, language.locale)
                     .transition(.opacity)
-                }
-
-                if showGamePicker && !showOnboarding {
-                    FreeFireSelectionView { edition in
-                        selectedEdition = edition
-                        withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
-                            showGamePicker = false
-                        }
-                    }
-                    .environment(\.appLanguage, language)
-                    .environment(\.locale, language.locale)
-                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
-                    .zIndex(1)
                 }
 
                 if showCHZAccessOverlay {
@@ -137,7 +117,7 @@ struct ThreeOneOSFiveApp: App {
                                         .zIndex(1)
                 }
             }
-            .displayIdentityAttribution(isPresented: $showAttribution, enabled: !showOnboarding && !showGamePicker)
+            .displayIdentityAttribution(isPresented: $showAttribution, enabled: !showOnboarding)
             .sheet(isPresented: $showAttribution) {
                 DisplayAttributionSheet()
             }
@@ -166,183 +146,6 @@ struct ThreeOneOSFiveApp: App {
                 patchDraftCoordinator.presentImport(url)
             }
         }
-    }
-}
-
-private enum GameEdition {
-    case freeFire
-    case freeFireMax
-}
-
-private struct FreeFireSelectionView: View {
-    let onContinue: (GameEdition) -> Void
-
-    private var artworkSide: CGFloat {
-        min(108, max(88, UIScreen.main.bounds.width * 0.24))
-    }
-
-    private var hasFreeFireMaxPatch: Bool {
-        let resources = Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil) ?? []
-        return resources.contains { url in
-            let name = url.deletingPathExtension().lastPathComponent
-            return name.hasPrefix("FFM - ")
-        }
-    }
-
-    var body: some View {
-        ZStack {
-            AppTheme.pageBackground.ignoresSafeArea()
-
-            LinearGradient(
-                colors: [AppTheme.accent.opacity(0.20), .clear, Color.black],
-                startPoint: .topTrailing,
-                endPoint: .bottomLeading
-            )
-            .ignoresSafeArea()
-
-            Circle()
-                .fill(AppTheme.accent.opacity(0.16))
-                .frame(width: 320, height: 320)
-                .blur(radius: 100)
-                .offset(x: 145, y: -285)
-
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 18) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("CHZ PRIV / GAME SELECT")
-                                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                .tracking(1.2)
-                                .foregroundStyle(AppTheme.accentBright)
-                            Text("Selecione o seu Free Fire")
-                                .font(.system(size: 27, weight: .black, design: .rounded))
-                                .foregroundStyle(.white)
-                            Text("Selecione uma edição para continuar")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(AppTheme.secondaryText)
-                        }
-                        Spacer()
-                        CHZPrivWordmark(size: 31)
-                    }
-                    .padding(.top, 22)
-
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(AppTheme.success)
-                            .frame(width: 8, height: 8)
-                            .shadow(color: AppTheme.success.opacity(0.8), radius: 5)
-                        Text("SISTEMA ONLINE")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
-                            .tracking(0.8)
-                            .foregroundStyle(AppTheme.success)
-                        Spacer()
-                        Text("CHZ PRIV")
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .foregroundStyle(AppTheme.tertiaryText)
-                    }
-                    .padding(.horizontal, 13)
-                    .frame(height: 34)
-                    .background(AppTheme.success.opacity(0.07), in: Capsule(style: .continuous))
-                    .overlay {
-                        Capsule(style: .continuous)
-                            .stroke(AppTheme.outline, lineWidth: 1.0)
-                    }
-
-                    Text("EDIÇÕES DISPONÍVEIS")
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
-                        .tracking(1.0)
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .padding(.top, 8)
-
-                    gameCard(
-                        title: "Free Fire",
-                        subtitle: "Edição principal",
-                        status: "SUPORTE ATIVO",
-                        artwork: "FreeFire",
-                        edition: .freeFire,
-                        supported: true
-                    )
-
-                    gameCard(
-                        title: "Free Fire Max",
-                        subtitle: "Edição expandida",
-                        status: hasFreeFireMaxPatch ? "SUPORTE ATIVO" : "INDISPONÍVEL",
-                        artwork: "FreeFireMax",
-                        edition: .freeFireMax,
-                        supported: hasFreeFireMaxPatch
-                    )
-
-                    HStack(spacing: 8) {
-                        Image(systemName: "lock.shield.fill")
-                            .foregroundStyle(AppTheme.accentBright)
-                        Text("Acesso autorizado · Ambiente protegido")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 9)
-                    .padding(.bottom, 22)
-                }
-                .padding(.horizontal, 18)
-            }
-        }
-    }
-
-    private func gameCard(
-        title: String,
-        subtitle: String,
-        status: String,
-        artwork: String,
-        edition: GameEdition,
-        supported: Bool
-    ) -> some View {
-        Button {
-            onContinue(edition)
-        } label: {
-            HStack(spacing: 15) {
-                Image(artwork)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 92, height: 92)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .stroke(supported ? AppTheme.outlineStrong : AppTheme.outline, lineWidth: 1.25)
-                    }
-                    .opacity(supported ? 1 : 0.60)
-                    .shadow(color: supported ? AppTheme.accent.opacity(0.35) : .clear, radius: 14, y: 6)
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(title)
-                        .font(.custom(AppTheme.brandFontName, size: 25))
-                        .fontWeight(.black)
-                        .italic()
-                        .foregroundStyle(.white)
-                    Text(subtitle)
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(AppTheme.secondaryText)
-                    Text(status)
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .tracking(0.65)
-                        .foregroundStyle(supported ? AppTheme.success : AppTheme.accentBright)
-                }
-                Spacer(minLength: 4)
-                Image(systemName: supported ? "arrow.right.circle.fill" : "clock.badge.exclamationmark")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(supported ? AppTheme.accentBright : AppTheme.secondaryText)
-            }
-            .padding(14)
-            .frame(maxWidth: .infinity, minHeight: 122)
-            .background(.ultraThinMaterial.opacity(supported ? 0.84 : 0.56), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .background((supported ? AppTheme.accent : Color.white).opacity(supported ? 0.08 : 0.035), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(supported ? AppTheme.outlineStrong : AppTheme.outline, lineWidth: 1.05)
-            }
-            .shadow(color: supported ? AppTheme.accent.opacity(0.18) : .clear, radius: 16, y: 8)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(title), \(status)")
     }
 }
 
