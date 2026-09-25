@@ -467,10 +467,13 @@ private struct CHZPrivHomeView: View {
                 }
             )
         }
-        .alert("Arquivo validado", isPresented: $showPathValidationConfirmation) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(pathValidationConfirmationMessage)
+        .overlay {
+            if showPathValidationConfirmation {
+                ValidationConfirmationOverlay(
+                    message: pathValidationConfirmationMessage,
+                    onDismiss: { showPathValidationConfirmation = false }
+                )
+            }
         }
     }
 
@@ -1492,10 +1495,13 @@ private struct ExternalPanelView: View {
         .scrollIndicators(.hidden)
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .onAppear { refreshExternalState() }
-        .alert("Arquivo validado", isPresented: $showPathValidationConfirmation) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(pathValidationConfirmationMessage)
+        .overlay {
+            if showPathValidationConfirmation {
+                ValidationConfirmationOverlay(
+                    message: pathValidationConfirmationMessage,
+                    onDismiss: { showPathValidationConfirmation = false }
+                )
+            }
         }
         .sheet(isPresented: $showDemoUnlock) {
             ExternalDemoUnlockSheet(
@@ -2183,6 +2189,51 @@ private struct ExternalDemoUnlockSheet: View {
         }
         onSuccess()
         dismiss()
+    }
+}
+
+private struct ValidationConfirmationOverlay: View {
+    let message: String
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.42)
+                .ignoresSafeArea()
+                .onTapGesture(perform: onDismiss)
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 10) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(AppTheme.success)
+                    Text("Ativação concluída")
+                        .font(.system(size: 19, weight: .bold))
+                        .foregroundStyle(AppTheme.primaryText)
+                }
+                Text(message)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button("Continuar", action: onDismiss)
+                    .font(.system(size: 15, weight: .semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+                    .background(AppTheme.primaryText, in: Capsule())
+                    .foregroundStyle(AppTheme.pageBackground)
+            }
+            .padding(20)
+            .frame(maxWidth: 330)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(AppTheme.outlineStrong, lineWidth: 1)
+            }
+            .shadow(color: .black.opacity(0.3), radius: 24, y: 10)
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.96)))
+        .animation(.easeOut(duration: 0.2), value: message)
     }
 }
 
