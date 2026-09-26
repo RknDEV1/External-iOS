@@ -520,33 +520,59 @@ private struct CHZPrivHomeView: View {
     }
 
     private func validateCatalogChPainelArtifact() -> Bool {
-        guard let url = Bundle.main.url(forResource: "chpainel", withExtension: "3105.validation") else { return false }
-        do {
-            let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
-            guard report.sha256 == "627c73e1def4df9bd38b30db255cadd9264bf1651e73e9064bac38c0bf019387" else { return false }
-            _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-chpainel")
-            pathValidationConfirmationMessage = "ChPainel foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
-            showPathValidationConfirmation = true
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "ChPainel: arquivo validado e enviado à quarentena interna", level: .success))
-            return true
-        } catch {
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "ChPainel: validação interna falhou", level: .warning))
-            return false
-        }
+        validateCatalogBundledArtifact(
+            filename: "FF - Painel.3105",
+            expectedHash: "400bf94ef2cccf108405144063294617ea09ec1a01133efe11fa9e01dbfbcc15",
+            editionKey: "catalog-free-fire-chpainel",
+            title: "ChPainel"
+        )
     }
 
     private func validateCatalogModnewArtifact() -> Bool {
-        guard let url = Bundle.main.url(forResource: "modnew", withExtension: "3105.validation") else { return false }
+        validateCatalogBundledArtifact(
+            filename: "FFM - BoxBlue.3105",
+            expectedHash: "20fafcf858381cf64ad62cbe3c10ab6bc5c03580de62a4513eb975732be49421",
+            editionKey: "catalog-free-fire-max-modnew",
+            title: "Raki"
+        )
+    }
+
+    private func validateCatalogBundledArtifact(
+        filename: String,
+        expectedHash: String,
+        editionKey: String,
+        title: String
+    ) -> Bool {
+        guard let url = Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil)
+            ?.first(where: { $0.lastPathComponent == filename }) else {
+            activityLog.append(LogEntry(
+                timestamp: Date().formatted(date: .omitted, time: .shortened),
+                message: "\(title): arquivo \(filename) ausente no bundle",
+                level: .warning
+            ))
+            return false
+        }
         do {
-            let report = try DevicePatchService.validateExternalArtifact(at: url, password: nil)
-            guard report.sha256 == "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b" else { return false }
-            _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-max-modnew")
-            pathValidationConfirmationMessage = "Raki foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+            let report = try DevicePatchService.validateEmbeddedExternalArtifact(url)
+            guard report.sha256.caseInsensitiveCompare(expectedHash) == .orderedSame else {
+                throw PatchPackageError.unsupportedFormat
+            }
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+            try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
+            pathValidationConfirmationMessage = "\(title) foi validado por SHA-256 e gravado somente no sandbox do Raki."
             showPathValidationConfirmation = true
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki: Modnew.3105 validado e enviado à quarentena interna", level: .success))
+            activityLog.append(LogEntry(
+                timestamp: Date().formatted(date: .omitted, time: .shortened),
+                message: "\(title): arquivo validado, backup criado e instalado internamente",
+                level: .success
+            ))
             return true
         } catch {
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki: validação interna falhou", level: .warning))
+            activityLog.append(LogEntry(
+                timestamp: Date().formatted(date: .omitted, time: .shortened),
+                message: "\(title): validação interna falhou — \(error.localizedDescription)",
+                level: .warning
+            ))
             return false
         }
     }
