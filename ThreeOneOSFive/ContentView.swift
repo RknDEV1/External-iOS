@@ -543,8 +543,11 @@ private struct CHZPrivHomeView: View {
         editionKey: String,
         title: String
     ) -> Bool {
-        guard let url = Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil)
-            ?.first(where: { $0.lastPathComponent == filename }) else {
+        let bundledURLs = Bundle.main.urls(
+            forResourcesWithExtension: "3105",
+            subdirectory: nil
+        ) ?? []
+        guard let url = bundledURLs.first(where: { $0.lastPathComponent == filename }) else {
             activityLog.append(LogEntry(
                 timestamp: Date().formatted(date: .omitted, time: .shortened),
                 message: "\(title): arquivo \(filename) ausente no bundle",
