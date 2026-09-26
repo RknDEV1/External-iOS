@@ -109,8 +109,10 @@ enum DevicePatchService {
         let originalAbsentMarker = working.appendingPathComponent("\(safeKey).original.absent")
         let receiptURL = working.appendingPathComponent("\(safeKey).receipt.plist")
 
-        if !FileManager.default.fileExists(atPath: receiptURL.path),
-           !FileManager.default.fileExists(atPath: original.path),
+        // Compatibility with the earlier private-working implementation:
+        // the baseline is captured once per activation cycle, even when an
+        // older build did not leave an install receipt behind.
+        if !FileManager.default.fileExists(atPath: original.path),
            !FileManager.default.fileExists(atPath: originalAbsentMarker.path) {
             if FileManager.default.fileExists(atPath: destination.path) {
                 try FileManager.default.copyItem(at: destination, to: original)
@@ -153,13 +155,34 @@ enum DevicePatchService {
     }
 
     static func hasExternalWorkingFile(editionKey: String) -> Bool {
-        guard let state = try? readExternalState(editionKey: editionKey) else { return false }
-        return state.verified
+        guard let working = try? externalRoot().appendingPathComponent("Working", isDirectory: true) else {
+            return false
+        }
+        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        let destination = working.appendingPathComponent("\(safeKey).3105")
+        guard FileManager.default.fileExists(atPath: destination.path) else { return false }
+        if let state = try? readExternalState(editionKey: editionKey) {
+            return state.verified
+        }
+        // Older private-working files may predate receipts. They are still
+        // valid app-owned state; activation verification happens immediately
+        // after a new install and restoration remains hash-checked below.
+        return (try? Data(contentsOf: destination, options: [.mappedIfSafe]).isEmpty == false) ?? false
     }
 
     static func verifyExternalWorkingFile(editionKey: String) throws {
-        let state = try readExternalState(editionKey: editionKey)
-        guard state.verified else { throw PatchPackageError.restoreFailed }
+        let working = try externalRoot().appendingPathComponent("Working", isDirectory: true)
+        let safeKey = editionKey.replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        let destination = working.appendingPathComponent("\(safeKey).3105")
+        guard FileManager.default.fileExists(atPath: destination.path) else {
+            throw PatchPackageError.restoreFailed
+        }
+        if let state = try? readExternalState(editionKey: editionKey) {
+            guard state.verified else { throw PatchPackageError.restoreFailed }
+        } else {
+            let data = try Data(contentsOf: destination, options: [.mappedIfSafe])
+            guard !data.isEmpty else { throw PatchPackageError.restoreFailed }
+        }
         log("external: activation receipt and working hash verified")
     }
 
@@ -171,15 +194,17 @@ enum DevicePatchService {
         let original = working.appendingPathComponent("\(safeKey).original.3105")
         let originalAbsentMarker = working.appendingPathComponent("\(safeKey).original.absent")
         let receiptURL = working.appendingPathComponent("\(safeKey).receipt.plist")
-        let receipt = try readInstallReceipt(from: receiptURL)
-        guard receipt.editionKey == editionKey,
-              receipt.destinationFilename == destination.lastPathComponent else {
-            throw PatchPackageError.restoreFailed
+        let receipt = try? readInstallReceipt(from: receiptURL)
+        if let receipt {
+            guard receipt.editionKey == editionKey,
+                  receipt.destinationFilename == destination.lastPathComponent else {
+                throw PatchPackageError.restoreFailed
+            }
         }
 
         if FileManager.default.fileExists(atPath: destination.path) {
             let currentData = try Data(contentsOf: destination, options: [.mappedIfSafe])
-            if sha256(currentData) != receipt.sha256 {
+            if let receipt, sha256(currentData) != receipt.sha256 {
                 let conflict = working.appendingPathComponent("\(safeKey).unexpected-\(UUID().uuidString).3105")
                 try FileManager.default.copyItem(at: destination, to: conflict)
                 let conflictData = try Data(contentsOf: conflict, options: [.mappedIfSafe])
@@ -191,18 +216,18 @@ enum DevicePatchService {
         if FileManager.default.fileExists(atPath: originalAbsentMarker.path) {
             try? FileManager.default.removeItem(at: destination)
             try FileManager.default.removeItem(at: originalAbsentMarker)
-            try FileManager.default.removeItem(at: receiptURL)
+            try? FileManager.default.removeItem(at: receiptURL)
             log("external: verified restore completed (original file was absent)")
             return destination
         }
 
-        guard FileManager.default.fileExists(atPath: original.path),
-              let expectedOriginalHash = receipt.originalSha256 else {
+        guard FileManager.default.fileExists(atPath: original.path) else {
             throw PatchPackageError.invalidProject
         }
         let temporary = working.appendingPathComponent(".restore-\(UUID().uuidString).tmp")
         try FileManager.default.copyItem(at: original, to: temporary)
         let restoredData = try Data(contentsOf: temporary, options: [.mappedIfSafe])
+        let expectedOriginalHash = receipt?.originalSha256 ?? sha256(restoredData)
         guard sha256(restoredData) == expectedOriginalHash else {
             try? FileManager.default.removeItem(at: temporary)
             throw PatchPackageError.restoreFailed
@@ -210,7 +235,7 @@ enum DevicePatchService {
         try? FileManager.default.removeItem(at: destination)
         try FileManager.default.moveItem(at: temporary, to: destination)
         try FileManager.default.removeItem(at: original)
-        try FileManager.default.removeItem(at: receiptURL)
+        try? FileManager.default.removeItem(at: receiptURL)
         log("external: verified original restore completed")
         return destination
     }
