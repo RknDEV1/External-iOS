@@ -1384,6 +1384,23 @@ private struct ExternalPanelView: View {
         let title: String
         let detail: String
         let isDemoOnly: Bool
+        let bundledURL: URL?
+
+        init(
+            id: String,
+            filename: String,
+            title: String,
+            detail: String,
+            isDemoOnly: Bool,
+            bundledURL: URL? = nil
+        ) {
+            self.id = id
+            self.filename = filename
+            self.title = title
+            self.detail = detail
+            self.isDemoOnly = isDemoOnly
+            self.bundledURL = bundledURL
+        }
     }
 
     private var externalFunctions: [ExternalPatchFunction] {
@@ -1434,7 +1451,8 @@ private struct ExternalPanelView: View {
                     filename: filename,
                     title: title,
                     detail: detail,
-                    isDemoOnly: false
+                    isDemoOnly: false,
+                    bundledURL: url
                 )
             }
             + (isFreeFireMax ? [ExternalPatchFunction(
@@ -1854,18 +1872,20 @@ private struct ExternalPanelView: View {
         }
         let sourceURL: URL?
         if enabled {
-            let resourceName = URL(fileURLWithPath: function.filename)
-                .deletingPathExtension()
-                .lastPathComponent
-            sourceURL = Bundle.main.url(forResource: resourceName, withExtension: "3105")
+            sourceURL = function.bundledURL ?? Bundle.main.urls(
+                forResourcesWithExtension: "3105",
+                subdirectory: nil
+            )?.first(where: { $0.lastPathComponent == function.filename })
             guard sourceURL != nil else {
                 externalPatchMessage = "Recurso não encontrado no bundle."
+                appendExternalLog("[ERRO] Recurso não encontrado: \(function.filename)")
                 return
             }
         } else {
             sourceURL = nil
         }
         workingExternalPatchID = function.id
+        let editionKey = externalEditionKey(for: function)
         let action = enabled ? "ATIVAR" : "DESATIVAR"
         appendExternalLog("[\(action)] \(function.title)")
         appendExternalLog(enabled ? "[PROCESSO] 3105 iniciou a validação e aplicação" : "[PROCESSO] 3105 iniciou a restauração do original")
@@ -1876,7 +1896,6 @@ private struct ExternalPanelView: View {
         externalPatchMessage = enabled ? "Processando ativação…" : "Processando restauração…"
         Task.detached(priority: .userInitiated) {
             do {
-                let editionKey = externalEditionKey(for: function)
                 if enabled {
                     guard let sourceURL else { throw PatchPackageError.invalidProject }
                     let report = try DevicePatchService.validateEmbeddedExternalArtifact(sourceURL)
@@ -1899,8 +1918,9 @@ private struct ExternalPanelView: View {
             } catch {
                 await MainActor.run {
                     workingExternalPatchID = nil
-                    externalPatchMessage = "Operação interrompida."
-                    appendExternalLog("[ERRO] Operação interrompida: \(error.localizedDescription)")
+                    let reason = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                    externalPatchMessage = "Validação falhou: \(reason)"
+                    appendExternalLog("[ERRO] \(function.title): \(reason)")
                 }
             }
         }
