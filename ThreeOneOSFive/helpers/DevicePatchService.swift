@@ -59,19 +59,17 @@ enum DevicePatchService {
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
     }
 
-    /// Validates a bundled artifact against the catalog digest and copies it into
-    /// the app-private quarantine. No external container is accessed.
+    /// Validates only the package envelope, size, and catalog digest before
+    /// copying the artifact into the app-private quarantine. The encrypted
+    /// project rules are intentionally not decoded here: this internal-only
+    /// flow stores and verifies the package as data and never resolves or
+    /// executes any target outside the Raki container.
     static func validateEmbeddedExternalArtifact(_ bundledURL: URL) throws -> ExternalArtifactReport {
         guard bundledURL.isFileURL, bundledURL.pathExtension.lowercased() == "3105" else {
             throw PatchPackageError.unsupportedFormat
         }
         let data = try Data(contentsOf: bundledURL, options: [.mappedIfSafe])
         let summary = try PatchPackageCodec.inspect(data)
-        if summary.isPasswordProtected {
-            _ = try PatchPackageCodec.decode(data, password: "CHZ")
-        } else {
-            _ = try PatchPackageCodec.decode(data, password: nil)
-        }
         let report = try validateExternalArtifact(at: bundledURL, packageSummary: summary)
         guard let expected = expectedEmbeddedSHA256(for: report.filename),
               report.sha256.caseInsensitiveCompare(expected) == .orderedSame else {
