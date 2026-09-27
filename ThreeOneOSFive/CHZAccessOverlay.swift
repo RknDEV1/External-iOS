@@ -90,10 +90,10 @@ struct CHZAccessOverlay: View {
             .padding(.top, 22)
             .padding(.bottom, 18)
             .frame(width: min(UIScreen.main.bounds.width - 42, 330))
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .background(Color.black.opacity(0.80), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.red.opacity(0.74), lineWidth: 1.2))
-            .shadow(color: .red.opacity(0.20), radius: 22, y: 10)
+            .shadow(color: .clear, radius: 0)
         }
         .onReceive(timer) { _ in tick() }
     }

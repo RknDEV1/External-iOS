@@ -106,7 +106,7 @@ struct LicenseInfoView: View {
             }
             .padding(.horizontal, AppTheme.contentCardPadding)
             .padding(.vertical, 4)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .background(AppTheme.cardBackground.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -116,7 +116,7 @@ struct LicenseInfoView: View {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
             }
-            .shadow(color: AppTheme.accent.opacity(0.13), radius: 16, y: 8)
+            .shadow(color: .clear, radius: 0)
         }
     }
 

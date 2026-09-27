@@ -606,7 +606,7 @@ private struct CHZPrivHomeView: View {
             bottomNavigationItem(.injector, title: "Injetor", symbol: "gamecontroller.fill")
         }
         .padding(5)
-        .background(.ultraThinMaterial, in: Capsule(style: .continuous))
+        .background(AppTheme.cardBackground, in: Capsule(style: .continuous))
         .background(AppTheme.cardBackground.opacity(0.84), in: Capsule(style: .continuous))
         .overlay {
             Capsule(style: .continuous)
@@ -769,8 +769,8 @@ private struct CHZPrivHomeView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
         .frame(minHeight: 78)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
-        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
     }
 
@@ -805,8 +805,8 @@ private struct CHZPrivHomeView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
         .frame(minHeight: 78)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
-        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
     }
 
@@ -841,8 +841,8 @@ private struct CHZPrivHomeView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
         .frame(minHeight: 78)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
-        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
     }
 
@@ -900,8 +900,8 @@ private struct CHZPrivHomeView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
         .frame(minHeight: 78)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
-        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.0)
@@ -1284,7 +1284,7 @@ private struct CHZSwitchStyle: ToggleStyle {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ))
-                    .background(.ultraThinMaterial, in: Capsule(style: .continuous))
+                    .background(AppTheme.cardBackground, in: Capsule(style: .continuous))
                     .frame(width: 58, height: 34)
                     .overlay {
                         Capsule(style: .continuous)
@@ -1845,8 +1845,8 @@ private struct ExternalPanelView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
         .frame(minHeight: 78)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
-        .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.0)
@@ -2124,8 +2124,8 @@ private struct ExternalPanelView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 5)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .background(AppTheme.cardBackground.opacity(0.74), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
@@ -2282,7 +2282,7 @@ private struct ValidationConfirmationOverlay: View {
             }
             .padding(20)
             .frame(maxWidth: 330)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
