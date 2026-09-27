@@ -1439,7 +1439,9 @@ private struct ExternalPanelView: View {
 
     private var externalFunctions: [ExternalPatchFunction] {
         let prefix = isFreeFireMax ? "FFM - " : "FF - "
-        let urls = Bundle.main.urls(forResourcesWithExtension: "3105", subdirectory: nil) ?? []
+        // Use the same authoritative resource list used by the validation service.
+        // This keeps the catalog and activation flow in sync after packaging.
+        let urls = DevicePatchService.embeddedExternalArtifacts()
         return urls
             .filter { url in
                 let name = url.lastPathComponent
@@ -1886,9 +1888,9 @@ private struct ExternalPanelView: View {
         guard workingExternalPatchID == nil else { return }
         if function.isDemoOnly {
             guard enabled else {
-                activeExternalPatchIDs.remove(function.id)
                 do {
                     _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: externalEditionKey(for: function))
+                    activeExternalPatchIDs.remove(function.id)
                     externalPatchMessage = "\(function.title) desativado e backup original restaurado na área privada."
                     appendExternalLog("[OK] Backup original restaurado; nenhuma área externa acessada")
                 } catch {
