@@ -485,6 +485,8 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url)
             guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-demo")
+            try DevicePatchService.verifyExternalWorkingFile(editionKey: "catalog-free-fire-demo")
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Painel External: externo(1).3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -501,6 +503,8 @@ private struct CHZPrivHomeView: View {
         do {
             let report = try DevicePatchService.validateExternalArtifact(at: url, password: "chz15")
             guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-chz-external")
+            try DevicePatchService.verifyExternalWorkingFile(editionKey: "catalog-free-fire-chz-external")
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: rkn.3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
@@ -513,10 +517,11 @@ private struct CHZPrivHomeView: View {
         do {
             _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Backup interno restaurado", level: .success))
+            return true
         } catch {
             activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Nenhum backup interno pôde ser restaurado", level: .warning))
+            return false
         }
-        return false
     }
 
     private func validateCatalogChPainelArtifact() -> Bool {
@@ -1573,7 +1578,9 @@ private struct ExternalPanelView: View {
                             isDemoOnly: true
                         )
                         do {
-                            _ = try DevicePatchService.installExternalArtifact(report, editionKey: externalEditionKey(for: function))
+                            let editionKey = externalEditionKey(for: function)
+                            _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+                            try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
                             externalReport = report
                             activeExternalPatchIDs.insert(id)
                             externalPatchMessage = "\(function.title) validado e substituído na área privada do app."
@@ -1964,7 +1971,9 @@ private struct ExternalPanelView: View {
             : "b1f1d5d273f156bf3f60dfbf55327206eb693619a411fa7a00f8ccb605f06f3b"
         guard let report = prepareBundledDemoArtifact(resourceName: resourceName, password: nil, displayName: displayName, expectedHash: expectedHash) else { return }
         do {
-            _ = try DevicePatchService.installExternalArtifact(report, editionKey: externalEditionKey(for: function))
+            let editionKey = externalEditionKey(for: function)
+            _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+            try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
             activeExternalPatchIDs.insert(function.id)
             externalPatchMessage = "\(function.title) ativado sem senha na área privada do app."
             pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
