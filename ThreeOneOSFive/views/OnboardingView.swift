@@ -204,20 +204,14 @@ struct OnboardingView: View {
                 versionRow(icon: "checkmark.circle.fill", title: "iOS 26", value: ExploitSupportPolicy.verifiedIOS26Range, color: .green)
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill").foregroundStyle(AppTheme.primaryText)
-                        Text("iOS 27.0").font(.subheadline.weight(.semibold))
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(AppTheme.primaryText)
+                        Text("iOS 27 beta").font(.subheadline.weight(.semibold))
                         Spacer()
-                        Text(language.text("onboarding.beta")).font(.caption.weight(.semibold)).foregroundStyle(AppTheme.secondaryText)
+                        Text("NÃO VALIDADO").font(.caption.weight(.semibold)).foregroundStyle(AppTheme.secondaryText)
                     }
-                    ForEach(ExploitSupportPolicy.verifiedIOS27Builds, id: \.build) { v in
-                        HStack {
-                            Text("Beta \(v.beta)" + (v.publicBeta.map { " / Public \($0)" } ?? ""))
-                                .font(.caption.weight(.medium)).foregroundStyle(AppTheme.secondaryText)
-                            Spacer()
-                            Text(v.build).font(.caption.monospaced()).foregroundStyle(AppTheme.secondaryText)
-                        }
-                        .padding(.leading, 24)
-                    }
+                    Text("Offsets nativos ausentes; o exploit permanece bloqueado para evitar kernel panic.")
+                        .font(.caption.monospaced())
+                        .foregroundStyle(AppTheme.secondaryText)
                 }
                 .padding(12)
                  .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
