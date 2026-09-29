@@ -25,7 +25,7 @@ enum AppTheme {
     static let appIconSize: CGFloat = 32
     static let emptyIconSize: CGFloat = 30
     static let selectionIconSize: CGFloat = 18
-    static let contentCardCornerRadius: CGFloat = 14
+    static let contentCardCornerRadius: CGFloat = 16
     static let contentCardInset: CGFloat = 14
     static let contentCardPadding: CGFloat = 14
     static let brandFontName = "SF Mono"
@@ -35,10 +35,10 @@ struct CHZPrivWordmark: View {
     var size: CGFloat = 34
 
     var body: some View {
-        Text("3105")
+        Text("Raki")
             .font(.system(size: size, weight: .semibold, design: .monospaced))
            .foregroundStyle(AppTheme.primaryText)
-            .accessibilityLabel("3105")
+            .accessibilityLabel("Raki")
     }
 }
 

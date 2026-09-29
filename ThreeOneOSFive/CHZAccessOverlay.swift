@@ -31,7 +31,7 @@ struct CHZAccessOverlay: View {
                         .foregroundStyle(AppTheme.primaryText.opacity(0.95))
                 }
 
-                Text("3105")
+                Text("Raki")
                     .font(.system(size: 18, weight: .bold, design: .monospaced))
                     .tracking(1.3)
                     .foregroundStyle(.white)

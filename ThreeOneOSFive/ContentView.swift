@@ -2247,13 +2247,23 @@ private struct ValidationConfirmationOverlay: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 10) {
-                    Image(systemName: isActivation ? "checkmark.square.fill" : "arrow.uturn.backward.square.fill")
-                        .font(.system(size: 24, weight: .semibold))
+                    Image(systemName: isActivation ? "checkmark.seal.fill" : "arrow.uturn.backward.circle.fill")
+                        .font(.system(size: 23, weight: .semibold))
                         .foregroundStyle(AppTheme.primaryText)
-                    Text(title)
-                        .font(.system(size: 19, weight: .bold))
-                       .foregroundStyle(AppTheme.primaryText)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("RAKI / SYSTEM")
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .tracking(1.0)
+                            .foregroundStyle(AppTheme.tertiaryText)
+                        Text(title)
+                            .font(.system(size: 19, weight: .bold, design: .monospaced))
+                            .foregroundStyle(AppTheme.primaryText)
+                    }
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 9)
+                .background(AppTheme.primaryText.opacity(0.07), in: Capsule(style: .continuous))
+                .overlay(Capsule(style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 0.8))
                 Text(message)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppTheme.secondaryText)
@@ -2262,18 +2272,18 @@ private struct ValidationConfirmationOverlay: View {
                     .font(.system(size: 15, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 11)
-                    .background(AppTheme.primaryText, in: Rectangle())
+                    .background(AppTheme.primaryText, in: Capsule(style: .continuous))
                     .foregroundStyle(AppTheme.pageBackground)
             }
             .padding(20)
             .frame(maxWidth: 330)
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(Color.black.opacity(0.88), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 0, style: .continuous)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .stroke(AppTheme.outlineStrong, lineWidth: 1)
             }
-            .shadow(color: .black.opacity(0.3), radius: 24, y: 10)
+            .shadow(color: .black.opacity(0.42), radius: 26, y: 12)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.96)))
         .animation(.easeOut(duration: 0.2), value: message)
