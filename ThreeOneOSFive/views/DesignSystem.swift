@@ -28,7 +28,7 @@ enum AppTheme {
     static let contentCardCornerRadius: CGFloat = 14
     static let contentCardInset: CGFloat = 14
     static let contentCardPadding: CGFloat = 14
-    static let brandFontName = "SF Pro Rounded"
+    static let brandFontName = "SF Mono"
 }
 
 struct CHZPrivWordmark: View {
@@ -36,7 +36,7 @@ struct CHZPrivWordmark: View {
 
     var body: some View {
         Text("Raki")
-            .font(.system(size: size, weight: .semibold, design: .rounded))
+            .font(.system(size: size, weight: .semibold, design: .monospaced))
            .foregroundStyle(AppTheme.primaryText)
             .accessibilityLabel("Raki")
     }
@@ -126,7 +126,7 @@ struct AppThemeModifier: ViewModifier {
         content
             .preferredColorScheme(.dark)
             .tint(AppTheme.accent)
-            .environment(\.font, .system(.body, design: .rounded))
+            .environment(\.font, .system(.body, design: .monospaced))
            .foregroundStyle(AppTheme.primaryText)
             .scrollContentBackground(.hidden)
             .background(AppTheme.pageBackground.ignoresSafeArea())

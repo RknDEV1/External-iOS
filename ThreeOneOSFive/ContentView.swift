@@ -627,7 +627,7 @@ private struct CHZPrivHomeView: View {
                 Image(systemName: symbol)
                     .font(.system(size: 20, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
             }
             .foregroundStyle(selectedPage == page ? AppTheme.accentBright : AppTheme.secondaryText)
             .frame(maxWidth: .infinity)
@@ -679,10 +679,10 @@ private struct CHZPrivHomeView: View {
                 .foregroundStyle(AppTheme.accentBright)
             VStack(alignment: .leading, spacing: 1) {
                 Text(category.rawValue.uppercased())
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
                    .foregroundStyle(AppTheme.primaryText)
                 Text("\(count) funções")
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
@@ -748,10 +748,10 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text("PAINEL EXTERNAL")
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .font(.system(size: 17, weight: .bold, design: .monospaced))
                    .foregroundStyle(AppTheme.primaryText)
                 Text("externo.3105 · ESP com painel interno de funções e configurações.")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
@@ -782,10 +782,10 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text("CHPAINEL")
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .font(.system(size: 17, weight: .bold, design: .monospaced))
                    .foregroundStyle(AppTheme.primaryText)
                 Text("Painel interno com funções e configurações.")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
@@ -818,10 +818,10 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text("RAKI")
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .font(.system(size: 17, weight: .bold, design: .monospaced))
                    .foregroundStyle(AppTheme.primaryText)
                 Text("ESP com assistência de mira e painel externo.")
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
@@ -860,19 +860,19 @@ private struct CHZPrivHomeView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(title.uppercased())
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .font(.system(size: 17, weight: .bold, design: .monospaced))
                     .tracking(0.25)
                    .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(2)
                 if unavailable {
                     Text("INDISPONÍVEL")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
                         .tracking(0.7)
                        .foregroundStyle(AppTheme.primaryText)
                 }
                 if !description.isEmpty {
                     Text(description)
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.system(size: 12, weight: .medium, design: .monospaced))
                         .foregroundStyle(unavailable ? AppTheme.primaryText.opacity(0.82) : AppTheme.tertiaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
@@ -1607,7 +1607,7 @@ private struct ExternalPanelView: View {
                 .tracking(1.0)
                 .foregroundStyle(AppTheme.accentBright)
             Text(isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE")
-                .font(.system(size: 24, weight: .black, design: .rounded))
+                .font(.system(size: 24, weight: .black, design: .monospaced))
                .foregroundStyle(AppTheme.primaryText)
         }
     }
@@ -1701,7 +1701,7 @@ private struct ExternalPanelView: View {
                         .tracking(1.1)
                         .foregroundStyle(AppTheme.accentBright)
                     Text("External Menu")
-                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .font(.system(size: 28, weight: .black, design: .monospaced))
                        .foregroundStyle(AppTheme.primaryText)
                 }
                 Spacer()
@@ -1710,7 +1710,7 @@ private struct ExternalPanelView: View {
                     .foregroundStyle(AppTheme.accentBright)
             }
             Text("Central de status, diagnóstico e configurações internas do aplicativo.")
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .font(.system(size: 13, weight: .medium, design: .monospaced))
                 .foregroundStyle(AppTheme.secondaryText)
         }
     }
@@ -1724,7 +1724,7 @@ private struct ExternalPanelView: View {
                     .frame(width: 34)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(editionName)
-                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .font(.system(size: 17, weight: .bold, design: .monospaced))
                        .foregroundStyle(AppTheme.primaryText)
                     Text(editionStatus)
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
@@ -1797,12 +1797,12 @@ private struct ExternalPanelView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(function.title.uppercased())
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .font(.system(size: 17, weight: .bold, design: .monospaced))
                     .tracking(0.25)
                    .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(2)
                 Text(function.detail)
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .font(.system(size: 13, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(2)
             }
@@ -2050,13 +2050,13 @@ private struct ExternalPanelView: View {
                     .buttonStyle(.bordered)
                     .disabled(externalBackup == nil)
                 }
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
                 .padding(.vertical, 8)
             }
 
             if let externalMessage {
                 Text(externalMessage)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 6)
@@ -2080,7 +2080,7 @@ private struct ExternalPanelView: View {
             Image(systemName: "lock.shield.fill")
                 .foregroundStyle(AppTheme.accentBright)
             Text("Este painel controla somente estados, diagnósticos e preferências internas. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -2114,10 +2114,10 @@ private struct ExternalPanelView: View {
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
                    .foregroundStyle(AppTheme.primaryText)
                 Text(detail)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
@@ -2131,7 +2131,7 @@ private struct ExternalPanelView: View {
                 .foregroundStyle(AppTheme.accentBright)
                 .frame(width: 24)
             Text(title)
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .font(.system(size: 15, weight: .semibold, design: .monospaced))
                .foregroundStyle(AppTheme.primaryText)
             Spacer(minLength: 8)
             Text(value)
