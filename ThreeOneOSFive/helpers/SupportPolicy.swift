@@ -3,7 +3,7 @@ import Foundation
 enum ExploitSupportPolicy {
     static let verifiedIOS17Range = "17.0–17.7.x"
     static let verifiedIOS18Range = "18.0–18.7.1"
-    static let verifiedIOS26Range = "26.0–26.6.1"
+    static let verifiedIOS26Range = "26.0.x"
 
     static let verifiedIOS27Builds: [(beta: Int, publicBeta: Int?, build: String)] = [
         (1, nil, "24A5355q"),
@@ -39,12 +39,12 @@ enum ExploitSupportPolicy {
             return true
         }
 
+        // offsets.m aborts above iOS 26.0.x; do not advertise later builds.
         if major == 26 {
-            guard minor >= 0, patch >= 0 else { return false }
-            return minor < 6 || (minor == 6 && patch <= 1)
+            return minor == 0 && patch >= 0
         }
 
-        guard major == 27, minor == 0, patch == 0 else { return false }
-        return iOS27BetaNumber(for: build) != nil
+        // No native offsets for iOS 27 are bundled in this target.
+        return false
     }
 }

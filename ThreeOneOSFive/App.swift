@@ -247,8 +247,9 @@ class AppState: ObservableObject {
                     self.unsupportedMessage = nil
                     log("app: kernel exploit active")
                 } else {
-                    self.exploitStatus = .failed(method: "kexploit", code: -1)
-                    log("app: kernel exploit activation failed")
+                    let code = KernelExploit.lastFailureCode
+                    self.exploitStatus = .failed(method: KernelExploit.lastFailureStage.isEmpty ? "kexploit" : KernelExploit.lastFailureStage, code: code)
+                    log("app: kernel exploit activation failed — \(KernelExploit.lastFailureStage) (\(code))")
                 }
             }
         }
