@@ -240,7 +240,7 @@ struct WallpaperLabView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 18)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 0))
             }
         }
     }

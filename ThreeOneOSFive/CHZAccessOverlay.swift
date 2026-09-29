@@ -31,7 +31,7 @@ struct CHZAccessOverlay: View {
                         .foregroundStyle(AppTheme.primaryText.opacity(0.95))
                 }
 
-                Text("Raki")
+                Text("3105")
                     .font(.system(size: 18, weight: .bold, design: .monospaced))
                     .tracking(1.3)
                     .foregroundStyle(.white)
@@ -48,8 +48,8 @@ struct CHZAccessOverlay: View {
                     .onSubmit(submit)
                     .padding(.horizontal, 13)
                     .frame(height: 44)
-                    .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(AppTheme.primaryText.opacity(0.56), lineWidth: 1))
+                    .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 0, style: .continuous).stroke(AppTheme.primaryText.opacity(0.56), lineWidth: 1))
                     .foregroundStyle(.white)
                     .disabled(isSubmitting || isRestoringSession || secondsRemaining == 0)
 
@@ -76,7 +76,7 @@ struct CHZAccessOverlay: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.white)
-                .background(AppTheme.primaryText.opacity(0.82), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                .background(AppTheme.primaryText.opacity(0.82), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
                 .disabled(isSubmitting || isRestoringSession || normalizedKey.isEmpty || secondsRemaining == 0)
 
                 Text(errorMessage ?? " ")
@@ -90,9 +90,9 @@ struct CHZAccessOverlay: View {
             .padding(.top, 22)
             .padding(.bottom, 18)
             .frame(width: min(UIScreen.main.bounds.width - 42, 330))
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .background(Color.black.opacity(0.80), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(AppTheme.primaryText.opacity(0.74), lineWidth: 1.2))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+            .background(Color.black.opacity(0.80), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 0, style: .continuous).stroke(AppTheme.primaryText.opacity(0.74), lineWidth: 1.2))
             .shadow(color: .clear, radius: 0)
         }
         .onReceive(timer) { _ in tick() }

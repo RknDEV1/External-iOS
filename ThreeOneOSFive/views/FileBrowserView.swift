@@ -254,7 +254,7 @@ struct FileBrowserView: View {
                             .ignoresSafeArea()
                         ProgressView(activityText)
                             .padding()
-                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 0))
                     }
                     .transition(.opacity)
                 }

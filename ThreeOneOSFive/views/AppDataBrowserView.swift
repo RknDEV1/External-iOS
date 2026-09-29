@@ -119,14 +119,14 @@ struct AppDataBrowserView: View {
                     let workspaceDestination = FileBrowserDestination(
                         containerPath: workspaceURL.path,
                         startPath: workspaceURL.path,
-                        title: "Raki",
+                        title: "External",
                         bundleID: nil
                     )
                     NavigationLink(value: workspaceDestination) {
                         HStack(spacing: 10) {
                             AppRowIcon(systemName: "folder.fill")
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Raki")
+                                Text("3105")
                                     .font(.subheadline.weight(.semibold))
                                 Text(language.text("browser.workspace_subtitle"))
                                     .font(.caption)
@@ -405,7 +405,7 @@ struct BrowserAppIcon: View {
             }
         }
         .frame(width: AppTheme.appIconSize, height: AppTheme.appIconSize)
-        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
         .accessibilityHidden(true)
         .onAppear {
             guard resolvedIcon == nil, !didRequestIcon else { return }

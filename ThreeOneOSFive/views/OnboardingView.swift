@@ -122,10 +122,10 @@ struct OnboardingView: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 14)
                         .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            RoundedRectangle(cornerRadius: 0, style: .continuous)
                                 .fill(Color(uiColor: .secondarySystemBackground))
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    RoundedRectangle(cornerRadius: 0, style: .continuous)
                                         .stroke(languageCode == option.rawValue ? AppTheme.accent : Color.clear, lineWidth: 1)
                                 )
                         )
@@ -142,10 +142,10 @@ struct OnboardingView: View {
         VStack(spacing: 18) {
             Spacer(minLength: 10)
              ZStack {
-                 RoundedRectangle(cornerRadius: 10, style: .continuous)
+                 RoundedRectangle(cornerRadius: 0, style: .continuous)
                      .fill(Color(uiColor: .secondarySystemBackground))
                      .overlay(
-                         RoundedRectangle(cornerRadius: 10, style: .continuous)
+                         RoundedRectangle(cornerRadius: 0, style: .continuous)
                              .stroke(AppTheme.outline, lineWidth: 1.0)
                      )
                      .frame(width: 72, height: 72)
@@ -168,7 +168,7 @@ struct OnboardingView: View {
                  .foregroundStyle(AppTheme.accent)
                  .padding(.horizontal, 14)
                  .padding(.vertical, 8)
-                 .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                 .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
             Spacer(minLength: 10)
         }
     }
@@ -177,10 +177,10 @@ struct OnboardingView: View {
         VStack(spacing: 16) {
             Spacer(minLength: 8)
              ZStack {
-                 RoundedRectangle(cornerRadius: 18, style: .continuous)
+                 RoundedRectangle(cornerRadius: 0, style: .continuous)
                      .fill(Color(uiColor: .secondarySystemBackground))
                      .overlay(
-                         RoundedRectangle(cornerRadius: 10, style: .continuous)
+                         RoundedRectangle(cornerRadius: 0, style: .continuous)
                              .stroke(AppTheme.outline, lineWidth: 1.0)
                      )
                      .frame(width: 72, height: 72)
@@ -220,7 +220,7 @@ struct OnboardingView: View {
                     }
                 }
                 .padding(12)
-                 .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                 .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
             }
             .padding(.horizontal, 20)
             Text(language.text("onboarding.versions_footer", AppInfo.osVersion, AppInfo.osBuild))
@@ -236,10 +236,10 @@ struct OnboardingView: View {
         VStack(spacing: 16) {
             Spacer(minLength: 8)
              ZStack {
-                 RoundedRectangle(cornerRadius: 10, style: .continuous)
+                 RoundedRectangle(cornerRadius: 0, style: .continuous)
                      .fill(Color(uiColor: .secondarySystemBackground))
                      .overlay(
-                         RoundedRectangle(cornerRadius: 10, style: .continuous)
+                         RoundedRectangle(cornerRadius: 0, style: .continuous)
                              .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
                      )
                      .frame(width: 72, height: 72)
@@ -263,7 +263,7 @@ struct OnboardingView: View {
                 installBullet(icon: "exclamationmark.triangle.fill", text: language.text("onboarding.install_jailbreak"), color: .orange)
             }
             .padding(14)
-             .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+             .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
             .padding(.horizontal, 20)
             Text(language.text("onboarding.install_footer"))
                 .font(.caption)
@@ -282,7 +282,7 @@ struct OnboardingView: View {
             Text(value).font(.subheadline.monospaced()).foregroundStyle(AppTheme.secondaryText)
         }
         .padding(12)
-        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
     }
 
     private func installBullet(icon: String, text: String, color: Color) -> some View {

@@ -35,10 +35,10 @@ struct CHZPrivWordmark: View {
     var size: CGFloat = 34
 
     var body: some View {
-        Text("Raki")
+        Text("3105")
             .font(.system(size: size, weight: .semibold, design: .monospaced))
            .foregroundStyle(AppTheme.primaryText)
-            .accessibilityLabel("Raki")
+            .accessibilityLabel("3105")
     }
 }
 
@@ -97,9 +97,9 @@ struct AppSearchField: View {
         }
         .padding(.horizontal, 11)
         .frame(minHeight: 38)
-        .background(AppTheme.fieldBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(AppTheme.fieldBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 0.7)
         }
         .padding(.horizontal, AppTheme.pageInset)

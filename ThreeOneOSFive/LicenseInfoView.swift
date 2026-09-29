@@ -106,14 +106,14 @@ struct LicenseInfoView: View {
             }
             .padding(.horizontal, AppTheme.contentCardPadding)
             .padding(.vertical, 4)
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .background(AppTheme.cardBackground.opacity(0.72), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+            .background(AppTheme.cardBackground.opacity(0.72), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                RoundedRectangle(cornerRadius: 0, style: .continuous)
                     .stroke(AppTheme.outline, lineWidth: 1.0)
             }
             .overlay {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                RoundedRectangle(cornerRadius: 0, style: .continuous)
                     .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
             }
             .shadow(color: .clear, radius: 0)

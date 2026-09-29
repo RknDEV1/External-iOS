@@ -915,9 +915,9 @@ private struct RepositoryScreenshotPreview: View {
             }
         }
         .frame(width: previewSize.width, height: previewSize.height)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 0.5)
         }
         .animation(.easeInOut(duration: 0.2), value: previewSize)
@@ -946,7 +946,7 @@ struct RepositorySourceIcon: View {
         }
         .frame(width: 38, height: 38)
         .background(AppTheme.accent.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
         .accessibilityHidden(true)
         .task(id: repository?.iconURL) {
             guard let iconURL = repository?.iconURL else { return }

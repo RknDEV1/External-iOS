@@ -96,7 +96,7 @@ struct FilesTabStrip: View {
         .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.secondaryText)
         .background(
             isSelected ? AppTheme.accent.opacity(0.12) : AppTheme.secondaryText.opacity(0.08),
-            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+            in: RoundedRectangle(cornerRadius: 0, style: .continuous)
         )
         .contextMenu {
             Button {

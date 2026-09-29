@@ -459,7 +459,7 @@ private struct CHZPrivHomeView: View {
         }
         .sheet(isPresented: $showCatalogModnewUnlock) {
             ExternalDemoUnlockSheet(
-                title: "Raki",
+                title: "External",
                 onCancel: { showCatalogModnewUnlock = false },
                 onSuccess: {
                     catalogModnewActive = validateCatalogModnewArtifact()
@@ -538,7 +538,7 @@ private struct CHZPrivHomeView: View {
             filename: "FFM - BoxBlue.3105",
             expectedHash: "20fafcf858381cf64ad62cbe3c10ab6bc5c03580de62a4513eb975732be49421",
             editionKey: "catalog-free-fire-max-modnew",
-            title: "Raki"
+            title: "External"
         )
     }
 
@@ -567,7 +567,7 @@ private struct CHZPrivHomeView: View {
             }
             _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
             try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
-            pathValidationConfirmationMessage = "\(title) foi validado por SHA-256 e gravado somente no sandbox do Raki."
+            pathValidationConfirmationMessage = "\(title) foi validado por SHA-256 e gravado somente no sandbox interno do app."
             showPathValidationConfirmation = true
             activityLog.append(LogEntry(
                 timestamp: Date().formatted(date: .omitted, time: .shortened),
@@ -593,9 +593,9 @@ private struct CHZPrivHomeView: View {
         .pickerStyle(.segmented)
         .tint(AppTheme.accent)
         .padding(4)
-        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 0.8)
         }
     }
@@ -688,9 +688,9 @@ private struct CHZPrivHomeView: View {
         }
         .padding(.horizontal, 13)
         .frame(minWidth: 142, minHeight: 48, alignment: .leading)
-        .background(AppTheme.cardBackground.opacity(0.72), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(AppTheme.cardBackground.opacity(0.72), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
         }
     }
@@ -768,7 +768,7 @@ private struct CHZPrivHomeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
-        .frame(minHeight: 78)
+        .frame(minHeight: 64)
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
@@ -804,7 +804,7 @@ private struct CHZPrivHomeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
-        .frame(minHeight: 78)
+        .frame(minHeight: 64)
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
@@ -817,16 +817,12 @@ private struct CHZPrivHomeView: View {
                 .foregroundStyle(AppTheme.accentBright)
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
-                Text("RAKI")
+                Text("SYSTEM")
                     .font(.system(size: 17, weight: .bold, design: .monospaced))
                    .foregroundStyle(AppTheme.primaryText)
-                Text("ESP com assistência de mira e painel externo.")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundStyle(AppTheme.tertiaryText)
-                    .lineLimit(1)
             }
             Spacer(minLength: 6)
-            Toggle("Raki", isOn: Binding(
+            Toggle("External", isOn: Binding(
                 get: { catalogModnewActive },
                 set: { enabled in
                     if enabled { catalogModnewActive = validateCatalogModnewArtifact() }
@@ -840,7 +836,7 @@ private struct CHZPrivHomeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
-        .frame(minHeight: 78)
+        .frame(minHeight: 64)
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay { RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1.15) }
@@ -870,15 +866,6 @@ private struct CHZPrivHomeView: View {
                         .tracking(0.7)
                        .foregroundStyle(AppTheme.primaryText)
                 }
-                if !description.isEmpty {
-                    Text(description)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(unavailable ? AppTheme.primaryText.opacity(0.82) : AppTheme.tertiaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
-                        .allowsTightening(true)
-                        .truncationMode(.tail)
-                }
             }
             Spacer(minLength: 6)
             if workingPatchID == item.id {
@@ -899,7 +886,7 @@ private struct CHZPrivHomeView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
-        .frame(minHeight: 78)
+        .frame(minHeight: 64)
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay {
@@ -912,10 +899,10 @@ private struct CHZPrivHomeView: View {
         }
         .shadow(color: .clear, radius: 0)
         .overlay(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .fill(Color.white.opacity(0.06))
                 .frame(height: 28)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
                 .allowsHitTesting(false)
         }
     }
@@ -1168,7 +1155,7 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 34, height: 34)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("RAKI // SYSTEM LOG")
+                    Text("SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
                         .foregroundStyle(AppTheme.primaryText.opacity(0.96))
@@ -1219,17 +1206,17 @@ private struct CHZPrivHomeView: View {
             }
         }
         .padding(15)
-        .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .background(AppTheme.primaryText.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+        .background(AppTheme.primaryText.opacity(0.035), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 15, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.05)
         }
         .overlay(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 15, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .fill(Color.white.opacity(0.05))
                 .frame(height: 24)
-                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
                 .allowsHitTesting(false)
         }
     }
@@ -1470,7 +1457,7 @@ private struct ExternalPanelView: View {
             + (isFreeFireMax ? [ExternalPatchFunction(
                 id: "demo-modnew-external",
                 filename: "modnew.3105.validation",
-                title: "Raki",
+                title: "External",
                 detail: "ESP com assistência de mira e painel externo.",
                 isDemoOnly: true
             )] : [])
@@ -1488,9 +1475,9 @@ private struct ExternalPanelView: View {
         .pickerStyle(.segmented)
         .tint(AppTheme.accent)
         .padding(4)
-        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(AppTheme.outlineStrong, lineWidth: 0.8)
         }
     }
@@ -1551,7 +1538,7 @@ private struct ExternalPanelView: View {
                         let function = ExternalPatchFunction(
                             id: id,
                             filename: report.filename,
-                            title: isChPainel ? "ChPainel" : (isModnew ? "Raki" : "Painel External"),
+                            title: isChPainel ? "ChPainel" : (isModnew ? "External" : "Painel External"),
                             detail: "Função interna do Raki.",
                             isDemoOnly: true
                         )
@@ -1562,7 +1549,7 @@ private struct ExternalPanelView: View {
                             externalReport = report
                             activeExternalPatchIDs.insert(id)
                             externalPatchMessage = "\(function.title) validado e substituído na área privada do app."
-                            pathValidationConfirmationMessage = "\(function.title) foi validado com SHA-256 e o caminho interno foi confirmado no container do Raki."
+                            pathValidationConfirmationMessage = "\(function.title) foi validado com SHA-256 e o caminho interno foi confirmado no container privado do app."
                             showPathValidationConfirmation = true
                             appendExternalLog("[OK] Backup original criado; arquivo instalado em Application Support/ExternalMenu/Working")
                         } catch {
@@ -1627,7 +1614,7 @@ private struct ExternalPanelView: View {
                 }
                 .frame(width: 34, height: 34)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("RAKI // SYSTEM LOG")
+                    Text("SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
                         .foregroundStyle(AppTheme.primaryText.opacity(0.96))
@@ -1677,17 +1664,17 @@ private struct ExternalPanelView: View {
             }
         }
         .padding(15)
-        .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .background(AppTheme.primaryText.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+        .background(AppTheme.primaryText.opacity(0.035), in: RoundedRectangle(cornerRadius: 0, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 15, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.05)
         }
         .overlay(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 15, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .fill(Color.white.opacity(0.05))
                 .frame(height: 24)
-                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
                 .allowsHitTesting(false)
         }
     }
@@ -1696,7 +1683,7 @@ private struct ExternalPanelView: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("RAKI / MENU")
+                    Text("SYSTEM / MENU")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .tracking(1.1)
                         .foregroundStyle(AppTheme.accentBright)
@@ -1822,7 +1809,7 @@ private struct ExternalPanelView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
-        .frame(minHeight: 78)
+        .frame(minHeight: 64)
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
         .overlay {
@@ -1835,10 +1822,10 @@ private struct ExternalPanelView: View {
         }
         .shadow(color: .clear, radius: 0)
         .overlay(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .fill(Color.white.opacity(0.06))
                 .frame(height: 28)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
                 .allowsHitTesting(false)
         }
     }
@@ -1920,7 +1907,7 @@ private struct ExternalPanelView: View {
                     workingExternalPatchID = nil
                     externalPatchMessage = enabled ? "Função ativada e verificada." : "Função desativada e original restaurado."
                     if enabled {
-                        pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+                        pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container privado do app."
                         showPathValidationConfirmation = true
                     }
                     appendExternalLog(enabled ? "[OK] Recibo e hash confirmados; função ativada" : "[OK] Original restaurado e verificado")
@@ -1950,7 +1937,7 @@ private struct ExternalPanelView: View {
             try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
             activeExternalPatchIDs.insert(function.id)
             externalPatchMessage = "\(function.title) ativado sem senha na área privada do app."
-            pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container do Raki."
+            pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container privado do app."
             showPathValidationConfirmation = true
             appendExternalLog("[OK] \(function.title) validado, com backup criado e instalado internamente")
         } catch {
@@ -2098,10 +2085,10 @@ private struct ExternalPanelView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 5)
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: 0, style: .continuous)
                     .stroke(AppTheme.outlineStrong, lineWidth: 1.05)
             }
         }
@@ -2256,10 +2243,10 @@ private struct ValidationConfirmationOverlay: View {
             }
             .padding(20)
             .frame(maxWidth: 330)
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                RoundedRectangle(cornerRadius: 0, style: .continuous)
                     .stroke(AppTheme.outlineStrong, lineWidth: 1)
             }
             .shadow(color: .black.opacity(0.3), radius: 24, y: 10)

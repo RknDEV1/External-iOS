@@ -487,12 +487,12 @@ private struct RepositoryFeaturedCard: View {
         .background(Color(uiColor: .secondarySystemFill))
         .clipShape(
             RoundedRectangle(
-                cornerRadius: 14,
+                cornerRadius: 0,
                 style: .continuous
             )
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 0, style: .continuous)
                 .strokeBorder(
                     Color(uiColor: .separator).opacity(0.24),
                     lineWidth: 0.5
