@@ -1348,6 +1348,8 @@ private struct ExternalPanelView: View {
     @State private var externalPatchMessage: String?
     @State private var showPathValidationConfirmation = false
     @State private var pathValidationConfirmationMessage = ""
+    @State private var pathValidationConfirmationTitle = "Ativação concluída"
+    @State private var pathValidationConfirmationIsActivation = true
     @State private var showDemoUnlock = false
     @State private var demoUnlockFunctionID: String?
     private enum ExternalLogLevel: Equatable {
