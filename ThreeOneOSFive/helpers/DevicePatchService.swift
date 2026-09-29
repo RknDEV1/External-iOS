@@ -64,13 +64,13 @@ enum DevicePatchService {
     /// project rules are intentionally not decoded here: this internal-only
     /// flow stores and verifies the package as data and never resolves or
     /// executes any target outside the Raki container.
-    static func validateEmbeddedExternalArtifact(_ bundledURL: URL) throws -> ExternalArtifactReport {
+    static func validateEmbeddedExternalArtifact(_ bundledURL: URL, password: String? = nil) throws -> ExternalArtifactReport {
         guard bundledURL.isFileURL, bundledURL.pathExtension.lowercased() == "3105" else {
             throw PatchPackageError.unsupportedFormat
         }
         let data = try Data(contentsOf: bundledURL, options: [.mappedIfSafe])
         let summary = try PatchPackageCodec.inspect(data)
-        let report = try validateExternalArtifact(at: bundledURL, packageSummary: summary)
+        let report = try validateExternalArtifact(at: bundledURL, password: password, packageSummary: summary)
         guard let expected = expectedEmbeddedSHA256(for: report.filename),
               report.sha256.caseInsensitiveCompare(expected) == .orderedSame else {
             log("external: rejected catalog digest for \(report.filename)")
@@ -269,17 +269,18 @@ enum DevicePatchService {
         try PropertyListDecoder().decode(ExternalInstallReceipt.self, from: Data(contentsOf: url))
     }
 
-    static func validateExternalArtifact(at sourceURL: URL, password: String? = "CHZ") throws -> ExternalArtifactReport {
+    static func validateExternalArtifact(at sourceURL: URL, password: String? = nil) throws -> ExternalArtifactReport {
         let data = try Data(contentsOf: sourceURL, options: [.mappedIfSafe])
         let summary = try PatchPackageCodec.inspect(data)
-        if summary.isPasswordProtected {
+        if summary.isPasswordProtected, let password, !password.isEmpty {
             _ = try PatchPackageCodec.decode(data, password: password)
         }
-        return try validateExternalArtifact(at: sourceURL, packageSummary: summary)
+        return try validateExternalArtifact(at: sourceURL, password: password, packageSummary: summary)
     }
 
     private static func validateExternalArtifact(
         at sourceURL: URL,
+        password: String? = nil,
         packageSummary: PatchPackageSummary?
     ) throws -> ExternalArtifactReport {
         let lowerName = sourceURL.lastPathComponent.lowercased()

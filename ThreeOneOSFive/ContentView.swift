@@ -1023,7 +1023,7 @@ private struct CHZPrivHomeView: View {
                     belongsToSelectedEdition(item) && !isUnavailablePatch(item)
                 }
                 let enabled = Set(scopedItems.compactMap { item in
-                    return DevicePatchService.latestReceipt(projectID: item.id) == nil ? nil : item.id
+                    DevicePatchService.hasExternalWorkingFile(editionKey: safeCatalogEditionKey(for: item)) ? item.id : nil
                 })
                 DispatchQueue.main.async {
                     freeFirePatches = scopedItems
@@ -1040,28 +1040,11 @@ private struct CHZPrivHomeView: View {
             return
         }
 
-        // Todo External protegido pede CHZ no início de cada ativação,
-        // mesmo que o pacote tenha sido desbloqueado em uma sessão anterior.
-        // A retomada após uma senha correta usa afterUnlock para não reabrir a folha.
-        if isEnabled, !afterUnlock, item.category == .external, item.summary.isPasswordProtected {
-            pendingExternalUnlockID = item.id
-            guard patchStore.requestUnlock(for: item, force: true) else {
-                pendingExternalUnlockID = nil
-                pendingExternalPasswordItem = nil
-                return
-            }
-            if isEspOnly(item) {
-                pendingExternalPasswordItem = nil
-                appendLog("ESP ONLY autorizado automaticamente; validando pacote protegido", level: .progress)
-                patchStore.unlock(password: "CHZ")
-                return
-            }
-            pendingExternalPasswordItem = item
-            appendLog("Senha necessária para ativar o patch External", level: .progress)
-            return
-        }
-
-        guard let baseProject = item.project else {
+        guard let baseProject = item.project ?? (item.category == .external ? PatchProject(
+            id: item.id,
+            name: item.packageURL.deletingPathExtension().lastPathComponent,
+            rules: []
+        ) : nil) else {
             appendLog("Patch indisponível: pacote bloqueado ou inválido", level: .warning)
             return
         }
@@ -1111,10 +1094,11 @@ private struct CHZPrivHomeView: View {
     private func applyPatch(item: PatchLibraryItem, baseProject: PatchProject, patchName: String) {
         Task.detached(priority: .userInitiated) {
             do {
-                let project = item.summary.schemaVersion >= 2
-                    ? try PatchProjectLibrary.synchronizeWorkspace(item: item)
-                    : baseProject
-                _ = try DevicePatchService.apply(project: project)
+                _ = baseProject
+                let report = try DevicePatchService.validateExternalArtifact(at: item.packageURL, password: nil)
+                let editionKey = safeCatalogEditionKey(for: item)
+                _ = try DevicePatchService.installExternalArtifact(report, editionKey: editionKey)
+                try DevicePatchService.verifyExternalWorkingFile(editionKey: editionKey)
                 await MainActor.run {
                     enabledPatchIDs.insert(item.id)
                     workingPatchID = nil
@@ -1133,7 +1117,8 @@ private struct CHZPrivHomeView: View {
     }
 
     private func restorePatch(item: PatchLibraryItem, patchName: String) {
-        guard let receipt = DevicePatchService.latestReceipt(projectID: item.id) else {
+        let editionKey = safeCatalogEditionKey(for: item)
+        guard DevicePatchService.hasExternalWorkingFile(editionKey: editionKey) else {
             enabledPatchIDs.remove(item.id)
             isWorking = false
             appendLog("Nenhum backup ativo encontrado", level: .warning)
@@ -1141,7 +1126,7 @@ private struct CHZPrivHomeView: View {
         }
         Task.detached(priority: .userInitiated) {
             do {
-                try DevicePatchService.restore(receipt: receipt)
+                _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: editionKey)
                 await MainActor.run {
                     enabledPatchIDs.remove(item.id)
                     workingPatchID = nil
@@ -1165,6 +1150,13 @@ private struct CHZPrivHomeView: View {
         if activityLog.count > 30 {
             activityLog.removeFirst(activityLog.count - 30)
         }
+    }
+
+    private func safeCatalogEditionKey(for item: PatchLibraryItem) -> String {
+        let edition = isFreeFireMax ? "free-fire-max" : "free-fire"
+        let filename = item.packageURL.lastPathComponent
+            .replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+        return "catalog-\(edition)-\(filename)-\(item.id.uuidString)"
     }
 
     private var activityLogView: some View {
