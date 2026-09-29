@@ -357,6 +357,8 @@ private struct CHZPrivHomeView: View {
     @State private var showCatalogModnewUnlock = false
     @State private var showPathValidationConfirmation = false
     @State private var pathValidationConfirmationMessage = ""
+    @State private var pathValidationConfirmationTitle = "Ativação concluída"
+    @State private var pathValidationConfirmationIsActivation = true
     @State private var activityLog = [LogEntry(
         timestamp: Date().formatted(date: .omitted, time: .shortened),
         message: "Sistema pronto — aguardando patches",
@@ -470,7 +472,9 @@ private struct CHZPrivHomeView: View {
         .overlay {
             if showPathValidationConfirmation {
                 ValidationConfirmationOverlay(
+                    title: pathValidationConfirmationTitle,
                     message: pathValidationConfirmationMessage,
+                    isActivation: pathValidationConfirmationIsActivation,
                     onDismiss: { showPathValidationConfirmation = false }
                 )
             }
@@ -1087,6 +1091,10 @@ private struct CHZPrivHomeView: View {
                     workingPatchID = nil
                     isWorking = false
                     SoundEffectManager.shared.play(.confirmation)
+                    pathValidationConfirmationTitle = "Ativação concluída"
+                    pathValidationConfirmationIsActivation = true
+                    pathValidationConfirmationMessage = "\(patchName) foi ativado, verificado por SHA-256 e gravado somente no sandbox interno."
+                    showPathValidationConfirmation = true
                     appendLog("Patch aplicado e verificado", level: .success)
                 }
             } catch {
@@ -1115,6 +1123,10 @@ private struct CHZPrivHomeView: View {
                     workingPatchID = nil
                     isWorking = false
                     SoundEffectManager.shared.play(.confirmation)
+                    pathValidationConfirmationTitle = "Desativação concluída"
+                    pathValidationConfirmationIsActivation = false
+                    pathValidationConfirmationMessage = "\(patchName) foi desativado e o arquivo original foi restaurado no sandbox interno."
+                    showPathValidationConfirmation = true
                     appendLog("Arquivo original restaurado", level: .success)
                 }
             } catch {
@@ -1515,7 +1527,9 @@ private struct ExternalPanelView: View {
         .overlay {
             if showPathValidationConfirmation {
                 ValidationConfirmationOverlay(
+                    title: pathValidationConfirmationTitle,
                     message: pathValidationConfirmationMessage,
+                    isActivation: pathValidationConfirmationIsActivation,
                     onDismiss: { showPathValidationConfirmation = false }
                 )
             }
@@ -1850,6 +1864,10 @@ private struct ExternalPanelView: View {
                 do {
                     _ = try DevicePatchService.restoreExternalWorkingFile(editionKey: externalEditionKey(for: function))
                     activeExternalPatchIDs.remove(function.id)
+                    pathValidationConfirmationTitle = "Desativação concluída"
+                    pathValidationConfirmationIsActivation = false
+                    pathValidationConfirmationMessage = "\(function.title) foi desativado e o backup original foi restaurado na área privada."
+                    showPathValidationConfirmation = true
                     externalPatchMessage = "\(function.title) desativado e backup original restaurado na área privada."
                     appendExternalLog("[OK] Backup original restaurado; nenhuma área externa acessada")
                 } catch {
@@ -1906,10 +1924,12 @@ private struct ExternalPanelView: View {
                     else { activeExternalPatchIDs.remove(function.id) }
                     workingExternalPatchID = nil
                     externalPatchMessage = enabled ? "Função ativada e verificada." : "Função desativada e original restaurado."
-                    if enabled {
-                        pathValidationConfirmationMessage = "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container privado do app."
-                        showPathValidationConfirmation = true
-                    }
+                    pathValidationConfirmationTitle = enabled ? "Ativação concluída" : "Desativação concluída"
+                    pathValidationConfirmationIsActivation = enabled
+                    pathValidationConfirmationMessage = enabled
+                        ? "\(function.title) foi ativado, verificado por SHA-256 e gravado somente no container privado do app."
+                        : "\(function.title) foi desativado e o arquivo original foi restaurado no container privado do app."
+                    showPathValidationConfirmation = true
                     appendExternalLog(enabled ? "[OK] Recibo e hash confirmados; função ativada" : "[OK] Original restaurado e verificado")
                 }
             } catch {
@@ -2212,7 +2232,9 @@ private struct ExternalDemoUnlockSheet: View {
 }
 
 private struct ValidationConfirmationOverlay: View {
+    let title: String
     let message: String
+    let isActivation: Bool
     let onDismiss: () -> Void
 
     var body: some View {
@@ -2223,10 +2245,10 @@ private struct ValidationConfirmationOverlay: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: isActivation ? "checkmark.square.fill" : "arrow.uturn.backward.square.fill")
                         .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(AppTheme.success)
-                    Text("Ativação concluída")
+                        .foregroundStyle(AppTheme.primaryText)
+                    Text(title)
                         .font(.system(size: 19, weight: .bold))
                        .foregroundStyle(AppTheme.primaryText)
                 }
@@ -2238,7 +2260,7 @@ private struct ValidationConfirmationOverlay: View {
                     .font(.system(size: 15, weight: .semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 11)
-                    .background(AppTheme.primaryText, in: Capsule())
+                    .background(AppTheme.primaryText, in: Rectangle())
                     .foregroundStyle(AppTheme.pageBackground)
             }
             .padding(20)
