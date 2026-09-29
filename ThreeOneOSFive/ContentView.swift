@@ -260,43 +260,6 @@ private struct DashboardView: View {
                 .foregroundStyle(appState.isSupported ? AppTheme.success : AppTheme.primaryText)
             }
 
-            if appState.kernelExploitApplicable {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        Label("Kernel exploit", systemImage: "cpu.fill")
-                            .font(.subheadline.weight(.semibold))
-                        Spacer()
-                        Text(appState.kernelExploitRunning ? "EXECUTANDO" : (appState.exploitStatus.isSuccess ? "ATIVO" : "INATIVO"))
-                            .font(.caption.weight(.bold).monospaced())
-                            .foregroundStyle(appState.exploitStatus.isSuccess ? AppTheme.success : AppTheme.secondaryText)
-                    }
-                    HStack(spacing: 8) {
-                        Button {
-                            appState.activateKernel()
-                        } label: {
-                            Label("Ativar", systemImage: "power")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(appState.kernelExploitRunning || appState.exploitStatus.isSuccess)
-
-                        Button {
-                            appState.deactivateKernel()
-                            pathValidationConfirmationTitle = "Kernel desativado"
-                            pathValidationConfirmationIsActivation = false
-                            pathValidationConfirmationMessage = "A sessão do kernel foi encerrada no app. O iOS não oferece reversão pública das primitivas já obtidas."
-                            showPathValidationConfirmation = true
-                        } label: {
-                            Label("Desativar", systemImage: "stop.fill")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .disabled(appState.kernelExploitRunning || !appState.exploitStatus.isSuccess)
-                    }
-                }
-                .padding(.vertical, 4)
-            }
-
             if appState.kernelExploitApplicable && AppInfo.versionTuple.major < 26 {
                 HStack {
                     Text(language.text("dashboard.kernel_status"))
@@ -417,6 +380,7 @@ private struct CHZPrivHomeView: View {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
                                 editionSelector
+                                kernelControlSection
                                 logo
                                 categoryOverview
                                 functions
@@ -631,6 +595,46 @@ private struct CHZPrivHomeView: View {
             ))
             return false
         }
+    }
+
+    private var kernelControlSection: some View {
+        guard appState.kernelExploitApplicable else { return AnyView(EmptyView()) }
+        return AnyView(
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Label("Kernel exploit", systemImage: "cpu.fill")
+                        .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                    Spacer()
+                    Text(appState.kernelExploitRunning ? "EXECUTANDO" : (appState.exploitStatus.isSuccess ? "ATIVO" : "INATIVO"))
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .foregroundStyle(appState.exploitStatus.isSuccess ? AppTheme.success : AppTheme.secondaryText)
+                }
+                HStack(spacing: 8) {
+                    Button { appState.activateKernel() } label: {
+                        Label("Ativar", systemImage: "power")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(appState.kernelExploitRunning || appState.exploitStatus.isSuccess)
+
+                    Button {
+                        appState.deactivateKernel()
+                        pathValidationConfirmationTitle = "Kernel desativado"
+                        pathValidationConfirmationIsActivation = false
+                        pathValidationConfirmationMessage = "A sessão do kernel foi encerrada no app. O iOS não oferece reversão pública das primitivas já obtidas."
+                        showPathValidationConfirmation = true
+                    } label: {
+                        Label("Desativar", systemImage: "stop.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(appState.kernelExploitRunning || !appState.exploitStatus.isSuccess)
+                }
+            }
+            .padding(14)
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous).stroke(AppTheme.outlineStrong, lineWidth: 1))
+        )
     }
 
     private var editionSelector: some View {
