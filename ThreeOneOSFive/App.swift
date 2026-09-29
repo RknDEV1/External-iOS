@@ -169,15 +169,30 @@ class AppState: ObservableObject {
     var isSupported: Bool { unsupportedMessage == nil }
 
     func detectSupport() {
+        let v = AppInfo.versionTuple
+        let supported = ExploitSupportPolicy.isSupported(
+            major: v.major,
+            minor: v.minor,
+            patch: v.patch,
+            build: AppInfo.osBuild
+        )
         kernelExploitRunning = false
-        if kernelExploitApplicable {
+#if targetEnvironment(simulator)
+        if ProcessInfo.processInfo.arguments.contains("--simulate-access") {
+            exploitStatus = .success(method: "Simulator preview")
             unsupportedMessage = nil
-            exploitStatus = .notStarted
-            refreshKernelExploitStatus()
-        } else {
-            unsupportedMessage = "Este dispositivo/iOS não está na faixa suportada pelo exploit"
-            exploitStatus = .unsupported(unsupportedMessage ?? "Versão não suportada")
+            return
         }
+#endif
+        guard supported else {
+            unsupportedMessage = "iOS \(AppInfo.osVersion) (\(AppInfo.osBuild)) não está na faixa suportada"
+            exploitStatus = .unsupported(unsupportedMessage ?? "Versão não suportada")
+            return
+        }
+        unsupportedMessage = nil
+        exploitStatus = .notStarted
+        refreshKernelExploitStatus()
+        maybeAutoRunKernelExploit()
     }
 
     private func maybeAutoRunKernelExploit() {
@@ -209,6 +224,11 @@ class AppState: ObservableObject {
     }
 
     func runKernelExploitIfNeeded() {
+        refreshKernelExploitStatus()
+        guard kernelExploitApplicable,
+              !kernelExploitRunning,
+              !exploitStatus.isSuccess,
+              !exploitStatus.isFailed else { return }
         activateKernel()
     }
 
