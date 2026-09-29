@@ -94,7 +94,7 @@ struct WallpaperLabView: View {
                 .foregroundStyle(AppTheme.secondaryText)
             } else if let accessError {
                 Label(accessError, systemImage: "xmark.shield.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppTheme.primaryText)
                 Button(language.text("wallpaper.try_again")) { checkAccess() }
             } else {
                 HStack(spacing: 10) {
@@ -154,7 +154,7 @@ struct WallpaperLabView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(package.displayName)
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(1)
                 Text(
                     language.text(

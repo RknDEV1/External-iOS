@@ -130,7 +130,7 @@ struct PatchProjectEditorView: View {
                 if let validationMessageKey {
                     Section {
                         Label(language.text(validationMessageKey), systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(AppTheme.primaryText)
                     }
                 }
             }
@@ -160,7 +160,7 @@ struct PatchProjectEditorView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(rule.bundleID)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(AppTheme.primaryText)
+               .foregroundStyle(AppTheme.primaryText)
             Text(rule.relativePath)
                 .font(.caption.monospaced())
                 .foregroundStyle(AppTheme.secondaryText)
@@ -291,7 +291,7 @@ struct PatchRuleEditorView: View {
                                 Text(replacementFilename.isEmpty
                                      ? language.text("patch.choose_file")
                                      : replacementFilename)
-                                    .foregroundStyle(AppTheme.primaryText)
+                                   .foregroundStyle(AppTheme.primaryText)
                                     .lineLimit(1)
                                 Text(language.text(replacementFilename.isEmpty
                                      ? "patch.replacement_required"
@@ -329,7 +329,7 @@ struct PatchRuleEditorView: View {
                 if let validationMessageKey {
                     Section {
                         Label(language.text(validationMessageKey), systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(AppTheme.primaryText)
                     }
                 }
             }

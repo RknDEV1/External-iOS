@@ -326,7 +326,7 @@ struct LegacyRepositorySourcesView: View {
             .foregroundStyle(.secondary)
         case .failed(let error):
             Label(language.text(error.localizationKey), systemImage: "exclamationmark.triangle.fill")
-                .foregroundStyle(.red)
+                .foregroundStyle(AppTheme.primaryText)
                 .lineLimit(2)
         }
     }

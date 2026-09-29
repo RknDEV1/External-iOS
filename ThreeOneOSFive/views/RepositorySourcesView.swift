@@ -190,7 +190,7 @@ private struct RepositorySourceStatus: View {
                 language.text(error.localizationKey),
                 systemImage: "exclamationmark.triangle.fill"
             )
-            .foregroundStyle(.red)
+            .foregroundStyle(AppTheme.primaryText)
             .lineLimit(2)
         }
     }

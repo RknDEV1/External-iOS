@@ -69,7 +69,7 @@ struct FolderPatchSelectionView: View {
                         systemImage: "exclamationmark.triangle.fill"
                     )
                     .font(.subheadline)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(AppTheme.primaryText)
                 }
             }
 
@@ -85,7 +85,7 @@ struct FolderPatchSelectionView: View {
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(candidate.url.lastPathComponent)
                                     .font(.subheadline.weight(.medium))
-                                    .foregroundStyle(AppTheme.primaryText)
+                                   .foregroundStyle(AppTheme.primaryText)
                                     .lineLimit(1)
                                 Text(candidate.relativePath)
                                     .font(.caption2.monospaced())

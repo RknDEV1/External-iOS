@@ -257,7 +257,7 @@ private struct DashboardView: View {
                 Text(language.text("settings.compatibility"))
                 Spacer()
                 Text(language.text(appState.isSupported ? "settings.supported" : "settings.unsupported"))
-                .foregroundStyle(appState.isSupported ? AppTheme.success : Color.red)
+                .foregroundStyle(appState.isSupported ? AppTheme.success : AppTheme.primaryText)
             }
 
             if appState.kernelExploitApplicable && AppInfo.versionTuple.major < 26 {
@@ -317,7 +317,7 @@ private struct CHZPrivHomeView: View {
             case .info: return AppTheme.secondaryText
             case .progress: return AppTheme.accentBright
             case .success: return AppTheme.success
-            case .warning: return Color.orange
+            case .warning: return AppTheme.primaryText
             }
         }
 
@@ -627,7 +627,7 @@ private struct CHZPrivHomeView: View {
                 Image(systemName: symbol)
                     .font(.system(size: 20, weight: .semibold))
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .default))
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
             }
             .foregroundStyle(selectedPage == page ? AppTheme.accentBright : AppTheme.secondaryText)
             .frame(maxWidth: .infinity)
@@ -679,10 +679,10 @@ private struct CHZPrivHomeView: View {
                 .foregroundStyle(AppTheme.accentBright)
             VStack(alignment: .leading, spacing: 1) {
                 Text(category.rawValue.uppercased())
-                    .font(.system(size: 11, weight: .bold, design: .default))
-                    .foregroundStyle(AppTheme.primaryText)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                   .foregroundStyle(AppTheme.primaryText)
                 Text("\(count) funções")
-                    .font(.system(size: 10, weight: .medium, design: .default))
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
@@ -712,7 +712,7 @@ private struct CHZPrivHomeView: View {
                 Text(category.rawValue.uppercased())
                     .font(.system(size: 20, weight: .bold))
                     .tracking(0.6)
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                 Spacer()
                 Text("\(displayedCount)")
                     .font(.system(size: 14, weight: .bold))
@@ -748,10 +748,10 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text("PAINEL EXTERNAL")
-                    .font(.system(size: 17, weight: .bold, design: .default))
-                    .foregroundStyle(AppTheme.primaryText)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                   .foregroundStyle(AppTheme.primaryText)
                 Text("externo.3105 · ESP com painel interno de funções e configurações.")
-                    .font(.system(size: 12, weight: .medium, design: .default))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
@@ -782,10 +782,10 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text("CHPAINEL")
-                    .font(.system(size: 17, weight: .bold, design: .default))
-                    .foregroundStyle(AppTheme.primaryText)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                   .foregroundStyle(AppTheme.primaryText)
                 Text("Painel interno com funções e configurações.")
-                    .font(.system(size: 12, weight: .medium, design: .default))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
@@ -818,10 +818,10 @@ private struct CHZPrivHomeView: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text("RAKI")
-                    .font(.system(size: 17, weight: .bold, design: .default))
-                    .foregroundStyle(AppTheme.primaryText)
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                   .foregroundStyle(AppTheme.primaryText)
                 Text("ESP com assistência de mira e painel externo.")
-                    .font(.system(size: 12, weight: .medium, design: .default))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(1)
             }
@@ -860,20 +860,20 @@ private struct CHZPrivHomeView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(title.uppercased())
-                    .font(.system(size: 17, weight: .bold, design: .default))
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
                     .tracking(0.25)
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(2)
                 if unavailable {
                     Text("INDISPONÍVEL")
-                        .font(.system(size: 10, weight: .bold, design: .default))
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
                         .tracking(0.7)
-                        .foregroundStyle(Color.orange)
+                       .foregroundStyle(AppTheme.primaryText)
                 }
                 if !description.isEmpty {
                     Text(description)
-                        .font(.system(size: 12, weight: .medium, design: .default))
-                        .foregroundStyle(unavailable ? Color.orange.opacity(0.82) : AppTheme.tertiaryText)
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(unavailable ? AppTheme.primaryText.opacity(0.82) : AppTheme.tertiaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                         .allowsTightening(true)
@@ -913,11 +913,7 @@ private struct CHZPrivHomeView: View {
         .shadow(color: .clear, radius: 0)
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(LinearGradient(
-                    colors: [.white.opacity(0.13), .clear],
-                    startPoint: .topLeading,
-                    endPoint: .center
-                ))
+                .fill(Color.white.opacity(0.06))
                 .frame(height: 28)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .allowsHitTesting(false)
@@ -1175,10 +1171,10 @@ private struct CHZPrivHomeView: View {
                     Text("RAKI // SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
-                        .foregroundStyle(Color.green.opacity(0.96))
+                        .foregroundStyle(AppTheme.primaryText.opacity(0.96))
                     Text("PROCESSO EM TEMPO REAL · \(enabledPatchIDs.count) PATCH(S) ATIVO(S)")
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color.green.opacity(0.62))
+                        .foregroundStyle(AppTheme.primaryText.opacity(0.62))
                 }
                 Spacer()
                 Circle()
@@ -1201,10 +1197,10 @@ private struct CHZPrivHomeView: View {
                                     Text("› \(entry.message)")
                                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                                         .lineLimit(3)
-                                        .foregroundStyle(entry.level == .warning ? Color.orange : Color.green.opacity(0.88))
+                                        .foregroundStyle(entry.level == .warning ? AppTheme.primaryText : AppTheme.primaryText.opacity(0.88))
                                     Text(entry.timestamp)
                                         .font(.system(size: 9, weight: .medium, design: .monospaced))
-                                        .foregroundStyle(Color.green.opacity(0.42))
+                                        .foregroundStyle(AppTheme.primaryText.opacity(0.42))
                                 }
                                 Spacer(minLength: 0)
                             }
@@ -1224,18 +1220,14 @@ private struct CHZPrivHomeView: View {
         }
         .padding(15)
         .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .background(Color.green.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .background(AppTheme.primaryText.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.05)
         }
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 15, style: .continuous)
-                .fill(LinearGradient(
-                    colors: [.white.opacity(0.10), .clear],
-                    startPoint: .topLeading,
-                    endPoint: .center
-                ))
+                .fill(Color.white.opacity(0.05))
                 .frame(height: 24)
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
                 .allowsHitTesting(false)
@@ -1266,16 +1258,8 @@ private struct CHZSwitchStyle: ToggleStyle {
             ZStack(alignment: configuration.isOn ? .trailing : .leading) {
                 Capsule(style: .continuous)
                     .fill(configuration.isOn
-                    ? LinearGradient(
-                        colors: [AppTheme.accentBright, AppTheme.accent],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    : LinearGradient(
-                        colors: [Color.white.opacity(0.16), Color.black.opacity(0.35)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
+                    ? AppTheme.accentBright
+                    : Color.white.opacity(0.16))
                     .background(AppTheme.cardBackground, in: Capsule(style: .continuous))
                     .frame(width: 58, height: 34)
                     .overlay {
@@ -1284,7 +1268,7 @@ private struct CHZSwitchStyle: ToggleStyle {
                     }
 
                 Circle()
-                    .fill(configuration.isOn ? Color.white : Color(red: 0.70, green: 0.70, blue: 0.74))
+                    .fill(Color.white.opacity(configuration.isOn ? 1.0 : 0.72))
                     .frame(width: 28, height: 28)
                     .shadow(color: .black.opacity(0.28), radius: 2, y: 1)
                     .padding(3)
@@ -1320,7 +1304,7 @@ private struct ExternalPatchUnlockView: View {
                     if let errorKey = store.unlockErrorKey {
                         Text(errorKey == "patch.error.wrong_password" ? "Senha incorreta ou pacote inválido." : "Não foi possível desbloquear o patch.")
                             .font(.footnote)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(AppTheme.primaryText)
                     }
                 }
                 Section {
@@ -1623,8 +1607,8 @@ private struct ExternalPanelView: View {
                 .tracking(1.0)
                 .foregroundStyle(AppTheme.accentBright)
             Text(isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE")
-                .font(.system(size: 24, weight: .black, design: .default))
-                .foregroundStyle(AppTheme.primaryText)
+                .font(.system(size: 24, weight: .black, design: .rounded))
+               .foregroundStyle(AppTheme.primaryText)
         }
     }
 
@@ -1646,10 +1630,10 @@ private struct ExternalPanelView: View {
                     Text("RAKI // SYSTEM LOG")
                         .font(.system(size: 15, weight: .black, design: .monospaced))
                         .tracking(0.55)
-                        .foregroundStyle(Color.green.opacity(0.96))
+                        .foregroundStyle(AppTheme.primaryText.opacity(0.96))
                     Text("PROCESSO EM TEMPO REAL · \(activeExternalPatchIDs.count) PATCH(S) ATIVO(S)")
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color.green.opacity(0.62))
+                        .foregroundStyle(AppTheme.primaryText.opacity(0.62))
                 }
                 Spacer()
                 Circle()
@@ -1671,10 +1655,10 @@ private struct ExternalPanelView: View {
                                     Text("› \(entry.message)")
                                         .font(.system(size: 11, weight: .semibold, design: .monospaced))
                                         .lineLimit(3)
-                                        .foregroundStyle(entry.level == .warning ? .orange : Color.green.opacity(0.88))
+                                        .foregroundStyle(entry.level == .warning ? .orange : AppTheme.primaryText.opacity(0.88))
                                     Text(entry.timestamp)
                                         .font(.system(size: 9, weight: .medium, design: .monospaced))
-                                        .foregroundStyle(Color.green.opacity(0.42))
+                                        .foregroundStyle(AppTheme.primaryText.opacity(0.42))
                                 }
                                 Spacer(minLength: 0)
                             }
@@ -1694,14 +1678,14 @@ private struct ExternalPanelView: View {
         }
         .padding(15)
         .background(Color.black.opacity(0.92), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .background(Color.green.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .background(AppTheme.primaryText.opacity(0.035), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .stroke(AppTheme.outline, lineWidth: 1.05)
         }
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 15, style: .continuous)
-                .fill(LinearGradient(colors: [.white.opacity(0.10), .clear], startPoint: .topLeading, endPoint: .center))
+                .fill(Color.white.opacity(0.05))
                 .frame(height: 24)
                 .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
                 .allowsHitTesting(false)
@@ -1717,8 +1701,8 @@ private struct ExternalPanelView: View {
                         .tracking(1.1)
                         .foregroundStyle(AppTheme.accentBright)
                     Text("External Menu")
-                        .font(.system(size: 28, weight: .black, design: .default))
-                        .foregroundStyle(AppTheme.primaryText)
+                        .font(.system(size: 28, weight: .black, design: .rounded))
+                       .foregroundStyle(AppTheme.primaryText)
                 }
                 Spacer()
                 Image(systemName: "rectangle.3.group.fill")
@@ -1726,7 +1710,7 @@ private struct ExternalPanelView: View {
                     .foregroundStyle(AppTheme.accentBright)
             }
             Text("Central de status, diagnóstico e configurações internas do aplicativo.")
-                .font(.system(size: 13, weight: .medium, design: .default))
+                .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
         }
     }
@@ -1740,8 +1724,8 @@ private struct ExternalPanelView: View {
                     .frame(width: 34)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(editionName)
-                        .font(.system(size: 17, weight: .bold, design: .default))
-                        .foregroundStyle(AppTheme.primaryText)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                       .foregroundStyle(AppTheme.primaryText)
                     Text(editionStatus)
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundStyle(AppTheme.success)
@@ -1782,7 +1766,7 @@ private struct ExternalPanelView: View {
                 Text("FUNÇÕES")
                     .font(.system(size: 20, weight: .bold))
                     .tracking(0.6)
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                 Spacer()
                 Text("\(externalFunctions.count)")
                     .font(.system(size: 14, weight: .bold))
@@ -1813,12 +1797,12 @@ private struct ExternalPanelView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(function.title.uppercased())
-                    .font(.system(size: 17, weight: .bold, design: .default))
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
                     .tracking(0.25)
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(2)
                 Text(function.detail)
-                    .font(.system(size: 13, weight: .medium, design: .default))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.tertiaryText)
                     .lineLimit(2)
             }
@@ -1852,11 +1836,7 @@ private struct ExternalPanelView: View {
         .shadow(color: .clear, radius: 0)
         .overlay(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(LinearGradient(
-                    colors: [.white.opacity(0.13), .clear],
-                    startPoint: .topLeading,
-                    endPoint: .center
-                ))
+                .fill(Color.white.opacity(0.06))
                 .frame(height: 28)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .allowsHitTesting(false)
@@ -2070,13 +2050,13 @@ private struct ExternalPanelView: View {
                     .buttonStyle(.bordered)
                     .disabled(externalBackup == nil)
                 }
-                .font(.system(size: 12, weight: .semibold, design: .default))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .padding(.vertical, 8)
             }
 
             if let externalMessage {
                 Text(externalMessage)
-                    .font(.system(size: 11, weight: .medium, design: .default))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 6)
@@ -2100,7 +2080,7 @@ private struct ExternalPanelView: View {
             Image(systemName: "lock.shield.fill")
                 .foregroundStyle(AppTheme.accentBright)
             Text("Este painel controla somente estados, diagnósticos e preferências internas. Nenhuma função deste painel altera memória, arquivos ou comportamento de outro aplicativo.")
-                .font(.system(size: 12, weight: .medium, design: .default))
+                .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -2134,10 +2114,10 @@ private struct ExternalPanelView: View {
                 .frame(width: 24)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .default))
-                    .foregroundStyle(AppTheme.primaryText)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                   .foregroundStyle(AppTheme.primaryText)
                 Text(detail)
-                    .font(.system(size: 11, weight: .medium, design: .default))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
@@ -2151,8 +2131,8 @@ private struct ExternalPanelView: View {
                 .foregroundStyle(AppTheme.accentBright)
                 .frame(width: 24)
             Text(title)
-                .font(.system(size: 15, weight: .semibold, design: .default))
-                .foregroundStyle(AppTheme.primaryText)
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+               .foregroundStyle(AppTheme.primaryText)
             Spacer(minLength: 8)
             Text(value)
                 .font(.system(size: 12, weight: .bold, design: .monospaced))
@@ -2196,7 +2176,7 @@ private struct ExternalDemoUnlockSheet: View {
                         .autocorrectionDisabled(true)
                     if let errorMessage {
                         Text(errorMessage)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(AppTheme.primaryText)
                             .font(.footnote)
                     }
                 }
@@ -2261,7 +2241,7 @@ private struct ValidationConfirmationOverlay: View {
                         .foregroundStyle(AppTheme.success)
                     Text("Ativação concluída")
                         .font(.system(size: 19, weight: .bold))
-                        .foregroundStyle(AppTheme.primaryText)
+                       .foregroundStyle(AppTheme.primaryText)
                 }
                 Text(message)
                     .font(.system(size: 14, weight: .medium))

@@ -171,7 +171,7 @@ struct CleanerView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(record.app.displayName)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
                 Text(record.app.bundleID)
                     .font(.caption2.monospaced())

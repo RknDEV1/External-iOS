@@ -103,7 +103,7 @@ struct OnboardingView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(option.displayName)
                                     .font(.body.weight(.semibold))
-                                    .foregroundStyle(AppTheme.primaryText)
+                                   .foregroundStyle(AppTheme.primaryText)
                                 Text(option.rawValue == "en" ? "English" : option.rawValue == "vi" ? "Tiếng Việt" : "简体中文")
                                     .font(.caption)
                                     .foregroundStyle(AppTheme.secondaryText)
@@ -204,7 +204,7 @@ struct OnboardingView: View {
                 versionRow(icon: "checkmark.circle.fill", title: "iOS 26", value: ExploitSupportPolicy.verifiedIOS26Range, color: .green)
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(AppTheme.primaryText)
                         Text("iOS 27.0").font(.subheadline.weight(.semibold))
                         Spacer()
                         Text(language.text("onboarding.beta")).font(.caption.weight(.semibold)).foregroundStyle(AppTheme.secondaryText)
@@ -292,7 +292,7 @@ struct OnboardingView: View {
                 .font(.body.weight(.semibold))
             Text(text)
                 .font(.subheadline)
-                .foregroundStyle(AppTheme.primaryText)
+               .foregroundStyle(AppTheme.primaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }

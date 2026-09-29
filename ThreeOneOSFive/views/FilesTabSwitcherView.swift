@@ -79,7 +79,7 @@ struct FilesTabSwitcherView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(tab.displayTitle(defaultTitle: language.text("browser.tabs_root")))
                     .font(.body.weight(tab.id == session.selectedTabID ? .semibold : .regular))
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                     .lineLimit(1)
                 Text(tab.currentPath ?? language.text("browser.tabs_root_detail"))
                     .font(.caption.monospaced())

@@ -219,7 +219,7 @@ private struct PatchProjectRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(item.project?.name ?? language.text("patch.locked_project"))
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
                 Text(item.isLocked
                      ? language.text("patch.tap_to_unlock")
                      : language.text(
@@ -261,7 +261,7 @@ private struct PatchUnlockView: View {
                     if let errorKey = store.unlockErrorKey {
                         Text(language.text(errorKey))
                             .font(.footnote)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(AppTheme.primaryText)
                     }
                 } footer: {
                     Text(language.text("patch.password_once_message"))
@@ -481,7 +481,7 @@ private struct PatchProjectDetailView: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(rule.bundleID)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(AppTheme.primaryText)
+               .foregroundStyle(AppTheme.primaryText)
             Text(rule.relativePath)
                 .font(.caption.monospaced())
                 .foregroundStyle(AppTheme.secondaryText)

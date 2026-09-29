@@ -49,7 +49,7 @@ struct SettingsView: View {
                         Text(language.text("settings.current_version"))
                         Spacer()
                         Text(language.text(appState.isSupported ? "settings.supported" : "settings.unsupported"))
-                        .foregroundStyle(appState.isSupported ? AppTheme.success : Color.red)
+                        .foregroundStyle(appState.isSupported ? AppTheme.success : AppTheme.primaryText)
                     }
                     LabeledContent("iOS 17", value: ExploitSupportPolicy.verifiedIOS17Range)
                     LabeledContent("iOS 18", value: ExploitSupportPolicy.verifiedIOS18Range)
@@ -155,7 +155,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(name)
                             .font(.headline)
-                            .foregroundStyle(AppTheme.primaryText)
+                           .foregroundStyle(AppTheme.primaryText)
                         Text(role)
                             .font(.caption)
                             .foregroundStyle(AppTheme.secondaryText)

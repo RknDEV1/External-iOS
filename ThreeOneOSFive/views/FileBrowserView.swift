@@ -1559,7 +1559,7 @@ private struct FileSelectionActionBar: View {
             .frame(maxWidth: .infinity, minHeight: 34)
         }
         .buttonStyle(.plain)
-        .foregroundStyle(role == .destructive ? Color.red : AppTheme.accent)
+        .foregroundStyle(role == .destructive ? AppTheme.primaryText : AppTheme.accent)
         .accessibilityLabel(language.text(key))
         .accessibilityValue(language.text("browser.selected_count", Int64(selectedCount)))
     }

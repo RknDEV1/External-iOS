@@ -24,20 +24,20 @@ struct CHZAccessOverlay: View {
                     Circle()
                         .fill(Color.white.opacity(0.07))
                         .frame(width: 54, height: 54)
-                        .overlay(Circle().stroke(Color.red.opacity(0.72), lineWidth: 1))
+                        .overlay(Circle().stroke(AppTheme.primaryText.opacity(0.72), lineWidth: 1))
 
                     Image(systemName: secondsRemaining == 0 ? "lock.slash" : "lock.fill")
                         .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(Color.red.opacity(0.95))
+                        .foregroundStyle(AppTheme.primaryText.opacity(0.95))
                 }
 
                 Text("Raki")
-                    .font(.system(size: 18, weight: .bold, design: .default))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .tracking(1.3)
                     .foregroundStyle(.white)
 
                 Text(isRestoringSession ? "Validando sessão neste dispositivo" : "Acesso protegido")
-                    .font(.system(size: 12, weight: .medium, design: .default))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.62))
 
                 SecureField("Insira sua key", text: $key)
@@ -49,18 +49,18 @@ struct CHZAccessOverlay: View {
                     .padding(.horizontal, 13)
                     .frame(height: 44)
                     .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(Color.red.opacity(0.56), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(AppTheme.primaryText.opacity(0.56), lineWidth: 1))
                     .foregroundStyle(.white)
                     .disabled(isSubmitting || isRestoringSession || secondsRemaining == 0)
 
                 HStack {
                     Text("Tempo restante")
-                        .font(.system(size: 11, weight: .medium, design: .default))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.55))
                     Spacer()
                     Text("00:\(String(format: "%02d", secondsRemaining))")
                         .font(.system(size: 12, weight: .bold, design: .monospaced))
-                        .foregroundStyle(secondsRemaining <= 5 ? .red : .white.opacity(0.82))
+                        .foregroundStyle(.white.opacity(secondsRemaining <= 5 ? 1.0 : 0.82))
                 }
 
                 Button(action: submit) {
@@ -70,18 +70,18 @@ struct CHZAccessOverlay: View {
                             ProgressView().tint(.white)
                         }
                     }
-                    .font(.system(size: 14, weight: .bold, design: .default))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .frame(height: 42)
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.white)
-                .background(Color.red.opacity(0.82), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+                .background(AppTheme.primaryText.opacity(0.82), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .disabled(isSubmitting || isRestoringSession || normalizedKey.isEmpty || secondsRemaining == 0)
 
                 Text(errorMessage ?? " ")
-                    .font(.system(size: 11, weight: .medium, design: .default))
-                    .foregroundStyle(.red.opacity(0.95))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.95))
                     .multilineTextAlignment(.center)
                     .frame(minHeight: 28, alignment: .top)
                     .opacity(errorMessage == nil ? 0 : 1)
@@ -92,7 +92,7 @@ struct CHZAccessOverlay: View {
             .frame(width: min(UIScreen.main.bounds.width - 42, 330))
             .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .background(Color.black.opacity(0.80), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.red.opacity(0.74), lineWidth: 1.2))
+            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(AppTheme.primaryText.opacity(0.74), lineWidth: 1.2))
             .shadow(color: .clear, radius: 0)
         }
         .onReceive(timer) { _ in tick() }

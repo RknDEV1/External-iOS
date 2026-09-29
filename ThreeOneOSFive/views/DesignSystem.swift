@@ -5,16 +5,16 @@ enum AppTheme {
     // Raki: interface monocromática, plana e discreta.
     static let accent = Color.white
     static let accentBright = Color.white
-    static let accentSoft = Color.white.opacity(0.10)
-    static let outline = Color.white.opacity(0.08)
-    static let outlineStrong = Color.white.opacity(0.16)
+    static let accentSoft = Color.white.opacity(0.12)
+    static let outline = Color.white.opacity(0.14)
+    static let outlineStrong = Color.white.opacity(0.24)
     static let pageBackground = Color.black
-    static let consoleBackground = Color(red: 0.06, green: 0.06, blue: 0.07)
-    static let cardBackground = Color(red: 0.105, green: 0.105, blue: 0.115)
-    static let fieldBackground = Color(red: 0.145, green: 0.145, blue: 0.155)
+    static let consoleBackground = Color.black
+    static let cardBackground = Color.white.opacity(0.08)
+    static let fieldBackground = Color.white.opacity(0.12)
     static let primaryText = Color.white
-    static let secondaryText = Color(red: 0.66, green: 0.66, blue: 0.69)
-    static let tertiaryText = Color(red: 0.50, green: 0.50, blue: 0.53)
+    static let secondaryText = Color.white.opacity(0.72)
+    static let tertiaryText = Color.white.opacity(0.52)
     static let success = Color.white
     static let pageInset: CGFloat = 16
     static let rowIconSize: CGFloat = 17
@@ -28,7 +28,7 @@ enum AppTheme {
     static let contentCardCornerRadius: CGFloat = 14
     static let contentCardInset: CGFloat = 14
     static let contentCardPadding: CGFloat = 14
-    static let brandFontName = "SF Pro"
+    static let brandFontName = "SF Pro Rounded"
 }
 
 struct CHZPrivWordmark: View {
@@ -36,8 +36,8 @@ struct CHZPrivWordmark: View {
 
     var body: some View {
         Text("Raki")
-            .font(.system(size: size, weight: .semibold, design: .default))
-            .foregroundStyle(AppTheme.primaryText)
+            .font(.system(size: size, weight: .semibold, design: .rounded))
+           .foregroundStyle(AppTheme.primaryText)
             .accessibilityLabel("Raki")
     }
 }
@@ -79,7 +79,7 @@ struct AppSearchField: View {
 
             TextField(prompt, text: $text)
                 .font(.body)
-                .foregroundStyle(AppTheme.primaryText)
+               .foregroundStyle(AppTheme.primaryText)
                 .tint(AppTheme.accent)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -114,7 +114,7 @@ struct AppLogo: View {
     var body: some View {
         Image(systemName: "shippingbox.fill")
             .font(.system(size: size * 0.44, weight: .medium))
-            .foregroundStyle(AppTheme.primaryText)
+           .foregroundStyle(AppTheme.primaryText)
             .frame(width: size, height: size)
             .background(AppTheme.fieldBackground, in: RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
             .accessibilityHidden(true)
@@ -126,8 +126,8 @@ struct AppThemeModifier: ViewModifier {
         content
             .preferredColorScheme(.dark)
             .tint(AppTheme.accent)
-            .environment(\.font, .system(.body, design: .default))
-            .foregroundStyle(AppTheme.primaryText)
+            .environment(\.font, .system(.body, design: .rounded))
+           .foregroundStyle(AppTheme.primaryText)
             .scrollContentBackground(.hidden)
             .background(AppTheme.pageBackground.ignoresSafeArea())
     }

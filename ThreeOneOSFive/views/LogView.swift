@@ -81,7 +81,7 @@ struct LogView: View {
         VStack(spacing: 0) {
             Text(entry)
                 .font(.system(.caption, design: .monospaced))
-                .foregroundStyle(AppTheme.primaryText)
+               .foregroundStyle(AppTheme.primaryText)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 11)

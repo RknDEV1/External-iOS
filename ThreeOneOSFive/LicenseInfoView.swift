@@ -45,9 +45,9 @@ struct LicenseInfoView: View {
             VStack(alignment: .leading, spacing: 3) {
                 CHZPrivWordmark(size: 24)
                 Text("INFORMAÇÕES DA LICENÇA")
-                    .font(.system(size: 17, weight: .bold, design: .default))
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
                     .tracking(0.45)
-                    .foregroundStyle(AppTheme.primaryText)
+                   .foregroundStyle(AppTheme.primaryText)
             }
             Spacer()
         }
@@ -87,7 +87,7 @@ struct LicenseInfoView: View {
 
     private var footerNote: some View {
         Text("A chave é armazenada no Keychain. Os estados de segurança só são exibidos como ativos quando existe uma verificação correspondente no aplicativo.")
-            .font(.system(size: 12, weight: .medium, design: .default))
+            .font(.system(size: 12, weight: .medium, design: .rounded))
             .foregroundStyle(AppTheme.secondaryText)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 2)
@@ -97,9 +97,9 @@ struct LicenseInfoView: View {
     private func infoSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 9) {
             Text(title)
-                .font(.system(size: 15, weight: .bold, design: .default))
+                .font(.system(size: 15, weight: .bold, design: .rounded))
                 .tracking(0.6)
-                .foregroundStyle(AppTheme.primaryText)
+               .foregroundStyle(AppTheme.primaryText)
 
             VStack(spacing: 0) {
                 content()
@@ -134,8 +134,8 @@ struct LicenseInfoView: View {
     ) -> some View {
         HStack(alignment: .center, spacing: 12) {
             Text(label)
-                .font(.system(size: 15, weight: .medium, design: .default))
-                .foregroundStyle(AppTheme.primaryText)
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+               .foregroundStyle(AppTheme.primaryText)
                 .lineLimit(1)
 
             Spacer(minLength: 8)
@@ -143,7 +143,7 @@ struct LicenseInfoView: View {
             Text(value)
                 .font(monospaced
                     ? .system(size: 14, weight: .medium, design: .monospaced)
-                    : .system(size: 15, weight: .semibold, design: .default)
+                    : .system(size: 15, weight: .semibold, design: .rounded)
                 )
                 .foregroundStyle(valueColor)
                 .multilineTextAlignment(.trailing)
