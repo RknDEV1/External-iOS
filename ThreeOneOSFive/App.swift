@@ -185,8 +185,14 @@ class AppState: ObservableObject {
         }
 #endif
         guard supported else {
-            unsupportedMessage = "iOS \(AppInfo.osVersion) (\(AppInfo.osBuild)) não está na faixa suportada"
-            exploitStatus = .unsupported(unsupportedMessage ?? "Versão não suportada")
+            unsupportedMessage = ExploitSupportPolicy.supportReason(
+                major: v.major,
+                minor: v.minor,
+                patch: v.patch,
+                build: AppInfo.osBuild
+            )
+            exploitStatus = .unsupported(unsupportedMessage ?? "Offsets não validados")
+            log("kexploit: blocked safely — \(unsupportedMessage ?? "unknown compatibility reason")")
             return
         }
         unsupportedMessage = nil
@@ -233,7 +239,19 @@ class AppState: ObservableObject {
     }
 
     func activateKernel() {
-        guard kernelExploitApplicable, !kernelExploitRunning else { return }
+        guard kernelExploitApplicable else {
+            let v = AppInfo.versionTuple
+            unsupportedMessage = ExploitSupportPolicy.supportReason(
+                major: v.major,
+                minor: v.minor,
+                patch: v.patch,
+                build: AppInfo.osBuild
+            )
+            exploitStatus = .unsupported(unsupportedMessage ?? "Offsets não validados")
+            log("kexploit: activation refused safely — offsets are not validated")
+            return
+        }
+        guard !kernelExploitRunning else { return }
         kernelExploitRunning = true
         exploitStatus = .notStarted
         log("app: manual kernel activation requested")

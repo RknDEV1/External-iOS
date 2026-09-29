@@ -5,19 +5,17 @@ enum ExploitSupportPolicy {
     static let verifiedIOS18Range = "18.0–18.7.1"
     static let verifiedIOS26Range = "26.0.x"
 
-    static let verifiedIOS27Builds: [(beta: Int, publicBeta: Int?, build: String)] = [
-        (1, nil, "24A5355q"),
-        (2, nil, "24A5370h"),
-        (3, 1, "24A5380h"),
-        (4, 2, "24A5390f")
-    ]
-
-    static func iOS27BetaNumber(for build: String) -> Int? {
-        verifiedIOS27Builds.first { $0.build == build }?.beta
-    }
-
-    static func iOS27PublicBetaNumber(for build: String) -> Int? {
-        verifiedIOS27Builds.first { $0.build == build }?.publicBeta
+    static func supportReason(major: Int, minor: Int, patch: Int, build: String) -> String {
+        if major == 27 {
+            return "iOS 27 beta (\(build)) detectado: offsets nativos ainda não foram validados para este build"
+        }
+        if major > 27 {
+            return "iOS \(major).\(minor).\(patch) não possui offsets nativos validados"
+        }
+        if major == 26 && minor > 0 {
+            return "iOS 26.\(minor) não possui offsets nativos validados; somente iOS 26.0.x"
+        }
+        return "iOS \(major).\(minor).\(patch) (\(build)) não está na faixa validada"
     }
 
     static func supportsKernelExploit(major: Int, minor: Int, patch: Int) -> Bool {
