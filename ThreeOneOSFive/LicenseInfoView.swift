@@ -19,12 +19,9 @@ struct LicenseInfoView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 16) {
                 pageHeader
                 licenseSection
-                deviceSection
-                securitySection
-                footerNote
             }
             .padding(.horizontal, AppTheme.pageInset)
             .padding(.top, 18)
@@ -40,30 +37,17 @@ struct LicenseInfoView: View {
     }
 
     private var pageHeader: some View {
-        HStack(spacing: 12) {
-            AppLogo(size: 42)
-            VStack(alignment: .leading, spacing: 3) {
-                CHZPrivWordmark(size: 24)
-                Text("INFORMAÇÕES DA LICENÇA")
-                    .font(.system(size: 17, weight: .bold, design: .monospaced))
-                    .tracking(0.45)
-                   .foregroundStyle(AppTheme.primaryText)
-            }
-            Spacer()
-        }
+        Text("INFORMAÇÕES DA LICENÇA")
+            .font(.system(size: 17, weight: .bold, design: .monospaced))
+            .tracking(0.45)
+            .foregroundStyle(AppTheme.primaryText)
     }
 
     private var licenseSection: some View {
-        infoSection(title: "INFORMAÇÕES DA LICENÇA") {
-            infoRow(label: "Produto", value: licenseViewModel.snapshot.product)
+        infoSection(title: "LICENÇA") {
+            infoRow(label: "Status", value: licenseViewModel.statusText, valueColor: licenseViewModel.statusColor)
             divider
-            infoRow(label: "Status da Key", value: licenseViewModel.statusText, valueColor: licenseViewModel.statusColor)
-            divider
-            infoRow(label: "Tempo da Key", value: licenseViewModel.expirationText, valueColor: AppTheme.secondaryText, monospaced: true)
-            divider
-            infoRow(label: "Expiração", value: licenseViewModel.expirationText, valueColor: AppTheme.secondaryText, monospaced: true)
-            divider
-            infoRow(label: "ID do Dispositivo", value: shortIdentifier(licenseViewModel.snapshot.deviceID), valueColor: AppTheme.secondaryText, monospaced: true)
+            infoRow(label: "Validade", value: licenseViewModel.expirationText, valueColor: AppTheme.secondaryText, monospaced: true)
         }
     }
 
