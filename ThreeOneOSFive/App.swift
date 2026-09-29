@@ -157,15 +157,27 @@ class AppState: ObservableObject {
     private var autoRunAttempted = false
 
     var kernelExploitApplicable: Bool {
-        false
+        let v = AppInfo.versionTuple
+        return KernelExploit.isApplicable(
+            major: v.major,
+            minor: v.minor,
+            patch: v.patch,
+            build: AppInfo.osBuild
+        )
     }
 
     var isSupported: Bool { unsupportedMessage == nil }
 
     func detectSupport() {
-        unsupportedMessage = nil
-        exploitStatus = .unsupported("Somente validação, backup e restauração internos estão disponíveis")
         kernelExploitRunning = false
+        if kernelExploitApplicable {
+            unsupportedMessage = nil
+            exploitStatus = .notStarted
+            refreshKernelExploitStatus()
+        } else {
+            unsupportedMessage = "Este dispositivo/iOS não está na faixa suportada pelo exploit"
+            exploitStatus = .unsupported(unsupportedMessage ?? "Versão não suportada")
+        }
     }
 
     private func maybeAutoRunKernelExploit() {
@@ -197,6 +209,36 @@ class AppState: ObservableObject {
     }
 
     func runKernelExploitIfNeeded() {
-        log("raki: kernel and sandbox operations are disabled")
+        activateKernel()
+    }
+
+    func activateKernel() {
+        guard kernelExploitApplicable, !kernelExploitRunning else { return }
+        kernelExploitRunning = true
+        exploitStatus = .notStarted
+        log("app: manual kernel activation requested")
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let success = KernelExploit.run()
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.kernelExploitRunning = false
+                if success {
+                    self.exploitStatus = .success(method: "kexploit")
+                    self.unsupportedMessage = nil
+                    log("app: kernel exploit active")
+                } else {
+                    self.exploitStatus = .failed(method: "kexploit", code: -1)
+                    log("app: kernel exploit activation failed")
+                }
+            }
+        }
+    }
+
+    func deactivateKernel() {
+        guard !kernelExploitRunning else { return }
+        // The app can end its use of the kernel session, but iOS does not
+        // expose a safe public API to undo a kernel primitive in-process.
+        exploitStatus = .notStarted
+        log("app: kernel session deactivated by app; no external containers accessed")
     }
 }
