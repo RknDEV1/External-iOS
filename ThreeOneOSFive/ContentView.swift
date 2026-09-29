@@ -1539,7 +1539,7 @@ private struct ExternalPanelView: View {
                             id: id,
                             filename: report.filename,
                             title: isChPainel ? "ChPainel" : (isModnew ? "External" : "Painel External"),
-                            detail: "Função interna do Raki.",
+                            detail: "",
                             isDemoOnly: true
                         )
                         do {

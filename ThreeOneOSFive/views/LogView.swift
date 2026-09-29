@@ -9,7 +9,7 @@ struct LogView: View {
 
     private var shareText: String {
         var lines = [
-            "Raki Log",
+            "System Log",
             "iOS \(AppInfo.osVersion) (\(AppInfo.osBuild)) — \(AppInfo.machineName)",
             "Generated: \(Date())",
             ""

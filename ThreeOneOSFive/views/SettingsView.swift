@@ -34,7 +34,7 @@ struct SettingsView: View {
                     .labelsHidden()
                 }
 
-                Section("Raki") {
+                Section("System") {
                     Toggle("Efeitos sonoros", isOn: $soundEffectsEnabled)
                         .tint(AppTheme.accent)
                 }
