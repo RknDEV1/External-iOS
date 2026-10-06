@@ -415,6 +415,9 @@ private struct CHZPrivHomeView: View {
                 licenseViewModel.refresh()
             }
         }
+        .onChange(of: isFreeFireMax) { _ in
+            reloadPatchesForSelectedEdition()
+        }
         .onReceive(patchStore.$items) { _ in
             continuePendingExternalActivationIfReady()
         }
@@ -724,7 +727,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private func categoryOverviewCard(_ category: PatchCategory) -> some View {
-        let count = freeFirePatches.filter { $0.category == category }.count + (category == .external ? 1 : 0)
+        let count = freeFirePatches.filter { $0.category == category }.count
         return HStack(spacing: 9) {
             Image(systemName: category.symbol)
                 .font(.system(size: 16, weight: .bold))
@@ -1043,18 +1046,46 @@ private struct CHZPrivHomeView: View {
     private func loadPatchesIfNeeded() {
         guard !didLoadPatches, patchLoadingCoordinator.beginIfNeeded() else { return }
         didLoadPatches = true
+        loadPatchesForSelectedEdition()
+    }
+
+    private func reloadPatchesForSelectedEdition() {
+        guard didLoadPatches, !isWorking else { return }
+        // Clear the previous edition immediately so FF and FFM never share
+        // rows or enabled switches while the selected catalog is rebuilding.
+        freeFirePatches = []
+        enabledPatchIDs = []
+        loadPatchesForSelectedEdition()
+    }
+
+    private func loadPatchesForSelectedEdition() {
+        let selectedEditionIsMax = isFreeFireMax
         DispatchQueue.global(qos: .userInitiated).async {
             autoreleasepool {
                 PatchProjectLibrary.installBundledOriginalFreeFirePatches()
                 PatchProjectLibrary.removeObsoleteExternalPackages()
                 let items = PatchProjectLibrary.load()
                 let scopedItems = items.filter { item in
-                    belongsToSelectedEdition(item) && !isUnavailablePatch(item)
+                    let filename = item.packageURL.lastPathComponent
+                        .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+                        .uppercased()
+                    let belongs = selectedEditionIsMax
+                        ? filename.hasPrefix("FFM -")
+                        : filename.hasPrefix("FF -") && !filename.hasPrefix("FFM -")
+                    let unavailable = selectedEditionIsMax && item.category == .external && filename.contains("ESP+AIMBOT")
+                    return belongs && !unavailable
                 }
                 let enabled = Set(scopedItems.compactMap { item in
-                    DevicePatchService.hasExternalWorkingFile(editionKey: safeCatalogEditionKey(for: item)) ? item.id : nil
+                    let edition = selectedEditionIsMax ? "free-fire-max" : "free-fire"
+                    let filename = item.packageURL.lastPathComponent
+                        .replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "-", options: .regularExpression)
+                    let key = "catalog-\(edition)-\(filename)-\(item.id.uuidString)"
+                    return DevicePatchService.hasExternalWorkingFile(editionKey: key) ? item.id : nil
                 })
                 DispatchQueue.main.async {
+                    // Do not let an older background load overwrite a newer
+                    // edition selection made while the disk scan was running.
+                    guard self.isFreeFireMax == selectedEditionIsMax else { return }
                     freeFirePatches = scopedItems
                     enabledPatchIDs = enabled
                 }
