@@ -2,20 +2,20 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    // Raki: interface monocromática, plana e discreta.
-    static let accent = Color.white
-    static let accentBright = Color.white
-    static let accentSoft = Color.white.opacity(0.12)
-    static let outline = Color.white.opacity(0.14)
-    static let outlineStrong = Color.white.opacity(0.24)
+    // Identidade CHZ PRIV: fundo preto, vermelho vivo, branco e cinza.
+    static let accent = Color(red: 1.00, green: 0.015, blue: 0.055)
+    static let accentBright = Color(red: 1.00, green: 0.16, blue: 0.19)
+    static let accentSoft = Color(red: 1.00, green: 0.015, blue: 0.055).opacity(0.16)
+    static let outline = accent.opacity(0.58)
+    static let outlineStrong = accentBright.opacity(0.86)
     static let pageBackground = Color.black
-    static let consoleBackground = Color.black
-    static let cardBackground = Color.white.opacity(0.08)
-    static let fieldBackground = Color.white.opacity(0.12)
+    static let consoleBackground = Color(red: 0.045, green: 0.018, blue: 0.022)
+    static let cardBackground = Color(red: 0.065, green: 0.020, blue: 0.026)
+    static let fieldBackground = Color(red: 0.10, green: 0.035, blue: 0.042)
     static let primaryText = Color.white
-    static let secondaryText = Color.white.opacity(0.72)
-    static let tertiaryText = Color.white.opacity(0.52)
-    static let success = Color.white
+    static let secondaryText = Color(red: 0.56, green: 0.56, blue: 0.58)
+    static let tertiaryText = Color(red: 0.38, green: 0.38, blue: 0.40)
+    static let success = Color(red: 0.19, green: 0.82, blue: 0.42)
     static let pageInset: CGFloat = 16
     static let rowIconSize: CGFloat = 17
     static let rowIconFrame: CGFloat = 28
@@ -25,27 +25,29 @@ enum AppTheme {
     static let appIconSize: CGFloat = 32
     static let emptyIconSize: CGFloat = 30
     static let selectionIconSize: CGFloat = 18
-    static let contentCardCornerRadius: CGFloat = 16
-    static let contentCardInset: CGFloat = 14
-    static let contentCardPadding: CGFloat = 14
-    static let brandFontName = "SF Mono"
+    static let contentCardCornerRadius: CGFloat = 18
+    static let contentCardInset: CGFloat = 16
+    static let contentCardPadding: CGFloat = 16
+    static let brandFontName = "BurbankBigCondensed-Black"
 }
 
 struct CHZPrivWordmark: View {
     var size: CGFloat = 34
 
     var body: some View {
-        Text("Raki")
-            .font(.system(size: size, weight: .semibold, design: .monospaced))
-           .foregroundStyle(AppTheme.primaryText)
-            .accessibilityLabel("Raki")
+        Image("CHZPrivLogoFinal")
+            .resizable()
+            .scaledToFit()
+            .frame(width: max(size * 2.9, 88), height: max(size * 1.25, 38))
+            .shadow(color: AppTheme.accent.opacity(0.28), radius: 8, y: 3)
+            .accessibilityLabel("CHZ PRIV")
     }
 }
 
 struct AppCardBorder: View {
     var body: some View {
         RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
-            .strokeBorder(AppTheme.outlineStrong, lineWidth: 0.7)
+            .strokeBorder(AppTheme.accent.opacity(0.52), lineWidth: 0.7)
             .accessibilityHidden(true)
     }
 }
@@ -57,11 +59,19 @@ struct AppRowIcon: View {
     var frameSize: CGFloat = AppTheme.rowIconFrame
 
     var body: some View {
-        Image(systemName: systemName)
-            .font(.system(size: symbolSize, weight: .semibold))
-            .foregroundStyle(tint)
-            .frame(width: frameSize, height: frameSize)
-            .accessibilityHidden(true)
+        ZStack {
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(tint.opacity(0.16))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(AppTheme.accent.opacity(0.42), lineWidth: 0.6)
+                }
+            Image(systemName: systemName)
+                .font(.system(size: symbolSize, weight: .semibold))
+                .foregroundStyle(tint)
+        }
+        .frame(width: frameSize, height: frameSize)
+        .accessibilityHidden(true)
     }
 }
 
@@ -73,13 +83,13 @@ struct AppSearchField: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(AppTheme.secondaryText)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(AppTheme.accent)
                 .accessibilityHidden(true)
 
             TextField(prompt, text: $text)
                 .font(.body)
-               .foregroundStyle(AppTheme.primaryText)
+                .foregroundStyle(AppTheme.primaryText)
                 .tint(AppTheme.accent)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -97,10 +107,13 @@ struct AppSearchField: View {
         }
         .padding(.horizontal, 11)
         .frame(minHeight: 38)
-        .background(AppTheme.fieldBackground, in: RoundedRectangle(cornerRadius: 0, style: .continuous))
+        .background(
+            AppTheme.fieldBackground,
+            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+        )
         .overlay {
-            RoundedRectangle(cornerRadius: 0, style: .continuous)
-                .stroke(AppTheme.outlineStrong, lineWidth: 0.7)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(AppTheme.accent.opacity(0.38), lineWidth: 0.7)
         }
         .padding(.horizontal, AppTheme.pageInset)
         .padding(.vertical, 8)
@@ -112,11 +125,18 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Image(systemName: "shippingbox.fill")
-            .font(.system(size: size * 0.44, weight: .medium))
-           .foregroundStyle(AppTheme.primaryText)
+        Image("CHZPrivLogoFinal")
+            .resizable()
+            .scaledToFit()
+            .padding(size * 0.08)
             .frame(width: size, height: size)
-            .background(AppTheme.fieldBackground, in: RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+            .background(Color.black.opacity(0.88))
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
+                    .stroke(AppTheme.outlineStrong, lineWidth: 1.35)
+            }
+            .shadow(color: AppTheme.accent.opacity(0.35), radius: 8)
             .accessibilityHidden(true)
     }
 }
@@ -126,8 +146,8 @@ struct AppThemeModifier: ViewModifier {
         content
             .preferredColorScheme(.dark)
             .tint(AppTheme.accent)
-            .environment(\.font, .system(.body, design: .monospaced))
-           .foregroundStyle(AppTheme.primaryText)
+            .environment(\.font, .system(.body, design: .rounded))
+            .foregroundStyle(AppTheme.primaryText)
             .scrollContentBackground(.hidden)
             .background(AppTheme.pageBackground.ignoresSafeArea())
     }

@@ -15,7 +15,7 @@ struct SettingsView: View {
                         AppLogo()
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("Raki").font(.headline)
+                            Text("External Chz").font(.headline)
                             Text(language.text("common.version", appVersion))
                                 .font(.subheadline)
                                 .foregroundStyle(AppTheme.secondaryText)
@@ -34,7 +34,7 @@ struct SettingsView: View {
                     .labelsHidden()
                 }
 
-                Section("Raki") {
+                Section("External Chz") {
                     Toggle("Efeitos sonoros", isOn: $soundEffectsEnabled)
                         .tint(AppTheme.accent)
                 }

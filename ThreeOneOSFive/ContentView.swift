@@ -2299,7 +2299,7 @@ private struct ValidationConfirmationOverlay: View {
                         .font(.system(size: 23, weight: .semibold))
                         .foregroundStyle(AppTheme.primaryText)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("RAKI / SYSTEM")
+                        Text("CHZ PRIV / SYSTEM")
                             .font(.system(size: 10, weight: .bold, design: .monospaced))
                             .tracking(1.0)
                             .foregroundStyle(AppTheme.tertiaryText)
