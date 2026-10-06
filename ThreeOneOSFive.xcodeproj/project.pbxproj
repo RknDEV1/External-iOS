@@ -113,6 +113,7 @@
 		3105P114 /* FFM - Hs Alto Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Alto Baypss.3105"; sourceTree = "<group>"; };
 		3105P115 /* FFM - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
 		3105P116 /* FFM - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
+		3105P119 /* FF - Painel External.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Painel External.3105"; sourceTree = "<group>"; };
 
 		3105A010 /* 3105.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3105.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3105A020 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
