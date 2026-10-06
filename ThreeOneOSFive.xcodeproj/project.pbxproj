@@ -447,7 +447,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-				3105P219 /* FF - Painel External.3105 in Resources */,
 		3105A800 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -456,6 +455,7 @@
                     3105L401,
                     3105A228,
                     3105P190,
+                    3105P219,
 
 				3105P201,
 				3105P202,
@@ -466,16 +466,7 @@
 				3105P207,
 				3105P208,
 					3105P209,
-					3105P210,
-							3105P220,
-					3105P211,
-					3105P218,
                     3105P219,
-                    3105V201,
-                    3105V202,
-                    3105V203,
-                    3105V204,
-                    3105V205,
 					3105P213,
 				3105P214,
 				3105P215,
