@@ -106,33 +106,9 @@
   {
     "id": 14,
     "category": "External",
-    "file": "FF - Esp only.3105",
-    "path": "External/FF - Esp only.3105",
-    "sha256": "f6da5f94d4c1f1d2a7d6a70403490889319bd4d5344b40347a4f3097446dc39b",
+    "file": "FF - Painel External.3105",
+    "path": "External/FF - Painel External.3105",
+    "sha256": "1d328b49322c33cde9584ce075900e0b681e27478c1b182b89922b0e75cb1f02",
     "edition": "Free Fire"
-  },
-  {
-    "id": 15,
-    "category": "External",
-    "file": "FF - Esp+aimbot.3105",
-    "path": "External/FF - Esp+aimbot.3105",
-    "sha256": "e01758777347f773b45f0d37bc40799c4495466ae1c1703fe8da3cdfaafed2a8",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 16,
-    "category": "External",
-    "file": "FF - Painel.3105",
-    "path": "External/FF - Painel.3105",
-    "sha256": "400bf94ef2cccf108405144063294617ea09ec1a01133efe11fa9e01dbfbcc15",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 17,
-    "category": "External",
-    "file": "FFM - BoxBlue.3105",
-    "path": "External/FFM - BoxBlue.3105",
-    "sha256": "20fafcf858381cf64ad62cbe3c10ab6bc5c03580de62a4513eb975732be49421",
-    "edition": "Free Fire MAX"
   }
 ]

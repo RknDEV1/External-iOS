@@ -758,7 +758,7 @@ private struct CHZPrivHomeView: View {
     @ViewBuilder
     private func categorySection(_ category: PatchCategory) -> some View {
         let items = freeFirePatches.filter { $0.category == category }
-        let displayedCount = items.count + (category == .external ? 1 : 0)
+        let displayedCount = items.count
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(category.rawValue.uppercased())
@@ -771,7 +771,7 @@ private struct CHZPrivHomeView: View {
                     .foregroundStyle(AppTheme.secondaryText)
             }
             if items.isEmpty {
-                Text("Nenhum patch disponível")
+                Text(category == .external ? "Aguardando novo patch .3105" : "Nenhum patch disponível")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppTheme.secondaryText)
                     .padding(.vertical, 8)
@@ -779,13 +779,6 @@ private struct CHZPrivHomeView: View {
                 LazyVStack(alignment: .leading, spacing: 8) {
                     ForEach(items) { item in
                         functionRow(item: item)
-                    }
-                    if category == .external {
-                        if isFreeFireMax {
-                            catalogModnewFunctionRow
-                        } else {
-                            catalogChPainelFunctionRow
-                        }
                     }
                 }
             }
@@ -968,6 +961,7 @@ private struct CHZPrivHomeView: View {
             .replacingOccurrences(of: "-", with: "")
             .replacingOccurrences(of: "+", with: "")
         if normalized.contains("BOXBLUE") { return isFreeFireMax ? "Esp+Aimbot" : "BoxBlue" }
+        if normalized.contains("PAINELEXTERNAL") { return "Painel External" }
         if normalized.contains("PAINEL") { return "Esp+Painel" }
         return item.project?.name ?? filename
     }
@@ -1486,7 +1480,10 @@ private struct ExternalPanelView: View {
                 let isBoxBlueArtifact = normalized.localizedCaseInsensitiveContains("boxblue")
                 let title: String
                 let detail: String
-                if isChPainelArtifact {
+                if normalized.localizedCaseInsensitiveContains("painel external") {
+                    title = "Painel External"
+                    detail = "Painel External interno com validação, backup e restauração."
+                } else if isChPainelArtifact {
                     title = "ChPainel"
                     detail = "Painel interno com funções e configurações."
                 } else if isPanelArtifact {
@@ -1516,13 +1513,6 @@ private struct ExternalPanelView: View {
                     bundledURL: url
                 )
             }
-            + (isFreeFireMax ? [ExternalPatchFunction(
-                id: "demo-modnew-external",
-                filename: "modnew.3105.validation",
-                title: "External",
-                detail: "ESP com assistência de mira e painel externo.",
-                isDemoOnly: true
-            )] : [])
     }
 
     private var editionName: String {
@@ -1824,8 +1814,15 @@ private struct ExternalPanelView: View {
                     .foregroundStyle(AppTheme.secondaryText)
             }
             LazyVStack(alignment: .leading, spacing: 8) {
-                ForEach(externalFunctions) { function in
-                    externalFunctionRow(function)
+                if externalFunctions.isEmpty {
+                    Text("Aguardando novo patch .3105")
+                        .font(.system(size: 13, weight: .medium, design: .monospaced))
+                        .foregroundStyle(AppTheme.secondaryText)
+                        .padding(.vertical, 8)
+                } else {
+                    ForEach(externalFunctions) { function in
+                        externalFunctionRow(function)
+                    }
                 }
             }
             if let externalPatchMessage {
