@@ -24,6 +24,7 @@ protocol LicenseSessionProviding {
 /// Adapter between the license screen and the actual CHZLogin framework
 /// session. The screen never invents an expiration date: the framework only
 /// exposes whether the saved session is currently valid.
+#if canImport(ChzLogin)
 struct CHZLicenseSessionProvider: LicenseSessionProviding {
     private var currentDeviceID: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
@@ -78,6 +79,7 @@ struct CHZLicenseSessionProvider: LicenseSessionProviding {
         }
     }
 }
+#endif
 
 /// Fallback used by previews or targets that do not link the login framework.
 struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
@@ -105,7 +107,11 @@ final class LicenseViewModel: ObservableObject {
     private let provider: LicenseSessionProviding
     private var sessionConfirmedInCurrentProcess = false
 
+#if canImport(ChzLogin)
     init(provider: LicenseSessionProviding = CHZLicenseSessionProvider()) {
+#else
+    init(provider: LicenseSessionProviding = UnauthenticatedLicenseProvider()) {
+#endif
         self.provider = provider
     }
 
