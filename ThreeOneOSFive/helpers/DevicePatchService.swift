@@ -164,10 +164,9 @@ enum DevicePatchService {
         if let state = try? readExternalState(editionKey: editionKey) {
             return state.verified
         }
-        // Older private-working files may predate receipts. They are still
-        // valid app-owned state; activation verification happens immediately
-        // after a new install and restoration remains hash-checked below.
-        return (try? Data(contentsOf: destination, options: [.mappedIfSafe]).isEmpty == false) ?? false
+        // A working file without a matching receipt is not considered active.
+        // This prevents stale or manually copied data from turning on a switch.
+        return false
     }
 
     static func verifyExternalWorkingFile(editionKey: String) throws {
@@ -272,7 +271,11 @@ enum DevicePatchService {
     static func validateExternalArtifact(at sourceURL: URL, password: String? = nil) throws -> ExternalArtifactReport {
         let data = try Data(contentsOf: sourceURL, options: [.mappedIfSafe])
         let summary = try PatchPackageCodec.inspect(data)
-        if summary.isPasswordProtected, let password, !password.isEmpty {
+        if summary.isPasswordProtected {
+            guard let password, !password.isEmpty else {
+                log("external: rejected password-protected artifact without validation key")
+                throw PatchPackageError.invalidPasswordOrCorruptedPackage
+            }
             _ = try PatchPackageCodec.decode(data, password: password)
         }
         return try validateExternalArtifact(at: sourceURL, password: password, packageSummary: summary)
@@ -321,6 +324,12 @@ enum DevicePatchService {
         let backupURL = try externalBackupDirectory()
             .appendingPathComponent("\(report.id.uuidString)-\(report.filename)")
         try FileManager.default.copyItem(at: source, to: backupURL)
+        let backupData = try Data(contentsOf: backupURL, options: [.mappedIfSafe])
+        guard sha256(backupData) == report.sha256 else {
+            try? FileManager.default.removeItem(at: backupURL)
+            log("external: backup hash mismatch for \(report.filename)")
+            throw PatchPackageError.restoreFailed
+        }
         let receipt = ExternalBackupReceipt(
             id: UUID(),
             sourceFilename: report.filename,
