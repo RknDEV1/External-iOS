@@ -100,6 +100,16 @@ struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
     }
 }
 
+struct DefaultLicenseSessionProvider: LicenseSessionProviding {
+    func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
+#if canImport(ChzLogin)
+        CHZLicenseSessionProvider().validateSavedLicense(completion: completion)
+#else
+        UnauthenticatedLicenseProvider().validateSavedLicense(completion: completion)
+#endif
+    }
+}
+
 @MainActor
 final class LicenseViewModel: ObservableObject {
     @Published private(set) var snapshot = LicenseSnapshot()
@@ -107,11 +117,7 @@ final class LicenseViewModel: ObservableObject {
     private let provider: LicenseSessionProviding
     private var sessionConfirmedInCurrentProcess = false
 
-#if canImport(ChzLogin)
-    init(provider: LicenseSessionProviding = CHZLicenseSessionProvider()) {
-#else
-    init(provider: LicenseSessionProviding = UnauthenticatedLicenseProvider()) {
-#endif
+    init(provider: LicenseSessionProviding = DefaultLicenseSessionProvider()) {
         self.provider = provider
     }
 
