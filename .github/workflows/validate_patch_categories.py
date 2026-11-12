@@ -18,8 +18,6 @@ EXPECTED_FILES = {
         "HSPEITO.3105",
         "HSPESCOÇO.3105",
         "HSPESCOÇOALTO.3105",
-    },
-    "Cache": {
         "HSBYPASSAP.3105",
     },
 }
@@ -101,7 +99,7 @@ def validate(root: Path) -> None:
         if actual != expected:
             fail(f"{category} mapping differs; missing={expected - actual}, unexpected={actual - expected}")
 
-    print(f"patch category validation passed: Avatar={len(EXPECTED_FILES['Avatar'])}, Cache={len(EXPECTED_FILES['Cache'])}")
+    print(f"patch category validation passed: Avatar={len(EXPECTED_FILES['Avatar'])}")
 
 
 if __name__ == "__main__":
