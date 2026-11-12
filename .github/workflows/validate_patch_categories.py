@@ -14,16 +14,13 @@ from pathlib import Path
 
 EXPECTED_FILES = {
     "Avatar": {
-        "HS ALTO - ANTENA.3105",
-        "HS ALTO.3105",
-        "HS PESCO-ALTO.3105",
-        "HS PESCOÇO - ANTENA.3105",
-        "HS PESCOÇO.3105",
+        "HSALTO.3105",
+        "HSPEITO.3105",
+        "HSPESCOÇO.3105",
+        "HSPESCOÇOALTO.3105",
     },
     "Cache": {
-        "HS 100- BAYPSS.3105",
-        "HS PEITO-PESCOÇO.3105",
-        "PESCOÇO BAYPS.3105",
+        "HSBYPASSAP.3105",
     },
 }
 
