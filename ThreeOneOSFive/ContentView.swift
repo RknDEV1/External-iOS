@@ -1488,53 +1488,19 @@ private struct ExternalPanelView: View {
     }
 
     private var externalFunctions: [ExternalPatchFunction] {
-        let prefix = isFreeFireMax ? "FFM - " : "FF - "
-        // Use the same authoritative resource list used by the validation service.
-        // This keeps the catalog and activation flow in sync after packaging.
         let urls = DevicePatchService.embeddedExternalArtifacts()
+        let newPatchNames = ["HSALTO.3105", "HSPEITO.3105", "HSPESCOÇO.3105", "HSPESCOÇOALTO.3105", "HSBYPASSAP.3105"]
         return urls
             .filter { url in
                 let name = url.lastPathComponent
-                return name.hasPrefix(prefix) && (
-                    name.localizedCaseInsensitiveContains("Esp") ||
-                    name.localizedCaseInsensitiveContains("Painel") ||
-                    name.localizedCaseInsensitiveContains("BoxBlue")
-                ) && !(isFreeFireMax && name.localizedCaseInsensitiveContains("Esp+aimbot"))
+                return newPatchNames.contains(name)
             }
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
             .map { url in
                 let filename = url.lastPathComponent
-                let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
-                let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                let isChPainelArtifact = normalized.localizedCaseInsensitiveContains("chpainel")
-                let isPanelArtifact = normalized.localizedCaseInsensitiveContains("painel")
-                let isBoxBlueArtifact = normalized.localizedCaseInsensitiveContains("boxblue")
-                let title: String
-                let detail: String
-                if normalized.localizedCaseInsensitiveContains("painel external") {
-                    title = "Painel External"
-                    detail = "Painel External interno com validação, backup e restauração."
-                } else if isChPainelArtifact {
-                    title = "ChPainel"
-                    detail = "Painel interno com funções e configurações."
-                } else if isPanelArtifact {
-                    title = "Esp+Painel"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
-                } else if isBoxBlueArtifact {
-                    title = isFreeFireMax ? "Esp+Aimbot" : "BoxBlue"
-                    detail = isFreeFireMax
-                        ? "ESP com assistência de mira e recursos adicionais."
-                        : "Função External interna com processamento e restauração do arquivo original"
-                } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
-                    title = "ESP + AIM"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
-                } else if normalized.localizedCaseInsensitiveContains("esp only") {
-                    title = "ESP ONLY"
-                    detail = "ESP sem assistência adicional de mira."
-                } else {
-                    title = "ESP"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
-                }
+                let base = filename.replacingOccurrences(of: ".3105", with: "")
+                let title = base
+                let detail = ""
                 return ExternalPatchFunction(
                     id: filename,
                     filename: filename,

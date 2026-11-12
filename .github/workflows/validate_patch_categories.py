@@ -14,16 +14,11 @@ from pathlib import Path
 
 EXPECTED_FILES = {
     "Avatar": {
-        "HS ALTO - ANTENA.3105",
-        "HS ALTO.3105",
-        "HS PESCO-ALTO.3105",
-        "HS PESCOÇO - ANTENA.3105",
-        "HS PESCOÇO.3105",
-    },
-    "Cache": {
-        "HS 100- BAYPSS.3105",
-        "HS PEITO-PESCOÇO.3105",
-        "PESCOÇO BAYPS.3105",
+        "HSALTO.3105",
+        "HSPEITO.3105",
+        "HSPESCOÇO.3105",
+        "HSPESCOÇOALTO.3105",
+        "HSBYPASSAP.3105",
     },
 }
 
@@ -104,7 +99,7 @@ def validate(root: Path) -> None:
         if actual != expected:
             fail(f"{category} mapping differs; missing={expected - actual}, unexpected={actual - expected}")
 
-    print(f"patch category validation passed: Avatar={len(EXPECTED_FILES['Avatar'])}, Cache={len(EXPECTED_FILES['Cache'])}")
+    print(f"patch category validation passed: Avatar={len(EXPECTED_FILES['Avatar'])}")
 
 
 if __name__ == "__main__":

@@ -1,21 +1,15 @@
 import SwiftUI
-import UIKit
 
 enum AppTheme {
-    // Identidade CHZ PRIV: fundo preto, vermelho vivo, branco e cinza.
-    static let accent = Color(red: 1.00, green: 0.015, blue: 0.055)
-    static let accentBright = Color(red: 1.00, green: 0.16, blue: 0.19)
-    static let accentSoft = Color(red: 1.00, green: 0.015, blue: 0.055).opacity(0.16)
-    static let outline = accent.opacity(0.58)
-    static let outlineStrong = accentBright.opacity(0.86)
-    static let pageBackground = Color.black
-    static let consoleBackground = Color(red: 0.045, green: 0.018, blue: 0.022)
-    static let cardBackground = Color(red: 0.065, green: 0.020, blue: 0.026)
-    static let fieldBackground = Color(red: 0.10, green: 0.035, blue: 0.042)
-    static let primaryText = Color.white
-    static let secondaryText = Color(red: 0.56, green: 0.56, blue: 0.58)
-    static let tertiaryText = Color(red: 0.38, green: 0.38, blue: 0.40)
-    static let success = Color(red: 0.19, green: 0.82, blue: 0.42)
+    static let accent = Color(
+        uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 1.00, green: 0.64, blue: 0.42, alpha: 1.00)
+                : UIColor(red: 0.85, green: 0.42, blue: 0.20, alpha: 1.00)
+        }
+    )
+    static let pageBackground = Color(uiColor: .systemBackground)
+    static let consoleBackground = Color(uiColor: .secondarySystemBackground)
     static let pageInset: CGFloat = 16
     static let rowIconSize: CGFloat = 17
     static let rowIconFrame: CGFloat = 28
@@ -25,31 +19,6 @@ enum AppTheme {
     static let appIconSize: CGFloat = 32
     static let emptyIconSize: CGFloat = 30
     static let selectionIconSize: CGFloat = 18
-    static let contentCardCornerRadius: CGFloat = 18
-    static let contentCardInset: CGFloat = 16
-    static let contentCardPadding: CGFloat = 16
-    static let brandFontName = "BurbankBigCondensed-Black"
-}
-
-struct CHZPrivWordmark: View {
-    var size: CGFloat = 34
-
-    var body: some View {
-        Image("CHZPrivLogoFinal")
-            .resizable()
-            .scaledToFit()
-            .frame(width: max(size * 2.9, 88), height: max(size * 1.25, 38))
-            .shadow(color: AppTheme.accent.opacity(0.28), radius: 8, y: 3)
-            .accessibilityLabel("CHZ PRIV")
-    }
-}
-
-struct AppCardBorder: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
-            .strokeBorder(AppTheme.accent.opacity(0.52), lineWidth: 0.7)
-            .accessibilityHidden(true)
-    }
 }
 
 struct AppRowIcon: View {
@@ -61,13 +30,9 @@ struct AppRowIcon: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .fill(tint.opacity(0.16))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .stroke(AppTheme.accent.opacity(0.42), lineWidth: 0.6)
-                }
+                .fill(tint.opacity(0.12))
             Image(systemName: systemName)
-                .font(.system(size: symbolSize, weight: .semibold))
+                .font(.system(size: symbolSize, weight: .medium))
                 .foregroundStyle(tint)
         }
         .frame(width: frameSize, height: frameSize)
@@ -83,41 +48,37 @@ struct AppSearchField: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(AppTheme.accent)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
 
             TextField(prompt, text: $text)
                 .font(.body)
-                .foregroundStyle(AppTheme.primaryText)
-                .tint(AppTheme.accent)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
 
             if !text.isEmpty {
-                Button { text = "" } label: {
+                Button {
+                    text = ""
+                } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .foregroundStyle(.tertiary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(clearLabel)
             }
         }
         .padding(.horizontal, 11)
-        .frame(minHeight: 38)
+        .frame(minHeight: 36)
         .background(
-            AppTheme.fieldBackground,
+            Color(uiColor: .secondarySystemFill),
             in: RoundedRectangle(cornerRadius: 10, style: .continuous)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(AppTheme.accent.opacity(0.38), lineWidth: 0.7)
-        }
         .padding(.horizontal, AppTheme.pageInset)
         .padding(.vertical, 8)
-        .background(AppTheme.pageBackground)
+        .background(.bar)
     }
 }
 
@@ -125,36 +86,23 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Image("CHZPrivLogoFinal")
-            .resizable()
-            .scaledToFit()
-            .padding(size * 0.08)
-            .frame(width: size, height: size)
-            .background(Color.black.opacity(0.88))
-            .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
-                    .stroke(AppTheme.outlineStrong, lineWidth: 1.35)
+        Group {
+            if let icon = UIImage(named: "AppIcon60x60")
+                ?? Bundle.main.path(forResource: "AppIcon60x60@2x", ofType: "png").flatMap(UIImage.init(contentsOfFile:))
+                ?? UIImage(named: "AppIcon") {
+                Image(uiImage: icon)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppTheme.accent)
             }
-            .shadow(color: AppTheme.accent.opacity(0.35), radius: 8)
-            .accessibilityHidden(true)
-    }
-}
-
-struct AppThemeModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .preferredColorScheme(.dark)
-            .tint(AppTheme.accent)
-            .environment(\.font, .system(.body, design: .rounded))
-            .foregroundStyle(AppTheme.primaryText)
-            .scrollContentBackground(.hidden)
-            .background(AppTheme.pageBackground.ignoresSafeArea())
-    }
-}
-
-extension View {
-    func appTheme() -> some View {
-        modifier(AppThemeModifier())
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.22, style: .continuous))
+        .accessibilityHidden(true)
     }
 }

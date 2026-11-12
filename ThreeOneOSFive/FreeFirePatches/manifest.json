@@ -2,113 +2,41 @@
   {
     "id": 1,
     "category": "Avatar",
-    "file": "FF - Hs Alto 100-.3105",
-    "path": "Avatar/FF - Hs Alto 100-.3105",
-    "sha256": "7366e37bd8c96699f1e1b6923ddeb8a09261f29c920d9d8ee43531141fd59973",
+    "file": "HSALTO.3105",
+    "path": "Avatar/HSALTO.3105",
+    "sha256": "a8776ffd033d932a020296146bd19ce74e5108a9e955c5f5aa042b5bc8c1de3b",
     "edition": "Free Fire"
   },
   {
     "id": 2,
     "category": "Avatar",
-    "file": "FF - Hs Alto-Antena.3105",
-    "path": "Avatar/FF - Hs Alto-Antena.3105",
-    "sha256": "26356c590ec78f34ca558608eeb7260265d4c5c70098d2ebf53bb8b60d1ea2e8",
+    "file": "HSPEITO.3105",
+    "path": "Avatar/HSPEITO.3105",
+    "sha256": "c9eb8d6c382c394e65b120fdc21e2cbf504accfd8f245172a69bd93848186edd",
     "edition": "Free Fire"
   },
   {
     "id": 3,
     "category": "Avatar",
-    "file": "FF - Hs Pescoço 100-.3105",
-    "path": "Avatar/FF - Hs Pescoço 100-.3105",
-    "sha256": "351326ac0335927b7b084f619803af9441afc07737d4a66b4691357da2455fb2",
+    "file": "HSPESCOÇO.3105",
+    "path": "Avatar/HSPESCOÇO.3105",
+    "sha256": "93cc0254598e9ee90a3a66e3ff2e79736e20674ea9f34341a6e62735f0041f2e",
     "edition": "Free Fire"
   },
   {
     "id": 4,
     "category": "Avatar",
-    "file": "FF - Hs Pescoço-Alto.3105",
-    "path": "Avatar/FF - Hs Pescoço-Alto.3105",
-    "sha256": "205efc20e12a5db1f1166834ad4ff892250490471fdebcc82368280570abf8e4",
+    "file": "HSPESCOÇOALTO.3105",
+    "path": "Avatar/HSPESCOÇOALTO.3105",
+    "sha256": "e5af5667064119d562d097f7fbdbc65498806c78bfa1a25591da256acbb2b812",
     "edition": "Free Fire"
   },
   {
     "id": 5,
     "category": "Avatar",
-    "file": "FF - Hs Pescoço-Antena.3105",
-    "path": "Avatar/FF - Hs Pescoço-Antena.3105",
-    "sha256": "55eeb6f2ad7e9eb7397a0ce1a65d20c71d941680bb396e4afdd6af42c6101a9f",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 6,
-    "category": "Cache",
-    "file": "FF - Hs 100- Baypss.3105",
-    "path": "Cache/FF - Hs 100- Baypss.3105",
-    "sha256": "43acccfdff55a603fda66f24bd432bab56e593833ccbaad0031026f11a14bb0f",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 7,
-    "category": "Cache",
-    "file": "FF - Hs Alto Baypss.3105",
-    "path": "Cache/FF - Hs Alto Baypss.3105",
-    "sha256": "60a5ccfa1cec0564bba60f7fc849b0c8a5cf16ed0bcd11964ef34dde39b99ef7",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 8,
-    "category": "Cache",
-    "file": "FF - Hs Peito-Pescoço.3105",
-    "path": "Cache/FF - Hs Peito-Pescoço.3105",
-    "sha256": "a48ec3c9a4de295f0856ce5302e48a74593a1a8812aa2c462e558ac45c6fe174",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 9,
-    "category": "Cache",
-    "file": "FF - Hs Pescoço Baypss.3105",
-    "path": "Cache/FF - Hs Pescoço Baypss.3105",
-    "sha256": "090876b44810ed84a26475a4c7502151467903b625c49a6411031ce86a9ed864",
-    "edition": "Free Fire"
-  },
-  {
-    "id": 10,
-    "category": "Cache",
-    "file": "FFM - Hs 100- Baypss.3105",
-    "path": "Cache/FFM - Hs 100- Baypss.3105",
-    "sha256": "5fb4980bbaeab95efc4d15c5fe31e222a8c94b801b13fdaf9c3b9c14f76c25c1",
-    "edition": "Free Fire MAX"
-  },
-  {
-    "id": 11,
-    "category": "Cache",
-    "file": "FFM - Hs Alto Baypss.3105",
-    "path": "Cache/FFM - Hs Alto Baypss.3105",
-    "sha256": "8def1fa8dc05aa966a6fc72a5dc524b1aa91b21b90dc0a9608be2dfa0595fe94",
-    "edition": "Free Fire MAX"
-  },
-  {
-    "id": 12,
-    "category": "Cache",
-    "file": "FFM - Hs Peito-Pescoço.3105",
-    "path": "Cache/FFM - Hs Peito-Pescoço.3105",
-    "sha256": "7df8edbaa0b6fc0291f6bdfae041667a7ca3ee6fc966c01be336cf37f3e276cc",
-    "edition": "Free Fire MAX"
-  },
-  {
-    "id": 13,
-    "category": "Cache",
-    "file": "FFM - Hs Pescoço Baypss.3105",
-    "path": "Cache/FFM - Hs Pescoço Baypss.3105",
-    "sha256": "96dcffd1413ed3eeec29e5c75ac5116f1d84051877516953e3ee61515ad5a0af",
-    "edition": "Free Fire MAX"
-  },
-  {
-    "id": 14,
-    "category": "External",
-    "file": "FF - Painel External.3105",
-    "path": "External/FF - Painel External.3105",
-    "sha256": "1d328b49322c33cde9584ce075900e0b681e27478c1b182b89922b0e75cb1f02",
+    "file": "HSBYPASSAP.3105",
+    "path": "Avatar/HSBYPASSAP.3105",
+    "sha256": "6ba64fe8c4d6d261f3a57e032e95d9adbad9861c81aabc148666dbc9edc4ffb5",
     "edition": "Free Fire"
   }
 ]
