@@ -1511,50 +1511,6 @@ private struct ExternalPanelView: View {
                 )
             }
     }
-            .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
-            .map { url in
-                let filename = url.lastPathComponent
-                let base = filename.replacingOccurrences(of: prefix, with: "").replacingOccurrences(of: ".3105", with: "")
-                let normalized = base.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
-                let isChPainelArtifact = normalized.localizedCaseInsensitiveContains("chpainel")
-                let isPanelArtifact = normalized.localizedCaseInsensitiveContains("painel")
-                let isBoxBlueArtifact = normalized.localizedCaseInsensitiveContains("boxblue")
-                let title: String
-                let detail: String
-                if normalized.localizedCaseInsensitiveContains("painel external") {
-                    title = "Painel External"
-                    detail = "Painel External interno com validação, backup e restauração."
-                } else if isChPainelArtifact {
-                    title = "ChPainel"
-                    detail = "Painel interno com funções e configurações."
-                } else if isPanelArtifact {
-                    title = "Esp+Painel"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
-                } else if isBoxBlueArtifact {
-                    title = isFreeFireMax ? "Esp+Aimbot" : "BoxBlue"
-                    detail = isFreeFireMax
-                        ? "ESP com assistência de mira e recursos adicionais."
-                        : "Função External interna com processamento e restauração do arquivo original"
-                } else if normalized.localizedCaseInsensitiveContains("esp+aim") {
-                    title = "ESP + AIM"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
-                } else if normalized.localizedCaseInsensitiveContains("esp only") {
-                    title = "ESP ONLY"
-                    detail = "ESP sem assistência adicional de mira."
-                } else {
-                    title = "ESP"
-                    detail = "Função External interna com processamento e restauração do arquivo original"
-                }
-                return ExternalPatchFunction(
-                    id: filename,
-                    filename: filename,
-                    title: title,
-                    detail: detail,
-                    isDemoOnly: false,
-                    bundledURL: url
-                )
-            }
-    }
 
     private var editionName: String {
         isFreeFireMax ? "FREE FIRE MAX" : "FREE FIRE"
