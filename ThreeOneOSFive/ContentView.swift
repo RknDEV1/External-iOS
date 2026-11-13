@@ -379,6 +379,7 @@ private struct CHZPrivHomeView: View {
                     } else {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
+                                CHZAnimatedBanner()
                                 editionSelector
                                 kernelControlSection
                                 logo

@@ -7,7 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3105P219 /* FF - Painel External.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P119; };
+		3105R011 /* CHZBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105R010; };
+		3105Q201 /* HSALTO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105Q101; };
+		3105Q202 /* HSBYPASSAP.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105Q102; };
+		3105Q203 /* HSPEITO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105Q103; };
+		3105Q204 /* HSPESCOCO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105Q104; };
+		3105Q205 /* HSPESCOCOALTO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105Q105; };
+		3105R201 /* chz-banner-1.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R101; };
+		3105R202 /* chz-banner-2.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R102; };
+		3105R203 /* chz-banner-3.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R103; };
+		3105R204 /* chz-banner-4.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R104; };
+		3105R205 /* chz-banner-5.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R105; };
+		3105R206 /* chz-banner-6.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R106; };
+		3105R207 /* chz-banner-7.gif in Resources */ = {isa = PBXBuildFile; fileRef = 3105R107; };
 		3105L401 /* Fortnite.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3105L400; };
 		3105Z011 /* CHZAccessOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3105Z010; };
 		3105Z200 /* ChzLogin.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3105Z100; };
@@ -81,39 +93,25 @@
 		3105A228 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3105A120; };
 		3105A211 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3105A031; };
 		3105P190 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3105P090; };
-		3105P201 /* FF - Hs Alto 100-.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P101; };
-		3105P202 /* FF - Hs Alto-Antena.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P102; };
-		3105P203 /* FF - Hs Pescoço 100-.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P103; };
-		3105P204 /* FF - Hs Pescoço-Alto.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P104; };
-		3105P205 /* FF - Hs Pescoço-Antena.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P105; };
-		3105P206 /* FF - Hs 100- Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P106; };
-		3105P207 /* FF - Hs Alto Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P107; };
-		3105P208 /* FF - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P108; };
-		3105P209 /* FF - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P109; };
-		3105P213 /* FFM - Hs 100- Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P113; };
-		3105P214 /* FFM - Hs Alto Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P114; };
-		3105P215 /* FFM - Hs Peito-Pescoço.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P115; };
-		3105P216 /* FFM - Hs Pescoço Baypss.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105P116; };
 
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3105R010 /* CHZBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHZBannerView.swift; sourceTree = "<group>"; };
+		3105Q101 /* HSALTO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/HSALTO.3105"; sourceTree = "<group>"; };
+		3105Q102 /* HSBYPASSAP.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/HSBYPASSAP.3105"; sourceTree = "<group>"; };
+		3105Q103 /* HSPEITO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/HSPEITO.3105"; sourceTree = "<group>"; };
+		3105Q104 /* HSPESCOCO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/HSPESCOCO.3105"; sourceTree = "<group>"; };
+		3105Q105 /* HSPESCOCOALTO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/HSPESCOCOALTO.3105"; sourceTree = "<group>"; };
+		3105R101 /* chz-banner-1.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-1.gif"; sourceTree = "<group>"; };
+		3105R102 /* chz-banner-2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-2.gif"; sourceTree = "<group>"; };
+		3105R103 /* chz-banner-3.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-3.gif"; sourceTree = "<group>"; };
+		3105R104 /* chz-banner-4.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-4.gif"; sourceTree = "<group>"; };
+		3105R105 /* chz-banner-5.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-5.gif"; sourceTree = "<group>"; };
+		3105R106 /* chz-banner-6.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-6.gif"; sourceTree = "<group>"; };
+		3105R107 /* chz-banner-7.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "ThreeOneOSFive/CHZBanners/chz-banner-7.gif"; sourceTree = "<group>"; };
 		3105L400 /* Fortnite.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fonts/Fortnite.otf"; sourceTree = "<group>"; };
 		3105P090 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "ThreeOneOSFive/FreeFirePatches/manifest.json"; sourceTree = "<group>"; };
-		3105P101 /* FF - Hs Alto 100-.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/FF - Hs Alto 100-.3105"; sourceTree = "<group>"; };
-		3105P102 /* FF - Hs Alto-Antena.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/FF - Hs Alto-Antena.3105"; sourceTree = "<group>"; };
-		3105P103 /* FF - Hs Pescoço 100-.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/FF - Hs Pescoço 100-.3105"; sourceTree = "<group>"; };
-		3105P104 /* FF - Hs Pescoço-Alto.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/FF - Hs Pescoço-Alto.3105"; sourceTree = "<group>"; };
-		3105P105 /* FF - Hs Pescoço-Antena.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/FF - Hs Pescoço-Antena.3105"; sourceTree = "<group>"; };
-		3105P106 /* FF - Hs 100- Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs 100- Baypss.3105"; sourceTree = "<group>"; };
-		3105P107 /* FF - Hs Alto Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Alto Baypss.3105"; sourceTree = "<group>"; };
-		3105P108 /* FF - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
-		3105P109 /* FF - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FF - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
-		3105P113 /* FFM - Hs 100- Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs 100- Baypss.3105"; sourceTree = "<group>"; };
-		3105P114 /* FFM - Hs Alto Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Alto Baypss.3105"; sourceTree = "<group>"; };
-		3105P115 /* FFM - Hs Peito-Pescoço.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Peito-Pescoço.3105"; sourceTree = "<group>"; };
-		3105P116 /* FFM - Hs Pescoço Baypss.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/FFM - Hs Pescoço Baypss.3105"; sourceTree = "<group>"; };
-		3105P119 /* FF - Painel External.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/External/FF - Painel External.3105"; sourceTree = "<group>"; };
 
 		3105A010 /* 3105.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3105.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3105A020 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -456,23 +454,20 @@
                     3105L401,
                     3105A228,
                     3105P190,
-                    3105P219,
 
-				3105P201,
-				3105P202,
-				3105P203,
-				3105P204,
-				3105P205,
-				3105P206,
-				3105P207,
-				3105P208,
-					3105P209,
-					3105P213,
-				3105P214,
-				3105P215,
-				3105P216,
-				3105P217,
 
+				3105Q201,
+				3105Q202,
+				3105Q203,
+				3105Q204,
+				3105Q205,
+				3105R201,
+				3105R202,
+				3105R203,
+				3105R204,
+				3105R205,
+				3105R206,
+				3105R207,
 	                );
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -537,6 +532,7 @@
 					3105K201,
 					3105K202,
 					3105Z011,
+				3105R011,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

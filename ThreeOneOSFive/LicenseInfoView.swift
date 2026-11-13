@@ -4,6 +4,7 @@ import UIKit
 struct LicenseInfoView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject var licenseViewModel: LicenseViewModel
+    @AppStorage("chz.banner.index") private var bannerIndex = 0
 
     private var deviceIdentifier: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
@@ -33,6 +34,7 @@ struct LicenseInfoView: View {
                 licenseSection
                 deviceSection
                 securitySection
+                bannerSection
                 footerNote
             }
             .padding(.horizontal, AppTheme.pageInset)
@@ -107,6 +109,32 @@ struct LicenseInfoView: View {
             infoRow(label: "Proteção Anti-Debugging", value: "NÃO VERIFICADA", valueColor: AppTheme.secondaryText)
             divider
             infoRow(label: "Criptografia Keychain", value: "ATIVA", valueColor: AppTheme.success)
+        }
+    }
+
+    private var bannerSection: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text("BANNER ANIMADO")
+                .font(.system(size: 15, weight: .bold, design: .monospaced))
+                .tracking(0.6)
+                .foregroundStyle(AppTheme.primaryText)
+
+            VStack(alignment: .leading, spacing: 12) {
+                CHZAnimatedBanner()
+                Picker("GIF", selection: $bannerIndex) {
+                    ForEach(Array(CHZBannerCatalog.names.enumerated()), id: \.offset) { index, _ in
+                        Text("GIF \(index + 1)").tag(index)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .tint(AppTheme.accent)
+            }
+            .padding(AppTheme.contentCardPadding)
+            .background(AppTheme.cardBackground, in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
+                    .stroke(AppTheme.outline, lineWidth: 1)
+            }
         }
     }
 
