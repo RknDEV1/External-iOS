@@ -1040,7 +1040,7 @@ private struct RakiHomeView: View {
         if isFreeFireMax {
             return filename.hasPrefix("FFM -")
         }
-        return filename.hasPrefix("FF -") && !filename.hasPrefix("FFM -")
+        return !filename.hasPrefix("FFM -")
     }
 
     private func loadPatchesIfNeeded() {
@@ -1071,7 +1071,7 @@ private struct RakiHomeView: View {
                         .uppercased()
                     let belongs = selectedEditionIsMax
                         ? filename.hasPrefix("FFM -")
-                        : filename.hasPrefix("FF -") && !filename.hasPrefix("FFM -")
+                        : !filename.hasPrefix("FFM -")
                     let unavailable = selectedEditionIsMax && item.category == .external && filename.contains("ESP+AIMBOT")
                     return belongs && !unavailable
                 }
