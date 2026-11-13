@@ -379,10 +379,8 @@ private struct RakiHomeView: View {
                     } else {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
-                                RakiAnimatedBanner()
-                                editionSelector
-                                kernelControlSection
                                 logo
+                                editionSelector
                                 categoryOverview
                                 functions
                                 backupStatus
