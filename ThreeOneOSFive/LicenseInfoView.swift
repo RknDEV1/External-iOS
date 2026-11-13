@@ -4,7 +4,7 @@ import UIKit
 struct LicenseInfoView: View {
     @EnvironmentObject private var appState: AppState
     @ObservedObject var licenseViewModel: LicenseViewModel
-    @AppStorage("chz.banner.index") private var bannerIndex = 0
+    @AppStorage("raki.banner.index") private var bannerIndex = 0
 
     private var deviceIdentifier: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
@@ -120,9 +120,9 @@ struct LicenseInfoView: View {
                 .foregroundStyle(AppTheme.primaryText)
 
             VStack(alignment: .leading, spacing: 12) {
-                CHZAnimatedBanner()
+                RakiAnimatedBanner()
                 Picker("GIF", selection: $bannerIndex) {
-                    ForEach(Array(CHZBannerCatalog.names.enumerated()), id: \.offset) { index, _ in
+                    ForEach(Array(RakiBannerCatalog.names.enumerated()), id: \.offset) { index, _ in
                         Text("GIF \(index + 1)").tag(index)
                     }
                 }

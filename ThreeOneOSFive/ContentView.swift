@@ -35,7 +35,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-        CHZPrivHomeView(
+        RakiHomeView(
             isFreeFireMax: $isFreeFireMax
         )
         .appTheme()
@@ -97,7 +97,7 @@ struct ContentView: View {
     private func sectionContent(_ section: AppSection) -> some View {
         switch section {
         case .home:
-            CHZPrivHomeView(
+            RakiHomeView(
                 isFreeFireMax: $isFreeFireMax
             )
         case .files:
@@ -288,7 +288,7 @@ private struct DashboardView: View {
 
 private extension View {
     @ViewBuilder
-    func chzPrivScrollBounceBehavior() -> some View {
+    func rakiScrollBounceBehavior() -> some View {
         if #available(iOS 16.4, *) {
             self.scrollBounceBehavior(.basedOnSize)
         } else {
@@ -297,7 +297,7 @@ private extension View {
     }
 }
 
-private struct CHZPrivHomeView: View {
+private struct RakiHomeView: View {
     @Binding var isFreeFireMax: Bool
     @EnvironmentObject private var appState: AppState
     @StateObject private var licenseViewModel = LicenseViewModel()
@@ -349,8 +349,8 @@ private struct CHZPrivHomeView: View {
     @State private var pendingExternalPasswordItem: PatchLibraryItem?
     @State private var catalogDemoActive = false
     @State private var showCatalogDemoUnlock = false
-    @State private var catalogChzExternalActive = false
-    @State private var showCatalogChzExternalUnlock = false
+    @State private var catalogRakiExternalActive = false
+    @State private var showCatalogRakiExternalUnlock = false
     @State private var catalogChPainelActive = false
     @State private var showCatalogChPainelUnlock = false
     @State private var catalogModnewActive = false
@@ -379,7 +379,7 @@ private struct CHZPrivHomeView: View {
                     } else {
                         ScrollView(.vertical, showsIndicators: false) {
                             LazyVStack(alignment: .leading, spacing: 13) {
-                                CHZAnimatedBanner()
+                                RakiAnimatedBanner()
                                 editionSelector
                                 kernelControlSection
                                 logo
@@ -391,7 +391,7 @@ private struct CHZPrivHomeView: View {
                             .padding(.top, 10)
                             .padding(.bottom, 112)
                         }
-                        .chzPrivScrollBounceBehavior()
+                        .rakiScrollBounceBehavior()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -450,14 +450,14 @@ private struct CHZPrivHomeView: View {
                 }
             )
         }
-        .sheet(isPresented: $showCatalogChzExternalUnlock) {
+        .sheet(isPresented: $showCatalogRakiExternalUnlock) {
             ExternalDemoUnlockSheet(
                 expectedPassword: "chz15",
-                title: "Chz External",
-                onCancel: { showCatalogChzExternalUnlock = false },
+                title: "Raki External",
+                onCancel: { showCatalogRakiExternalUnlock = false },
                 onSuccess: {
-                    catalogChzExternalActive = validateCatalogChzExternalArtifact()
-                    showCatalogChzExternalUnlock = false
+                    catalogRakiExternalActive = validateCatalogRakiExternalArtifact()
+                    showCatalogRakiExternalUnlock = false
                 }
             )
         }
@@ -511,9 +511,9 @@ private struct CHZPrivHomeView: View {
         }
     }
 
-    private func validateCatalogChzExternalArtifact() -> Bool {
+    private func validateCatalogRakiExternalArtifact() -> Bool {
         guard let url = Bundle.main.url(forResource: "rkn", withExtension: "3105.validation") else {
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: arquivo rkn.3105 ausente", level: .warning))
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki External: arquivo rkn.3105 ausente", level: .warning))
             return false
         }
         do {
@@ -521,10 +521,10 @@ private struct CHZPrivHomeView: View {
             guard report.sha256 == "2ed6b7562efc85965efc78304df8a37f9f6daea3eb900eb509409fc5eeabf3b" else { return false }
             _ = try DevicePatchService.installExternalArtifact(report, editionKey: "catalog-free-fire-chz-external")
             try DevicePatchService.verifyExternalWorkingFile(editionKey: "catalog-free-fire-chz-external")
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: rkn.3105 validado e enviado à quarentena interna", level: .success))
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki External: rkn.3105 validado e enviado à quarentena interna", level: .success))
             return true
         } catch {
-            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Chz External: validação interna falhou", level: .warning))
+            activityLog.append(LogEntry(timestamp: Date().formatted(date: .omitted, time: .shortened), message: "Raki External: validação interna falhou", level: .warning))
             return false
         }
     }
@@ -706,7 +706,7 @@ private struct CHZPrivHomeView: View {
     }
 
     private var logo: some View {
-        CHZPrivWordmark(size: 40)
+        RakiWordmark(size: 40)
             .frame(maxWidth: .infinity)
             .padding(.top, 6)
     }
@@ -814,7 +814,7 @@ private struct CHZPrivHomeView: View {
                 }
             ))
             .labelsHidden()
-            .toggleStyle(CHZSwitchStyle())
+            .toggleStyle(RakiSwitchStyle())
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
@@ -850,7 +850,7 @@ private struct CHZPrivHomeView: View {
                 }
             ))
             .labelsHidden()
-            .toggleStyle(CHZSwitchStyle())
+            .toggleStyle(RakiSwitchStyle())
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
@@ -882,7 +882,7 @@ private struct CHZPrivHomeView: View {
                 }
             ))
             .labelsHidden()
-            .toggleStyle(CHZSwitchStyle())
+            .toggleStyle(RakiSwitchStyle())
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 5)
@@ -931,7 +931,7 @@ private struct CHZPrivHomeView: View {
                 }
             ))
                 .labelsHidden()
-                .toggleStyle(CHZSwitchStyle())
+                .toggleStyle(RakiSwitchStyle())
                 .disabled(isWorking || unavailable)
         }
         .padding(.horizontal, 14)
@@ -1322,7 +1322,7 @@ private struct CHZPrivHomeView: View {
 }
 
 
-private struct CHZSwitchStyle: ToggleStyle {
+private struct RakiSwitchStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         Button {
             withAnimation(.spring(response: 0.30, dampingFraction: 0.78)) {
@@ -1574,7 +1574,7 @@ private struct ExternalPanelView: View {
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVStack(alignment: .leading, spacing: 13) {
-                CHZPrivWordmark(size: 40)
+                RakiWordmark(size: 40)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 6)
                 editionSelector
@@ -1593,7 +1593,7 @@ private struct ExternalPanelView: View {
             .padding(.top, 10)
             .padding(.bottom, 112)
         }
-        .chzPrivScrollBounceBehavior()
+        .rakiScrollBounceBehavior()
         .scrollIndicators(.hidden)
         .background(AppTheme.pageBackground.ignoresSafeArea())
         .onAppear { refreshExternalState() }
@@ -1898,7 +1898,7 @@ private struct ExternalPanelView: View {
                 set: { handleExternalPatch(function, enabled: $0) }
             ))
             .labelsHidden()
-            .toggleStyle(CHZSwitchStyle())
+            .toggleStyle(RakiSwitchStyle())
             .disabled(workingExternalPatchID != nil)
         }
         .padding(.horizontal, 14)
@@ -2329,7 +2329,7 @@ private struct ValidationConfirmationOverlay: View {
                         .font(.system(size: 23, weight: .semibold))
                         .foregroundStyle(AppTheme.primaryText)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("CHZ PRIV / SYSTEM")
+                        Text("RAKI / SYSTEM")
                             .font(.system(size: 10, weight: .bold, design: .monospaced))
                             .tracking(1.0)
                             .foregroundStyle(AppTheme.tertiaryText)

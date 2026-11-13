@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    // Identidade CHZ PRIV: fundo preto, vermelho vivo, branco e cinza.
+    // Identidade Raki: fundo preto, vermelho vivo, branco e cinza.
     static let accent = Color(red: 1.00, green: 0.015, blue: 0.055)
     static let accentBright = Color(red: 1.00, green: 0.16, blue: 0.19)
     static let accentSoft = Color(red: 1.00, green: 0.015, blue: 0.055).opacity(0.16)
@@ -31,16 +31,23 @@ enum AppTheme {
     static let brandFontName = "BurbankBigCondensed-Black"
 }
 
-struct CHZPrivWordmark: View {
+struct RakiWordmark: View {
     var size: CGFloat = 34
 
     var body: some View {
-        Image("CHZPrivLogoFinal")
-            .resizable()
-            .scaledToFit()
-            .frame(width: max(size * 2.9, 88), height: max(size * 1.25, 38))
-            .shadow(color: AppTheme.accent.opacity(0.28), radius: 8, y: 3)
-            .accessibilityLabel("CHZ PRIV")
+        VStack(spacing: 3) {
+            Image("RakiLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: max(size * 1.25, 42), height: max(size * 0.72, 28))
+            Text("RAKI")
+                .font(.system(size: max(size * 0.34, 12), weight: .black, design: .monospaced))
+                .tracking(2.4)
+                .foregroundStyle(AppTheme.primaryText)
+        }
+        .frame(width: max(size * 2.9, 88), height: max(size * 1.45, 48))
+        .shadow(color: AppTheme.accent.opacity(0.28), radius: 8, y: 3)
+        .accessibilityLabel("RAKI")
     }
 }
 
@@ -125,7 +132,7 @@ struct AppLogo: View {
     var size: CGFloat = 44
 
     var body: some View {
-        Image("CHZPrivLogoFinal")
+        Image("RakiLogo")
             .resizable()
             .scaledToFit()
             .padding(size * 0.08)

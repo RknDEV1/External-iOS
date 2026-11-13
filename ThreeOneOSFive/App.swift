@@ -11,10 +11,6 @@ struct ThreeOneOSFiveApp: App {
     @State private var showOnboarding = false
     @State private var isFreeFireMax = false
     @State private var showAttribution = false
-    @State private var showCHZAccessOverlay = true
-    @State private var sessionAuthenticated = false
-    @State private var isRestoringSession = false
-    @State private var didEvaluateInitialSession = false
     @State private var didStartPostLoginWork = false
     @State private var updateOffer: AppUpdateChecker.Offer?
     @Environment(\.scenePhase) private var scenePhase
@@ -35,7 +31,7 @@ struct ThreeOneOSFiveApp: App {
         }
     }
 
-    private func startPostLoginWork() {
+    private func startAppWork() {
         guard !didStartPostLoginWork else { return }
         didStartPostLoginWork = true
         Task { @MainActor in
@@ -43,37 +39,6 @@ struct ThreeOneOSFiveApp: App {
             appState.detectSupport()
             checkForUpdate()
         }
-    }
-
-    private func refreshAuthenticationState() {
-        guard !sessionAuthenticated, !isRestoringSession else { return }
-        let manager = CHZAuthManager.shared()
-        guard manager.hasValidSavedSession() else {
-            showCHZAccessOverlay = true
-            return
-        }
-
-        isRestoringSession = true
-        showCHZAccessOverlay = true
-        manager.validateSavedSession(success: {
-            DispatchQueue.main.async {
-                isRestoringSession = false
-                didAuthenticate()
-            }
-        }, failure: { _ in
-            DispatchQueue.main.async {
-                manager.clearSavedSession()
-                isRestoringSession = false
-                sessionAuthenticated = false
-                showCHZAccessOverlay = true
-            }
-        })
-    }
-
-    private func didAuthenticate() {
-        sessionAuthenticated = true
-        showCHZAccessOverlay = false
-        startPostLoginWork()
     }
 
     var body: some Scene {
@@ -91,25 +56,13 @@ struct ThreeOneOSFiveApp: App {
                     .transition(.opacity)
                 }
 
-                if showCHZAccessOverlay {
-                    CHZAccessOverlay(
-                        isPresented: $showCHZAccessOverlay,
-                        isRestoringSession: isRestoringSession,
-                        onAuthenticated: didAuthenticate
-                    )
-                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
-                    .zIndex(3)
-                }
-
                 if showOnboarding {
                     OnboardingView {
                         OnboardingStore.markCompleted()
                         withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
                             showOnboarding = false
                         }
-                        if sessionAuthenticated {
-                            startPostLoginWork()
-                        }
+                        startAppWork()
                     }
                     .environment(\.appLanguage, language)
                     .environment(\.locale, language.locale)
@@ -134,13 +87,11 @@ struct ThreeOneOSFiveApp: App {
                 )
             }
             .onAppear {
-                guard !didEvaluateInitialSession else { return }
-                didEvaluateInitialSession = true
-                refreshAuthenticationState()
+                startAppWork()
             }
             .onChange(of: scenePhase) { phase in
-                guard phase == .active, !showOnboarding, !sessionAuthenticated else { return }
-                refreshAuthenticationState()
+                guard phase == .active, !showOnboarding else { return }
+                startAppWork()
             }
             .onOpenURL { url in
                 patchDraftCoordinator.presentImport(url)

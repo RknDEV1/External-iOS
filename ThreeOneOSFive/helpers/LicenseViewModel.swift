@@ -21,66 +21,6 @@ protocol LicenseSessionProviding {
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void)
 }
 
-/// Adapter between the license screen and the actual CHZLogin framework
-/// session. The screen never invents an expiration date: the framework only
-/// exposes whether the saved session is currently valid.
-#if canImport(ChzLogin)
-struct CHZLicenseSessionProvider: LicenseSessionProviding {
-    private var currentDeviceID: String {
-        UIDevice.current.identifierForVendor?.uuidString ?? "Indisponível"
-    }
-
-    func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
-        let manager = CHZAuthManager.shared()
-        let deviceID = currentDeviceID
-
-        guard manager.hasValidSavedSession() else {
-            finish(
-                LicenseSnapshot(
-                    status: .unavailable,
-                    product: "3105",
-                    expiration: nil,
-                    deviceID: deviceID
-                ),
-                completion: completion
-            )
-            return
-        }
-
-        manager.validateSavedSession(success: {
-            finish(
-                LicenseSnapshot(
-                    status: .active,
-                    product: "3105",
-                    expiration: nil,
-                    deviceID: deviceID
-                ),
-                completion: completion
-            )
-        }, failure: { _ in
-            finish(
-                LicenseSnapshot(
-                    status: .invalid,
-                    product: "3105",
-                    expiration: nil,
-                    deviceID: deviceID
-                ),
-                completion: completion
-            )
-        })
-    }
-
-    private func finish(
-        _ snapshot: LicenseSnapshot,
-        completion: @escaping (LicenseSnapshot) -> Void
-    ) {
-        DispatchQueue.main.async {
-            completion(snapshot)
-        }
-    }
-}
-#endif
-
 /// Fallback used by previews or targets that do not link the login framework.
 struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
     private var currentDeviceID: String {
@@ -89,8 +29,8 @@ struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
 
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
         let snapshot = LicenseSnapshot(
-            status: .unavailable,
-            product: "3105",
+            status: .active,
+            product: "Raki",
             expiration: nil,
             deviceID: currentDeviceID
         )
@@ -102,11 +42,7 @@ struct UnauthenticatedLicenseProvider: LicenseSessionProviding {
 
 struct DefaultLicenseSessionProvider: LicenseSessionProviding {
     func validateSavedLicense(completion: @escaping (LicenseSnapshot) -> Void) {
-#if canImport(ChzLogin)
-        CHZLicenseSessionProvider().validateSavedLicense(completion: completion)
-#else
         UnauthenticatedLicenseProvider().validateSavedLicense(completion: completion)
-#endif
     }
 }
 
@@ -126,7 +62,7 @@ final class LicenseViewModel: ObservableObject {
     var statusText: String {
         switch snapshot.status {
         case .loading: return "VERIFICANDO"
-        case .active: return "ATIVA"
+        case .active: return "LOCAL"
         case .expired: return "EXPIRADA"
         case .invalid: return "INVÁLIDA"
         case .unavailable: return "INDISPONÍVEL"
@@ -144,7 +80,7 @@ final class LicenseViewModel: ObservableObject {
     var expirationText: String {
         guard let expiration = snapshot.expiration else {
             switch snapshot.status {
-            case .active: return "SESSÃO VÁLIDA"
+            case .active: return "SEM LOGIN"
             case .loading: return "AGUARDANDO VALIDAÇÃO"
             case .expired: return "PRAZO ENCERRADO"
             case .invalid: return "REVALIDAÇÃO NECESSÁRIA"

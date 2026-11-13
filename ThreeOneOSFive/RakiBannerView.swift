@@ -2,16 +2,16 @@ import SwiftUI
 import ImageIO
 import UIKit
 
-enum CHZBannerCatalog {
+enum RakiBannerCatalog {
     static let names = (1...7).map { "chz-banner-\($0)" }
 }
 
-struct CHZAnimatedBanner: View {
-    @AppStorage("chz.banner.index") private var selectedIndex = 0
+struct RakiAnimatedBanner: View {
+    @AppStorage("raki.banner.index") private var selectedIndex = 0
 
     var body: some View {
         Group {
-            if let image = animatedImage(named: CHZBannerCatalog.names[safe: selectedIndex] ?? CHZBannerCatalog.names[0]) {
+            if let image = animatedImage(named: RakiBannerCatalog.names[safe: selectedIndex] ?? RakiBannerCatalog.names[0]) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
