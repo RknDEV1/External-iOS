@@ -97,7 +97,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3105R010 /* CHZBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHZBannerView.swift; sourceTree = "<group>"; };
+		3105R010 /* CHZBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ThreeOneOSFive/CHZBannerView.swift"; sourceTree = "<group>"; };
 		3105Q101 /* HSALTO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Avatar/HSALTO.3105"; sourceTree = "<group>"; };
 		3105Q102 /* HSBYPASSAP.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/HSBYPASSAP.3105"; sourceTree = "<group>"; };
 		3105Q103 /* HSPEITO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "ThreeOneOSFive/FreeFirePatches/Cache/HSPEITO.3105"; sourceTree = "<group>"; };
