@@ -657,8 +657,9 @@ private struct CHZPrivHomeView: View {
 
     private var bottomNavigation: some View {
         HStack(spacing: 4) {
-            bottomNavigationItem(.license, title: "Início", symbol: "house.fill")
-            bottomNavigationItem(.injector, title: "Injetor", symbol: "gamecontroller.fill")
+            bottomNavigationItem(.injector, title: "Funções", symbol: "square.grid.2x2.fill")
+            bottomNavigationItem(.external, title: "Partidas", symbol: "gamecontroller.fill")
+            bottomNavigationItem(.license, title: "Config", symbol: "person.crop.circle.fill")
         }
         .padding(5)
         .background(AppTheme.cardBackground, in: Capsule(style: .continuous))

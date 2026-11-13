@@ -10,18 +10,30 @@ struct LicenseInfoView: View {
     }
 
     private var compatibilityText: String {
-        appState.isSupported ? "COMPATÍVEL" : "INCOMPATÍVEL"
+        if appState.isSupported { return "COMPATÍVEL" }
+        if ExploitSupportPolicy.isRecognizedSystemFamily(major: AppInfo.versionTuple.major) {
+            return "NÃO VERIFICADO"
+        }
+        return "INCOMPATÍVEL"
     }
 
     private var compatibilityColor: Color {
-        appState.isSupported ? AppTheme.success : .red
+        if appState.isSupported { return AppTheme.success }
+        if ExploitSupportPolicy.isRecognizedSystemFamily(major: AppInfo.versionTuple.major) {
+            return .orange
+        }
+        return .red
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 pageHeader
+                statusCard
                 licenseSection
+                deviceSection
+                securitySection
+                footerNote
             }
             .padding(.horizontal, AppTheme.pageInset)
             .padding(.top, 18)
@@ -37,10 +49,39 @@ struct LicenseInfoView: View {
     }
 
     private var pageHeader: some View {
-        Text("INFORMAÇÕES DA LICENÇA")
+        Text("CONFIGURAÇÃO")
             .font(.system(size: 17, weight: .bold, design: .monospaced))
             .tracking(0.45)
             .foregroundStyle(AppTheme.primaryText)
+    }
+
+    private var statusCard: some View {
+        VStack(spacing: 8) {
+            Image(systemName: appState.isSupported ? "checkmark.circle.fill" : "checkmark.shield.fill")
+                .font(.system(size: 30, weight: .bold))
+                .foregroundStyle(compatibilityColor)
+            Text(compatibilityText)
+                .font(.system(size: 20, weight: .bold, design: .monospaced))
+                .foregroundStyle(AppTheme.primaryText)
+            Text("COMPATIBILIDADE DO EXPLOIT")
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .tracking(0.8)
+                .foregroundStyle(AppTheme.secondaryText)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 22)
+        .background(
+            LinearGradient(
+                colors: [compatibilityColor.opacity(0.22), AppTheme.cardBackground],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppTheme.contentCardCornerRadius, style: .continuous)
+                .stroke(compatibilityColor.opacity(0.45), lineWidth: 1)
+        }
     }
 
     private var licenseSection: some View {

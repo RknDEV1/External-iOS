@@ -32,6 +32,10 @@ enum ExploitSupportPolicy {
         return false
     }
 
+    static func isRecognizedSystemFamily(major: Int) -> Bool {
+        [17, 18, 26, 27].contains(major)
+    }
+
     static func isSupported(major: Int, minor: Int, patch: Int, build: String) -> Bool {
         if supportsKernelExploit(major: major, minor: minor, patch: patch) {
             return true
